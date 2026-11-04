@@ -89,3 +89,38 @@
     border-radius: 6px;
     background: color-mix(in srgb, var(--primary) 25%, var(--background));
 }
+
+.item-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 960px;
+}
+
+.item-form > label,
+.item-form legend {
+    font-weight: 600;
+}
+
+.item-form fieldset {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.item-row {
+    display: flex;
+    gap: 8px;
+}
+
+.item-variants {
+    overflow-x: auto;
+}
+
+.item-variants input[type="text"] {
+    width: 100%;
+    min-width: 80px;
+    box-sizing: border-box;
+}

@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS VeneficiaItems (
 CREATE TABLE IF NOT EXISTS VeneficiaItemVariants (
     itemVariantId BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     itemId BIGINT UNSIGNED NOT NULL,
-    varriantType VARCHAR(100) NOT NULL,
+    varriantType JSON NOT NULL,
     varriantName VARCHAR(150) NOT NULL,
     varriantPrice DECIMAL(10,2) NOT NULL,
     inventoryCount INT UNSIGNED NOT NULL DEFAULT 0,

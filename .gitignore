@@ -1,6 +1,9 @@
 smartftp.json
 config.php
 database/migrations/*
+# Uploaded product images live only on the server
+src/uploads/*
+!src/uploads/.htaccess
 # Real site config (has the database password) - copied from config-examples/, never commit it
 /hbHubSiteConfig.php
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,windows,macos,linux

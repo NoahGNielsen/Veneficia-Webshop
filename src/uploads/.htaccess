@@ -1,0 +1,22 @@
+# Uploaded files (product images). Nothing in here may ever run as code, and the files never change (random names),
+# so browsers can cache them for a year.
+Options -Indexes -ExecCGI
+RemoveHandler .php .phtml .phar .php3 .php4 .php5 .php7 .php8 .pl .py .cgi
+RemoveType .php .phtml .phar .php3 .php4 .php5 .php7 .php8
+
+# Only images can be fetched
+<FilesMatch "^(?!.*\.(?i:jpe?g|png|webp|gif)$)">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set Content-Security-Policy "default-src 'none'; sandbox"
+    Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>
