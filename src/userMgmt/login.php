@@ -43,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="da">
 <head>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/header.php'; ?>
-    <link rel="stylesheet" href="/assets/css/mainStyle.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/mainStyle.css') ?>">
     <link rel="stylesheet" href="/assets/css/usermgnt.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/usermgnt.css') ?>">
     <title>Log ind - Veneficia</title>
     <meta name="description" content="Log ind på din Veneficia-konto.">

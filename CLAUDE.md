@@ -12,4 +12,7 @@ Last updated 04/11-26
 - `database/migrations/*` is in `.gitignore`, so migrations are never part of a commit.
 - **Update sitemap**, when a new site that should be on visible on a search engine is added.
   Make sure to add it to sitemap.xml
+- **When the colours in `src/assets/css/mainStyle.css` change, update the header colours too.** The `theme-color`
+  metas in `src/assets/php/header.php` (light and dark) and `theme_color`/`background_color` in `src/manifest.json`
+  must match mainStyle's `--background`.
 -
