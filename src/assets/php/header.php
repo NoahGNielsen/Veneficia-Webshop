@@ -17,10 +17,6 @@
 // The canonical URL is the page's clean path without the query string, so /userMgmt/login?return=%2F counts as
 // /userMgmt/login, and /index as /. Error pages (anything that isn't a 200) are noindex, so they get none.
 //
-// The keywords tag is only there when a page sets $headerKeywords (a list of words) before including this. Google
-// ignores the tag, but Bing and the smaller search engines still read it; the
-// descriptions do most of the work.
-//
 // The font (Raleway, assets/fonts/, @font-face in mainStyle.css) is our own copy instead of Google Fonts', so the
 // first paint doesn't wait on two other servers. Its Latin file is preloaded, since the browser would otherwise only
 // find it after mainStyle.css has loaded.
@@ -54,9 +50,6 @@ if (http_response_code() === 200) {
 <?php if ($headerCanonical !== null): ?>
 <link rel="canonical" href="<?= htmlspecialchars($headerCanonical) ?>">
 <meta property="og:url" content="<?= htmlspecialchars($headerCanonical) ?>">
-<?php endif; ?>
-<?php if (!empty($headerKeywords)): ?>
-<meta name="keywords" content="<?= htmlspecialchars(implode(', ', $headerKeywords)) ?>">
 <?php endif; ?>
 <meta property="og:site_name" content="Veneficia">
 <meta property="og:type" content="website">
