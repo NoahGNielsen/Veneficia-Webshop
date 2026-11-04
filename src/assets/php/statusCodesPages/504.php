@@ -2,6 +2,7 @@
 // 504 Gateway Timeout
 if (!headers_sent()) {
     http_response_code(504);
+    header('Retry-After: 300');
 }
 ?>
 <!DOCTYPE html>

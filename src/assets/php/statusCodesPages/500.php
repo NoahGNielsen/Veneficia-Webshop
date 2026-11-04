@@ -2,6 +2,7 @@
 // 500 Internal Server Error
 if (!headers_sent()) {
     http_response_code(500);
+    header('Retry-After: 300');
 }
 ?>
 <!DOCTYPE html>

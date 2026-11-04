@@ -2,6 +2,7 @@
 // 423 Locked
 if (!headers_sent()) {
     http_response_code(423);
+    header('Retry-After: 300');
 }
 ?>
 <!DOCTYPE html>

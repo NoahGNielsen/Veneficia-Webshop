@@ -2,6 +2,7 @@
 // 502 Bad Gateway
 if (!headers_sent()) {
     http_response_code(502);
+    header('Retry-After: 300');
 }
 ?>
 <!DOCTYPE html>
