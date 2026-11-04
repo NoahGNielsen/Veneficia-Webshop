@@ -119,6 +119,11 @@ function startSession(bool $create = true): void
         sessionHandler()->lifetime = SESSION_REMEMBER_LIFETIME;
         sendSessionCookie(time() + SESSION_REMEMBER_LIFETIME);
     }
+
+    // Every page visit by a logged-in customer counts as a login, so lastLoginAt shows when they were last seen
+    if (isset($_SESSION['customerId'])) {
+        getDb()->prepare('UPDATE VeneficiaCustomers SET lastLoginAt = NOW() WHERE VeneficiaCustomerId = ?')->execute([$_SESSION['customerId']]);
+    }
 }
 
 function sendSessionCookie(int $expires): void
