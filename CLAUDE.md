@@ -15,4 +15,6 @@ Last updated 04/11-26
 - **When the colours in `src/assets/css/mainStyle.css` change, update the header colours too.** The `theme-color`
   metas in `src/assets/php/header.php` (light and dark) and `theme_color`/`background_color` in `src/manifest.json`
   must match mainStyle's `--background`.
--
+- **Functionality first, not looks.** Right now the priority is only that the site works. A CSS designer will later
+  restyle the whole site with the proper CSS, so any CSS written now exists only to make pages usable and functional,
+  not pretty. Keep it minimal and don't spend effort on visual polish.
