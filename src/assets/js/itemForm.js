@@ -1,6 +1,6 @@
-// The variant types and variant table on /admin/items. The starting state comes from the page (data-state), so a form
-// that failed validation comes back with what was typed. Everything is built with DOM calls (no innerHTML), so typed
-// text is never parsed as HTML.
+// The variant types and variant table on /admin/item. The starting state comes from the page (data-state), so an item
+// being edited shows its saved variants and a form that failed validation comes back with what was typed. Everything is
+// built with DOM calls (no innerHTML), so typed text is never parsed as HTML.
 (() => {
     const editor = document.getElementById('variantEditor');
     if (!editor) {
@@ -56,6 +56,7 @@
             el('th', { textContent: 'Standard' }),
             el('th', { textContent: 'Navn (valgfrit)' }),
             el('th', { textContent: 'Pris (kr.)' }),
+            ...(state.showStock ? [el('th', { textContent: 'Lager' })] : []),
             ...state.types.map((type, j) => el('th', { id: 'typeHead' + j, textContent: type || 'Type ' + (j + 1) })),
             el('th'),
         ]);
@@ -69,14 +70,17 @@
                 ...props,
             });
             return el('tr', {}, [
-                el('td', {}, [el('input', {
-                    type: 'radio',
-                    name: 'defaultVariant',
-                    value: i,
-                    checked: i === state.defaultVariant,
-                    ariaLabel: 'Standard-variant ' + (i + 1),
-                    onchange: () => { state.defaultVariant = i; },
-                })]),
+                el('td', {}, [
+                    el('input', { type: 'hidden', name: 'variants[' + i + '][id]', value: variant.id ?? '' }),
+                    el('input', {
+                        type: 'radio',
+                        name: 'defaultVariant',
+                        value: i,
+                        checked: i === state.defaultVariant,
+                        ariaLabel: 'Standard-variant ' + (i + 1),
+                        onchange: () => { state.defaultVariant = i; },
+                    }),
+                ]),
                 el('td', {}, [field('name', 'name', { maxLength: 150, placeholder: 'Automatisk', ariaLabel: 'Navn, variant ' + (i + 1) })]),
                 el('td', {}, [field('price', 'price', {
                     required: true,
@@ -85,6 +89,12 @@
                     placeholder: '149,95',
                     ariaLabel: 'Pris, variant ' + (i + 1),
                 })]),
+                ...(state.showStock ? [el('td', {}, [field('stock', 'stock', {
+                    required: true,
+                    inputMode: 'numeric',
+                    pattern: '\\d{1,9}',
+                    ariaLabel: 'Lager, variant ' + (i + 1),
+                })])] : []),
                 ...state.types.map((type, j) => el('td', {}, [el('input', {
                     type: 'text',
                     name: 'variants[' + i + '][values][' + j + ']',
@@ -115,7 +125,7 @@
             typesSection(),
             variantTable(),
             button('Tilføj variant (' + state.variants.length + '/' + state.maxVariants + ')', () => {
-                state.variants.push({ name: '', price: '', values: state.types.map(() => '') });
+                state.variants.push({ id: null, name: '', price: '', stock: '0', values: state.types.map(() => '') });
             }, state.variants.length >= state.maxVariants),
         );
     }
