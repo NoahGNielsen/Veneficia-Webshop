@@ -12,7 +12,7 @@
     <main class="homepage">
         <h1>TEMP PAGE</h1>
         <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
-        <h1>Welcome to Veneficia</h1>
+        <h1>Welcome to Veneficia </h1>
         <p>This is the homepage of Veneficia. Explore our website to learn more about our services and offerings.</p>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
