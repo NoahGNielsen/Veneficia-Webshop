@@ -18,7 +18,7 @@ jobs:
         server: ${{ secrets.FTP_HOST }}
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PASSWORD }}
-        protocol: ftps
+        protocol: ftp
         local-dir: src/
         # Shows every FTP command, so a failure says which step the server rejected
         log-level: verbose
