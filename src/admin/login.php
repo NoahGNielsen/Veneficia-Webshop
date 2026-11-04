@@ -3,7 +3,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 startSession();
 
 if (currentEmployee() !== null) {
-    header('Location: /admin/employees');
+    header('Location: /admin/');
     exit;
 }
 
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ->execute([password_hash($password, PASSWORD_DEFAULT), $employee['employeeID']]);
             }
             loginEmployee((int)$employee['employeeID']);
-            header('Location: /admin/employees');
+            header('Location: /admin/');
             exit;
         }
 

@@ -36,17 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen($email) > 254 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'Skriv en gyldig e-mailadresse.';
     }
-    if (mb_strlen($password) < 8) {
-        $errors[] = 'Adgangskoden skal være mindst 8 tegn.';
-    } elseif (strlen($password) > 72) {
-        // bcrypt ignores everything after 72 bytes
-        $errors[] = 'Adgangskoden må højst være 72 tegn.';
-    } elseif (isCommonPassword($password)) {
-        $errors[] = 'Den adgangskode er for almindelig. Vælg en anden.';
-    }
-    if ($password !== $passwordRepeat) {
-        $errors[] = 'De to adgangskoder er ikke ens.';
-    }
+    array_push($errors, ...newPasswordErrors($password, $passwordRepeat));
     if (empty($_POST['acceptTerms'])) {
         $errors[] = 'Du skal acceptere handelsbetingelserne og privatlivspolitikken.';
     }

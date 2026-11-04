@@ -257,6 +257,14 @@ function logoutOtherSessions(int $customerId): void
         ->execute([$customerId, VeneficiaSessionHandler::hashId(session_id())]);
 }
 
+// Logs the employee out on every device except this one, e.g. after they changed their password
+function logoutOtherEmployeeSessions(int $employeeId): void
+{
+    getDb()
+        ->prepare('DELETE FROM VeneficiaSessions WHERE employeeId = ? AND sessionID <> ?')
+        ->execute([$employeeId, VeneficiaSessionHandler::hashId(session_id())]);
+}
+
 function csrfToken(): string
 {
     startSession();

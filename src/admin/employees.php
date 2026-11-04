@@ -18,17 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($username === '' || mb_strlen($username) > 100) {
         $errors[] = 'Skriv et brugernavn (højst 100 tegn).';
     }
-    if (mb_strlen($password) < 8) {
-        $errors[] = 'Adgangskoden skal være mindst 8 tegn.';
-    } elseif (strlen($password) > 72) {
-        // bcrypt ignores everything after 72 bytes
-        $errors[] = 'Adgangskoden må højst være 72 tegn.';
-    } elseif (isCommonPassword($password)) {
-        $errors[] = 'Den adgangskode er for almindelig. Vælg en anden.';
-    }
-    if ($password !== $passwordRepeat) {
-        $errors[] = 'De to adgangskoder er ikke ens.';
-    }
+    array_push($errors, ...newPasswordErrors($password, $passwordRepeat));
 
     if (!$errors) {
         try {
@@ -58,13 +48,7 @@ $employees = getDb()->query('SELECT employeeID, employeeUsername FROM VeneficiaE
     <meta name="robots" content="noindex">
 </head>
 <body>
-    <header class="admin-bar">
-        <span>Logget ind som <strong><?= htmlspecialchars($employee['employeeUsername']) ?></strong></span>
-        <form method="post" action="/admin/logout">
-            <input type="hidden" name="csrfToken" value="<?= htmlspecialchars(csrfToken()) ?>">
-            <button type="submit">Log ud</button>
-        </form>
-    </header>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/adminBar.php'; ?>
     <main class="admin-page">
         <section>
             <h1>Medarbejdere</h1>
