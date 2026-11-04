@@ -6,7 +6,7 @@ startSession(false);
 <html lang="da">
 <head>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/header.php'; ?>
-    <link rel="stylesheet" href="/assets/css/mainStyle.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/mainStyle.css') ?>">
+    <link rel="stylesheet" href="/assets/css/homepage.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/homepage.css') ?>">
     <title>Homepage - Veneficia</title>
     <meta name="description" content="">
     <meta property="og:title" content="Homepage - Veneficia">
