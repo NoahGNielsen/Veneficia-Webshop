@@ -1,3 +1,7 @@
+<?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
+startSession(false);
+?>
 <!DOCTYPE html>
 <html lang="da">
 <head>
@@ -12,8 +16,8 @@
     <main class="homepage">
         <h1>TEMP PAGE</h1>
         <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
-        <h1>Welcome to Veneficia </h1>
-        <p>This is the homepage of Veneficia. Explore our website to learn more about our services and offerings.</p>
+        <h1>Velkommen til Veneficia</h1>
+        <p>Dette er hjemmesiden for Veneficia. Udforsk vores website for at lære mere om vores tjenester og tilbud.</p>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>

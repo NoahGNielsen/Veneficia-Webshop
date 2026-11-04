@@ -198,9 +198,14 @@ CREATE TABLE IF NOT EXISTS VeneficiaSessions (
     sessionID VARCHAR(128) NOT NULL,
     customerId BIGINT UNSIGNED NULL,
     employeeId BIGINT UNSIGNED NULL,
+    sessionData MEDIUMBLOB NOT NULL,
     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    lastActivityAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ValidUntil DATETIME NOT NULL,
+    ipAddress VARCHAR(45) NULL,
+    userAgent VARCHAR(255) NULL,
     PRIMARY KEY (sessionID),
+    KEY ix_VeneficiaSessions_ValidUntil (ValidUntil),
     CONSTRAINT fk_VeneficiaSessions_customer
         FOREIGN KEY (customerId) REFERENCES VeneficiaCustomers (VeneficiaCustomerId)
         ON DELETE CASCADE,
