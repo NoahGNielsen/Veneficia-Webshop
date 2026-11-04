@@ -77,12 +77,9 @@ CREATE TABLE IF NOT EXISTS VeneficiaItems (
     itemId BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     itemName VARCHAR(200) NOT NULL,
     itemDescription TEXT NULL,
-    categoryId BIGINT UNSIGNED NOT NULL,
+    itemOptions JSON NULL,
     itemDefaultVariant BIGINT UNSIGNED NULL,
-    PRIMARY KEY (itemId),
-    CONSTRAINT fk_VeneficiaItems_category
-        FOREIGN KEY (categoryId) REFERENCES VeneficiaCategories (categoryId)
-        ON DELETE RESTRICT
+    PRIMARY KEY (itemId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS VeneficiaItemVariants (
