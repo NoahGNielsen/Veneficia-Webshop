@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS VeneficiaEmployees (
     employeeID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     employeeUsername VARCHAR(100) NOT NULL,
     passwordHash VARCHAR(255) NOT NULL,
-    PRIMARY KEY (employeeID)
+    PRIMARY KEY (employeeID),
+    UNIQUE KEY uq_VeneficiaEmployees_employeeUsername (employeeUsername)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS VeneficiaDiscountCodes (

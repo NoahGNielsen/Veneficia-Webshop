@@ -155,6 +155,18 @@ function loginCustomer(int $customerId, bool $rememberMe): void
     getDb()->prepare('UPDATE VeneficiaCustomers SET lastLoginAt = NOW() WHERE VeneficiaCustomerId = ?')->execute([$customerId]);
 }
 
+// Employees get a fresh session of their own (no "Husk mig"), so an admin login never lasts longer than 2 hours idle
+function loginEmployee(int $employeeId): void
+{
+    startSession();
+    session_regenerate_id(true);
+    $_SESSION = [
+        'employeeId' => $employeeId,
+        'csrfToken' => bin2hex(random_bytes(32)),
+    ];
+    sessionHandler()->lifetime = SESSION_DEFAULT_LIFETIME;
+}
+
 function logout(): void
 {
     startSession(false);
@@ -191,6 +203,33 @@ function requireCustomer(): array
         exit;
     }
     return $customer;
+}
+
+// The logged-in employee (id, username), or null. Only works once startSession() has run.
+function currentEmployee(): ?array
+{
+    static $employee = false;
+    if ($employee === false) {
+        $employee = null;
+        if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['employeeId'])) {
+            $stmt = getDb()->prepare('SELECT employeeID, employeeUsername FROM VeneficiaEmployees WHERE employeeID = ?');
+            $stmt->execute([$_SESSION['employeeId']]);
+            $employee = $stmt->fetch() ?: null;
+        }
+    }
+    return $employee;
+}
+
+// Sends visitors who aren't logged in as an employee to the admin login page
+function requireEmployee(): array
+{
+    startSession(false);
+    $employee = currentEmployee();
+    if ($employee === null) {
+        header('Location: /admin/login');
+        exit;
+    }
+    return $employee;
 }
 
 // All active sessions (devices) for a customer, newest activity first

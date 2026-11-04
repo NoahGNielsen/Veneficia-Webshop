@@ -1,0 +1,57 @@
+.admin-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: var(--primary);
+}
+
+.admin-bar form {
+    margin: 0;
+}
+
+.admin-bar button {
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 48px 16px;
+}
+
+.admin-page h1,
+.admin-page h2 {
+    margin: 0 0 8px;
+}
+
+.admin-table {
+    border-collapse: collapse;
+    min-width: 280px;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--primary);
+    text-align: left;
+}
+
+.admin-success {
+    margin: 0 0 8px;
+    padding: 10px;
+    border-left: 4px solid var(--primary);
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--primary) 25%, var(--background));
+}

@@ -1,24 +1,11 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/passwords.php';
 startSession();
 
 if (currentCustomer() !== null) {
     header('Location: /');
     exit;
-}
-
-function isCommonPassword(string $password): bool
-{
-    $needle = mb_strtolower($password);
-    $file = fopen($_SERVER['DOCUMENT_ROOT'] . '/assets/commonPasswords.txt', 'r');
-    while (($line = fgets($file)) !== false) {
-        if (mb_strtolower(trim($line)) === $needle) {
-            fclose($file);
-            return true;
-        }
-    }
-    fclose($file);
-    return false;
 }
 
 $errors = [];
