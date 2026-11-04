@@ -18,3 +18,7 @@ Last updated 04/11-26
 - **Functionality first, not looks.** Right now the priority is only that the site works. A CSS designer will later
   restyle the whole site with the proper CSS, so any CSS written now exists only to make pages usable and functional,
   not pretty. Keep it minimal and don't spend effort on visual polish.
+- **Security has very high priority.** Always check changes for security holes (SQL injection, XSS, CSRF, auth and
+  access-control flaws, unsafe file handling, leaked secrets etc.) and fix them.
+- **Page speed has fairly high priority.** Always spend time optimising what you touch (efficient queries, no
+  unnecessary requests or heavy assets, caching where it makes sense).
