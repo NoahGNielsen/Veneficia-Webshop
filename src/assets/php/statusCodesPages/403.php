@@ -1,0 +1,23 @@
+<?php
+// 403 Forbidden
+if (!headers_sent()) {
+    http_response_code(403);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/header.php'; ?>
+    <link rel="stylesheet" href="/assets/css/statusCodePage.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/statusCodePage.css') ?>">
+    <title>Access denied - Veneficia</title>
+    <meta name="robots" content="noindex">
+</head>
+<body>
+    <main class="status-page">
+        <p class="status-code">403</p>
+        <h1>Access denied</h1>
+        <p class="status-message">You don't have permission to view this page.<br>Either you are not logged in or your account does not have the necessary permissions.</p>
+    </main>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
+</body>
+</html>

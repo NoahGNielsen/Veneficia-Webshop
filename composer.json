@@ -1,0 +1,15 @@
+{
+    "name": "Veneficia Webshop",
+    "description": "A modern e-commerce solution for the Veneficia brand",
+    "type": "project",
+    "license": "Apache-2.0",
+    "require": {},
+    "authors": [
+        {
+            "name": "Noah G. Nielsen",
+            "email": "noah@noahgajnielsen.dk",
+            "homepage": "https://noahgajnielsen.dk",
+            "role": "Lead Developer"
+        }
+    ]
+}

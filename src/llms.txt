@@ -1,0 +1,9 @@
+## Avoid
+
+- /admin
+- /assets/php
+- /cron
+
+## Contact
+
+[admin@noahgajnielsen.dk](mailto:admin@noahgajnielsen.dk)
