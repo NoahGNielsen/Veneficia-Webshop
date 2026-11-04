@@ -5,7 +5,7 @@ require_once __DIR__ . '/db.php';
 
 const SESSION_COOKIE_NAME = 'VeneficiaSession';
 const SESSION_DEFAULT_LIFETIME = 7200;      // 2 hours since last activity
-const SESSION_REMEMBER_LIFETIME = 2592000;  // 30 days when "Husk mig" is ticked
+const SESSION_REMEMBER_LIFETIME = 31536000; // 1 year when "Husk mig" is ticked
 
 class VeneficiaSessionHandler implements SessionHandlerInterface, SessionUpdateTimestampHandlerInterface
 {

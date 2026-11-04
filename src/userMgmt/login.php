@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" id="password" name="password" autocomplete="current-password" required>
 
             <label class="auth-checkbox">
-                <input type="checkbox" name="rememberMe" value="1"> Husk mig i 30 dage
+                <input type="checkbox" name="rememberMe" value="1"> Husk mig
             </label>
 
             <button type="submit">Log ind</button>
