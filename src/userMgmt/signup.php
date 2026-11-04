@@ -26,6 +26,7 @@ $firstName = '';
 $lastName = '';
 $email = '';
 $newsLetterConsent = false;
+$rememberMe = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstName = trim($_POST['firstName'] ?? '');
@@ -34,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = (string)($_POST['password'] ?? '');
     $passwordRepeat = (string)($_POST['passwordRepeat'] ?? '');
     $newsLetterConsent = !empty($_POST['newsLetterConsent']);
+    $rememberMe = !empty($_POST['rememberMe']);
 
     if (!checkCsrf($_POST['csrfToken'] ?? null)) {
         $errors[] = 'Siden var udløbet. Prøv igen.';
@@ -68,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'INSERT INTO VeneficiaCustomers (email, firstName, lastName, passwordHash, newsLetterConsent, newsLetterConsentAt)
                  VALUES (?, ?, ?, ?, ?, ' . ($newsLetterConsent ? 'NOW()' : 'NULL') . ')'
             )->execute([$email, $firstName, $lastName, password_hash($password, PASSWORD_DEFAULT), (int)$newsLetterConsent]);
-            loginCustomer((int)getDb()->lastInsertId(), false);
+            loginCustomer((int)getDb()->lastInsertId(), $rememberMe);
             header('Location: /');
             exit;
         } catch (PDOException $e) {
@@ -122,6 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <label class="auth-checkbox">
                 <input type="checkbox" name="newsLetterConsent" value="1" <?= $newsLetterConsent ? 'checked' : '' ?>> Ja tak, send mig nyhedsbrevet
+            </label>
+            <label class="auth-checkbox">
+                <input type="checkbox" name="rememberMe" value="1" <?= $rememberMe ? 'checked' : '' ?>> Husk mig
             </label>
             <label class="auth-checkbox">
                 <input type="checkbox" name="acceptTerms" value="1" required> Jeg accepterer <a href="/legal/terms">handelsbetingelserne</a> og <a href="/legal/privacy">privatlivspolitikken</a>
