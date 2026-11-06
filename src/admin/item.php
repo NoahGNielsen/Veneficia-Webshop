@@ -373,6 +373,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Tags already used on any item, as suggestions for the tags field. Fetched here so a successful save skips it.
+$knownTags = [];
+$storedTags = $db->query("SELECT JSON_EXTRACT(itemOptions, '\$.tags') FROM VeneficiaItems WHERE itemOptions IS NOT NULL")->fetchAll(PDO::FETCH_COLUMN);
+foreach ($storedTags as $itemTags) {
+    foreach (json_decode((string)$itemTags, true) ?: [] as $tag) {
+        $knownTags[mb_strtolower($tag)] ??= $tag;
+    }
+}
+$knownTags = array_values($knownTags);
+sort($knownTags, SORT_NATURAL | SORT_FLAG_CASE);
+
 $editorState = ['types' => $form['types'], 'variants' => $form['variants'], 'defaultVariant' => $form['defaultVariant'], 'maxVariants' => ITEM_MAX_VARIANTS, 'maxTypes' => ITEM_MAX_TYPES, 'showStock' => $itemId !== null];
 $jsPath = '/assets/js/itemForm.js';
 $heading = $itemId === null ? 'Ny vare' : 'Ret vare';
@@ -424,7 +435,9 @@ $heading = $itemId === null ? 'Ny vare' : 'Ret vare';
             </fieldset>
 
             <label for="tags">Tags (adskilt med komma)</label>
-            <input type="text" id="tags" name="tags" maxlength="1100" placeholder="fx sommer, bomuld" value="<?= htmlspecialchars($form['tags']) ?>">
+            <div class="item-tags">
+                <input type="text" id="tags" name="tags" maxlength="1100" placeholder="fx sommer, bomuld" value="<?= htmlspecialchars($form['tags']) ?>" data-known-tags="<?= htmlspecialchars(json_encode($knownTags, JSON_UNESCAPED_UNICODE)) ?>">
+            </div>
 
             <?php if ($storedImages): ?>
                 <fieldset>

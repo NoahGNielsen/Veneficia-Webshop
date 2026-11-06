@@ -148,6 +148,37 @@
     gap: 8px;
 }
 
+.item-tags {
+    position: relative;
+}
+
+.item-tags input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.item-tag-list {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--primary);
+    background: var(--background);
+    list-style: none;
+}
+
+.item-tag-list li {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.item-tag-list li:hover,
+.item-tag-list li[aria-selected="true"] {
+    background: color-mix(in srgb, var(--primary) 25%, var(--background));
+}
+
 .item-images {
     display: flex;
     flex-wrap: wrap;

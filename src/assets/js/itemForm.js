@@ -1,4 +1,4 @@
-// The variant types and variant table on /admin/item. The starting state comes from the page (data-state), so an item
+// The variant types, variant table and tag suggestions on /admin/item. The starting state comes from the page (data-state), so an item
 // being edited shows its saved variants and a form that failed validation comes back with what was typed. Everything is
 // built with DOM calls (no innerHTML), so typed text is never parsed as HTML.
 (() => {
@@ -130,5 +130,100 @@
         );
     }
 
+    // While typing in the comma-separated tags field, tags from other items pop up and can be picked. A tag that isn't
+    // on the list is just typed out, and the server saves it as a new tag.
+    function tagSuggestions() {
+        const input = document.getElementById('tags');
+        const knownTags = JSON.parse(input.dataset.knownTags);
+        if (!knownTags.length) {
+            return;
+        }
+
+        const list = el('ul', { id: 'tagSuggestions', className: 'item-tag-list', hidden: true });
+        list.setAttribute('role', 'listbox');
+        list.setAttribute('aria-label', 'Tidligere tags');
+        input.after(list);
+        input.setAttribute('role', 'combobox');
+        input.setAttribute('aria-autocomplete', 'list');
+        input.setAttribute('aria-controls', list.id);
+        input.setAttribute('aria-expanded', 'false');
+        input.autocomplete = 'off';
+
+        let active = -1;
+        let range = { start: 0, end: 0 }; // Where in the field the tag being typed is
+
+        const setActive = (index) => {
+            active = index;
+            [...list.children].forEach((option, i) => option.setAttribute('aria-selected', String(i === index)));
+            if (index >= 0) {
+                input.setAttribute('aria-activedescendant', list.children[index].id);
+            } else {
+                input.removeAttribute('aria-activedescendant');
+            }
+        };
+
+        const close = () => {
+            setActive(-1);
+            list.hidden = true;
+            input.setAttribute('aria-expanded', 'false');
+        };
+
+        const pick = (tag) => {
+            const after = input.value.slice(range.end);
+            const text = input.value.slice(0, range.start) + (range.start ? ' ' : '') + tag + (after ? '' : ', ');
+            input.value = text + after;
+            input.setSelectionRange(text.length, text.length);
+            close();
+        };
+
+        const update = () => {
+            const caret = input.selectionStart;
+            const comma = input.value.indexOf(',', caret);
+            range = { start: input.value.slice(0, caret).lastIndexOf(',') + 1, end: comma === -1 ? input.value.length : comma };
+
+            const typed = input.value.slice(range.start, range.end).trim().toLowerCase();
+            const used = input.value.split(',').map((tag) => tag.trim().toLowerCase());
+            const matches = typed === '' ? [] : knownTags
+                .filter((tag) => tag.toLowerCase().includes(typed) && !used.includes(tag.toLowerCase()))
+                .slice(0, 10);
+
+            list.replaceChildren(...matches.map((tag, i) => {
+                const option = el('li', {
+                    id: 'tagSuggestion' + i,
+                    textContent: tag,
+                    onmousedown: (e) => e.preventDefault(), // Keeps focus in the field, so blur doesn't close the list first
+                    onclick: () => pick(tag),
+                });
+                option.setAttribute('role', 'option');
+                return option;
+            }));
+            setActive(-1);
+            list.hidden = !matches.length;
+            input.setAttribute('aria-expanded', String(!list.hidden));
+        };
+
+        input.addEventListener('input', update);
+        input.addEventListener('blur', close);
+        input.addEventListener('keydown', (e) => {
+            if (list.hidden) {
+                return;
+            }
+            const count = list.children.length;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActive((active + 1) % count);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActive(active <= 0 ? count - 1 : active - 1);
+            } else if (e.key === 'Enter' && active >= 0) {
+                e.preventDefault(); // Picks the tag instead of submitting the form
+                pick(list.children[active].textContent);
+            } else if (e.key === 'Escape') {
+                close();
+            }
+        });
+    }
+
     render();
+    tagSuggestions();
 })();
