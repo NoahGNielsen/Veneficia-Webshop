@@ -82,10 +82,13 @@ if (isset($_GET['id'])) {
         $form['imageOrder'][(int)$row['attachmentId']] = count($form['imageOrder']) + 1;
     }
 
+    $stmt = $db->prepare('SELECT t.tagName FROM VeneficiaItemTags it JOIN VeneficiaTags t ON t.tagId = it.tagId WHERE it.itemId = ? ORDER BY t.tagName');
+    $stmt->execute([$itemId]);
+
     $form['name'] = $item['itemName'];
     $form['description'] = (string)$item['itemDescription'];
     $form['categories'] = array_map('intval', $options['categories'] ?? []);
-    $form['tags'] = implode(', ', $options['tags'] ?? []);
+    $form['tags'] = implode(', ', $stmt->fetchAll(PDO::FETCH_COLUMN));
     $form['types'] = $types;
     $form['variants'] = array_values($storedVariants) ?: $form['variants'];
     $form['defaultVariant'] = (int)array_search((int)$item['itemDefaultVariant'], array_keys($storedVariants), true);
@@ -265,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
-        $itemOptions = json_encode(['categories' => $form['categories'], 'tags' => $tags, 'variantTypes' => $form['types']], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $itemOptions = json_encode(['categories' => $form['categories'], 'variantTypes' => $form['types']], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         $description = $form['description'] === '' ? null : $form['description'];
         $keptImages = array_diff_key($form['imageOrder'], array_flip($form['removeImages']));
         asort($keptImages);
@@ -332,6 +335,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $db->prepare('UPDATE VeneficiaItems SET itemDefaultVariant = ? WHERE itemId = ?')->execute([$defaultVariantId, $itemId]);
 
+            // New tags are created, and a tag that already exists keeps its spelling (the unique key ignores case)
+            $db->prepare('DELETE FROM VeneficiaItemTags WHERE itemId = ?')->execute([$itemId]);
+            if ($tags) {
+                $db->prepare('INSERT IGNORE INTO VeneficiaTags (tagName) VALUES ' . implode(',', array_fill(0, count($tags), '(?)')))->execute($tags);
+                $marks = implode(',', array_fill(0, count($tags), '?'));
+                $db->prepare("INSERT INTO VeneficiaItemTags (tagId, itemId) SELECT tagId, ? FROM VeneficiaTags WHERE tagName IN ($marks)")->execute([$itemId, ...$tags]);
+            }
+
             // The link in VeneficiaItemAttachments goes with the attachment (ON DELETE CASCADE)
             $deleteAttachment = $db->prepare('DELETE FROM VeneficiaAttachments WHERE attachmentId = ?');
             foreach ($form['removeImages'] as $id) {
@@ -374,15 +385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Tags already used on any item, as suggestions for the tags field. Fetched here so a successful save skips it.
-$knownTags = [];
-$storedTags = $db->query("SELECT JSON_EXTRACT(itemOptions, '\$.tags') FROM VeneficiaItems WHERE itemOptions IS NOT NULL")->fetchAll(PDO::FETCH_COLUMN);
-foreach ($storedTags as $itemTags) {
-    foreach (json_decode((string)$itemTags, true) ?: [] as $tag) {
-        $knownTags[mb_strtolower($tag)] ??= $tag;
-    }
-}
-$knownTags = array_values($knownTags);
-sort($knownTags, SORT_NATURAL | SORT_FLAG_CASE);
+$knownTags = $db->query('SELECT t.tagName FROM VeneficiaTags t WHERE EXISTS (SELECT 1 FROM VeneficiaItemTags it WHERE it.tagId = t.tagId) ORDER BY t.tagName')->fetchAll(PDO::FETCH_COLUMN);
 
 $editorState = ['types' => $form['types'], 'variants' => $form['variants'], 'defaultVariant' => $form['defaultVariant'], 'maxVariants' => ITEM_MAX_VARIANTS, 'maxTypes' => ITEM_MAX_TYPES, 'showStock' => $itemId !== null];
 $jsPath = '/assets/js/itemForm.js';

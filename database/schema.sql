@@ -257,3 +257,25 @@ CREATE TABLE IF NOT EXISTS VeneficiaItemAttachments (
         FOREIGN KEY (attachmentId) REFERENCES VeneficiaAttachments (attachmentId)
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- danish_ci: tags differing only in case are the same tag, but æ, ø and å stay separate letters (unicode_ci treats å as a)
+CREATE TABLE IF NOT EXISTS VeneficiaTags (
+    tagId BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    tagName VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_danish_ci NOT NULL,
+    PRIMARY KEY (tagId),
+    UNIQUE KEY uq_VeneficiaTags_tagName (tagName)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- tagId first in the key, so finding every item with a tag is a single index range
+CREATE TABLE IF NOT EXISTS VeneficiaItemTags (
+    tagId BIGINT UNSIGNED NOT NULL,
+    itemId BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (tagId, itemId),
+    KEY ix_VeneficiaItemTags_itemId (itemId),
+    CONSTRAINT fk_VeneficiaItemTags_tag
+        FOREIGN KEY (tagId) REFERENCES VeneficiaTags (tagId)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_VeneficiaItemTags_item
+        FOREIGN KEY (itemId) REFERENCES VeneficiaItems (itemId)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
