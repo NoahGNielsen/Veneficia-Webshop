@@ -18,6 +18,7 @@ startSession(false);
         <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
         <h1>Velkommen til Veneficia</h1>
         <p>Dette er hjemmesiden for Veneficia. Udforsk vores website for at lære mere om vores tjenester og tilbud.</p>
+        <a href="/products">Se vores produkter</a>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>
