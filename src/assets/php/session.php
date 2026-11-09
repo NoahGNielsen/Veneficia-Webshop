@@ -141,6 +141,8 @@ function sendSessionCookie(int $expires): void
 function loginCustomer(int $customerId, bool $rememberMe): void
 {
     startSession();
+    // A basket filled before logging in is kept
+    $guestBasket = is_array($_SESSION['basket'] ?? null) ? $_SESSION['basket'] : [];
     // New id on login, so a session id planted before login is worthless afterwards
     session_regenerate_id(true);
     $_SESSION = [
@@ -153,6 +155,10 @@ function loginCustomer(int $customerId, bool $rememberMe): void
         sendSessionCookie(time() + SESSION_REMEMBER_LIFETIME);
     }
     getDb()->prepare('UPDATE VeneficiaCustomers SET lastLoginAt = NOW() WHERE VeneficiaCustomerId = ?')->execute([$customerId]);
+    if ($guestBasket) {
+        require_once __DIR__ . '/basket.php';
+        mergeGuestBasket($guestBasket);
+    }
 }
 
 // Employees get a fresh session of their own (no "Husk mig"), so an admin login never lasts longer than 2 hours idle

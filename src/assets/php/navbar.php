@@ -1,11 +1,13 @@
 <?php
 // Shows the login state if the page called startSession() before its output (navbar is included mid-page, too late
 // to start a session itself)
-require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/basket.php';
 $navCustomer = currentCustomer();
+$navBasketCount = basketCount();
 ?>
 <nav class="navbar">
     <a href="/products">Produkter</a>
+    <a href="/basket">Kurv<?= $navBasketCount > 0 ? ' (' . $navBasketCount . ')' : '' ?></a>
     <?php if ($navCustomer !== null): ?>
         <span>Hej, <?= htmlspecialchars($navCustomer['firstName']) ?></span>
         <form method="post" action="/userMgmt/logout">

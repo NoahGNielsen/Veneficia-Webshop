@@ -2,7 +2,10 @@
 // One product: /product?id=5. Shows its images, description, tags and every variant with price and stock.
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/products.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/basket.php';
 startSession(false);
+$basketMessage = takeBasketMessage();
+$basketToken = session_status() === PHP_SESSION_ACTIVE ? csrfToken() : '';
 
 $db = getDb();
 $itemId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -146,6 +149,33 @@ $structuredData = array_filter($structuredData, fn($v) => $v !== null);
                 <?php endforeach; ?>
             </tbody>
         </table>
+
+        <?php if ($basketMessage !== null): ?>
+            <p role="status"><?= htmlspecialchars($basketMessage) ?> <a href="/basket">Gå til kurven</a></p>
+        <?php endif; ?>
+        <?php if ($inStock): ?>
+            <form class="product-add" method="post" action="/basket">
+                <?php // Guests without a session have no token yet; /basket checks the Origin header for them instead ?>
+                <input type="hidden" name="csrfToken" value="<?= htmlspecialchars($basketToken) ?>">
+                <input type="hidden" name="action" value="add">
+                <?php if (count($variants) > 1): ?>
+                    <label for="variantId">Variant</label>
+                    <select id="variantId" name="variantId" required>
+                        <?php foreach ($variants as $variant): ?>
+                            <option value="<?= (int)$variant['itemVariantId'] ?>" <?= (int)$variant['inventoryCount'] > 0 ? '' : 'disabled' ?>>
+                                <?= htmlspecialchars($types ? implode(' / ', $variant['values']) : $variant['varriantName']) ?>
+                                - <?= formatPrice($variant['varriantPrice']) ?><?= (int)$variant['inventoryCount'] > 0 ? '' : ' (udsolgt)' ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php else: ?>
+                    <input type="hidden" name="variantId" value="<?= (int)$variants[0]['itemVariantId'] ?>">
+                <?php endif; ?>
+                <label for="amount">Antal</label>
+                <input type="number" id="amount" name="amount" value="1" min="1" max="<?= BASKET_MAX_AMOUNT ?>" required>
+                <button type="submit">Læg i kurv</button>
+            </form>
+        <?php endif; ?>
 
         <?php if ($tags): ?>
             <h2>Tags</h2>
