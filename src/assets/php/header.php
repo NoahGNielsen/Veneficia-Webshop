@@ -15,7 +15,9 @@
 // (the icons, until they're made) gets no ?v= instead of a warning.
 //
 // The canonical URL is the page's clean path without the query string, so /userMgmt/login?return=%2F counts as
-// /userMgmt/login, and /index as /. Error pages (anything that isn't a 200) are noindex, so they get none.
+// /userMgmt/login, and /index as /. Error pages (anything that isn't a 200) are noindex, so they get none. A page whose
+// query string picks the content (/product?id=5) sets $headerCanonicalPath to its own path and query before including
+// this.
 //
 // The font (Raleway, assets/fonts/, @font-face in mainStyle.css) is our own copy instead of Google Fonts', so the
 // first paint doesn't wait on two other servers. Its Latin file is preloaded, since the browser would otherwise only
@@ -26,9 +28,13 @@ $headerVersion = fn(string $path): string => is_file(__DIR__ . '/../..' . $path)
 
 $headerCanonical = null;
 if (http_response_code() === 200) {
-    $headerPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-    $headerPath = is_string($headerPath) && str_starts_with($headerPath, '/') ? $headerPath : '/';
-    $headerCanonical = 'https://veneficia.noahgajnielsen.dk' . preg_replace('~(^|/)index$~', '$1', $headerPath);
+    if (isset($headerCanonicalPath)) {
+        $headerCanonical = 'https://veneficia.noahgajnielsen.dk' . $headerCanonicalPath;
+    } else {
+        $headerPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        $headerPath = is_string($headerPath) && str_starts_with($headerPath, '/') ? $headerPath : '/';
+        $headerCanonical = 'https://veneficia.noahgajnielsen.dk' . preg_replace('~(^|/)index$~', '$1', $headerPath);
+    }
 }
 ?>
 <meta charset="UTF-8">

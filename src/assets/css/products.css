@@ -1,0 +1,13 @@
+/* Functional only, the real design comes later */
+.products-page, .product-page { padding: 1rem; }
+.product-grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+.product-card { display: flex; flex-direction: column; gap: .25rem; }
+.product-card a { display: flex; flex-direction: column; gap: .25rem; }
+.product-card img, .product-noimage { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
+.product-noimage { display: flex; align-items: center; justify-content: center; border: 1px solid; }
+.product-images { display: flex; gap: .5rem; overflow-x: auto; }
+.product-images img { width: min(400px, 80vw); height: auto; aspect-ratio: 1; object-fit: cover; flex: none; }
+.product-variants { border-collapse: collapse; }
+.product-variants th, .product-variants td { border: 1px solid; padding: .25rem .5rem; text-align: left; }
+.product-tags { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.product-pages { display: flex; gap: 1rem; margin-top: 1rem; }

@@ -5,6 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 $navCustomer = currentCustomer();
 ?>
 <nav class="navbar">
+    <a href="/products">Produkter</a>
     <?php if ($navCustomer !== null): ?>
         <span>Hej, <?= htmlspecialchars($navCustomer['firstName']) ?></span>
         <form method="post" action="/userMgmt/logout">
