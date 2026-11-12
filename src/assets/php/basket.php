@@ -46,7 +46,7 @@ function basketItems(): array
     }
     $placeholders = implode(',', array_fill(0, count($lines), '?'));
     $stmt = getDb()->prepare(
-        "SELECT v.itemVariantId, v.itemId, v.varriantName, v.varriantPrice, v.inventoryCount, i.itemName
+        "SELECT v.itemVariantId, v.itemId, v.varriantName, v.varriantPrice, v.varriantWeight, v.inventoryCount, i.itemName
          FROM VeneficiaItemVariants v JOIN VeneficiaItems i ON i.itemId = v.itemId
          WHERE v.itemVariantId IN ($placeholders)"
     );

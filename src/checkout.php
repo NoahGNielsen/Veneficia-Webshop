@@ -8,15 +8,29 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/discounts.php';
 $customer = requireCustomer('/checkout');
 $customerId = (int)$customer['VeneficiaCustomerId'];
 
-const SHIPPING_PRICE = 39.00; // standard shipping price in kr. (0 with a free-shipping discount code)
+// GLS Pakkeshop prices in kr., by the order's total weight: max grams => price. Heavier orders can't be shipped.
+const SHIPPING_RATES = [2000 => 45.00, 5000 => 62.00, 10000 => 83.00, 15000 => 127.00, 20000 => 154.00];
+const SHIPPING_MAX_GRAMS = 20000;
 
-// Fingerprint of what the customer saw (variants, amounts, prices and discount code). The order is only placed if it
-// still matches, so a price change or a basket/code changed in another tab never orders something they didn't see.
+// Total weight of the basket in grams (variants without a weight count as 0)
+function basketWeight(array $items): int
+{
+    $grams = 0;
+    foreach ($items as $item) {
+        $grams += (int)($item['varriantWeight'] ?? 0) * (int)$item['amount'];
+    }
+    return $grams;
+}
+
+// Fingerprint of what the customer saw (variants, amounts, prices, weights and discount code). The order is only placed
+// if it still matches, so a price/weight change or a basket/code changed in another tab never orders something they
+// didn't see.
 function basketFingerprint(array $items, ?array $code): string
 {
     $lines = [];
     foreach ($items as $item) {
-        $lines[(int)$item['itemVariantId']] = (int)$item['amount'] . ':' . number_format((float)$item['varriantPrice'], 2, '.', '');
+        $lines[(int)$item['itemVariantId']] = (int)$item['amount'] . ':' . number_format((float)$item['varriantPrice'], 2, '.', '')
+            . ':' . (int)($item['varriantWeight'] ?? 0);
     }
     ksort($lines);
     return hash('sha256', json_encode([$lines, $code === null ? null : (int)$code['discountCodeID']]));
@@ -32,7 +46,7 @@ function placeOrder(int $customerId, array $address, bool $saveAddress, string $
         // Locks the basket and variant rows, so a double click on "Bestil" (or two tabs) can't order the same basket
         // twice, and two customers can't both buy the last one
         $stmt = $db->prepare(
-            'SELECT b.itemVariantId, b.amount, v.itemId, v.varriantPrice, v.inventoryCount, v.varriantName, i.itemName
+            'SELECT b.itemVariantId, b.amount, v.itemId, v.varriantPrice, v.varriantWeight, v.inventoryCount, v.varriantName, i.itemName
              FROM VeneficiaBasketItems b
              JOIN VeneficiaItemVariants v ON v.itemVariantId = b.itemVariantId
              JOIN VeneficiaItems i ON i.itemId = v.itemId
@@ -47,6 +61,8 @@ function placeOrder(int $customerId, array $address, bool $saveAddress, string $
             $errors[] = 'Din kurv er tom.';
         } elseif (!hash_equals(basketFingerprint($items, $code), $fingerprint)) {
             $errors[] = 'Kurven eller priserne har ændret sig. Tjek ordren og bestil igen.';
+        } elseif (basketWeight($items) > SHIPPING_MAX_GRAMS) {
+            $errors[] = 'Ordren vejer over 20 kg og kan ikke sendes. Del den op i flere ordrer.';
         } else {
             foreach ($items as $item) {
                 if ((int)$item['amount'] > (int)$item['inventoryCount']) {
@@ -68,7 +84,7 @@ function placeOrder(int $customerId, array $address, bool $saveAddress, string $
             $customerId, $address['addressLine'], $address['addressPostalCode'], $address['addressCity'],
             $code === null ? null : (int)$code['discountCodeID'],
             number_format(discountFor($code, $items), 2, '.', ''),
-            number_format(shippingFor($code), 2, '.', ''),
+            number_format(shippingFor($code, basketWeight($items)), 2, '.', ''),
         ]);
         $orderId = (int)$db->lastInsertId();
 
@@ -104,9 +120,19 @@ function placeOrder(int $customerId, array $address, bool $saveAddress, string $
     }
 }
 
-function shippingFor(?array $code): float
+// Shipping price for a basket weighing $grams (0 with a free-shipping discount code). Callers block orders over the
+// max weight; the top rate is only a fallback.
+function shippingFor(?array $code, int $grams): float
 {
-    return $code !== null && $code['discountType'] === 'freeShipping' ? 0.0 : SHIPPING_PRICE;
+    if ($code !== null && $code['discountType'] === 'freeShipping') {
+        return 0.0;
+    }
+    foreach (SHIPPING_RATES as $maxGrams => $price) {
+        if ($grams <= $maxGrams) {
+            return $price;
+        }
+    }
+    return max(SHIPPING_RATES);
 }
 
 // The discount code form: choose or remove a code, then back to the checkout
@@ -173,7 +199,9 @@ foreach ($items as $item) {
     $overStock = $overStock || $item['amount'] > (int)$item['inventoryCount'];
 }
 $discount = discountFor($code, $items);
-$shipping = shippingFor($code);
+$weight = basketWeight($items);
+$tooHeavy = $weight > SHIPPING_MAX_GRAMS;
+$shipping = shippingFor($code, $weight);
 $total = $subtotal - $discount + $shipping;
 $message = $_SESSION['checkoutMessage'] ?? null;
 unset($_SESSION['checkoutMessage']);
@@ -232,7 +260,7 @@ unset($_SESSION['checkoutMessage']);
                     <?php if ($code !== null): ?>
                         <tr><th colspan="3">Rabat: <?= htmlspecialchars(describeDiscountCode($code)) ?></th><th>-<?= formatPrice($discount) ?></th></tr>
                     <?php endif; ?>
-                    <tr><th colspan="3">Fragt</th><th><?= formatPrice($shipping) ?></th></tr>
+                    <tr><th colspan="3">Fragt - GLS Pakkeshop (<?= htmlspecialchars(number_format($weight / 1000, 1, ',', '.')) ?> kg)</th><th><?= formatPrice($shipping) ?></th></tr>
                     <tr><th colspan="3">Total</th><th><?= formatPrice($total) ?></th></tr>
                 </tfoot>
             </table>
@@ -256,6 +284,8 @@ unset($_SESSION['checkoutMessage']);
 
             <?php if ($overStock): ?>
                 <p><strong>Der er ikke nok på lager af alle varer. <a href="/basket">Ret antallet i kurven</a> før du bestiller.</strong></p>
+            <?php elseif ($tooHeavy): ?>
+                <p><strong>Ordren vejer over 20 kg og kan ikke sendes. <a href="/basket">Del den op i flere ordrer</a>.</strong></p>
             <?php else: ?>
                 <h2>Levering</h2>
                 <form class="checkout-form" method="post" action="/checkout">
