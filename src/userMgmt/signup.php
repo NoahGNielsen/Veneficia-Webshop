@@ -2,9 +2,12 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/passwords.php';
 startSession();
+// Where to go after signing up, e.g. back to /checkout
+$next = safeReturnPath($_GET['next'] ?? null);
+$nextQuery = $next !== null ? '?next=' . rawurlencode($next) : '';
 
 if (currentCustomer() !== null) {
-    header('Location: /');
+    header('Location: ' . ($next ?? '/'));
     exit;
 }
 
@@ -48,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  VALUES (?, ?, ?, ?, ?, ' . ($newsLetterConsent ? 'NOW()' : 'NULL') . ')'
             )->execute([$email, $firstName, $lastName, password_hash($password, PASSWORD_DEFAULT), (int)$newsLetterConsent]);
             loginCustomer((int)getDb()->lastInsertId(), $rememberMe);
-            header('Location: /');
+            header('Location: ' . ($next ?? '/'));
             exit;
         } catch (PDOException $e) {
             // 23000 = the unique key on email
@@ -72,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <main class="auth-page">
-        <form class="auth-form" method="post" action="/userMgmt/signup">
+        <form class="auth-form" method="post" action="/userMgmt/signup<?= htmlspecialchars($nextQuery) ?>">
             <h1>Opret konto</h1>
             <?php if ($errors): ?>
                 <ul class="auth-error" role="alert">
@@ -109,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </label>
 
             <button type="submit">Opret konto</button>
-            <p class="auth-switch">Har du allerede en konto? <a href="/userMgmt/login">Log ind</a></p>
+            <p class="auth-switch">Har du allerede en konto? <a href="/userMgmt/login<?= htmlspecialchars($nextQuery) ?>">Log ind</a></p>
         </form>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>

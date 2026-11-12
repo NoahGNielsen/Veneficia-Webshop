@@ -116,6 +116,7 @@ $token = session_status() === PHP_SESSION_ACTIVE ? csrfToken() : '';
                     <tr><th colspan="3">Total</th><th><?= formatPrice($total) ?></th><th></th></tr>
                 </tfoot>
             </table>
+            <p><a href="/checkout">Gå til kassen</a></p>
         <?php endif; ?>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>

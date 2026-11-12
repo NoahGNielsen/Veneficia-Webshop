@@ -16,3 +16,4 @@
 .basket-page { padding: 1rem; overflow-x: auto; }
 .basket-table { border-collapse: collapse; }
 .basket-table th, .basket-table td { border: 1px solid; padding: .25rem .5rem; text-align: left; vertical-align: top; }
+.checkout-form { display: flex; flex-direction: column; gap: .25rem; max-width: 400px; }

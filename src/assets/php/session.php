@@ -199,16 +199,24 @@ function currentCustomer(): ?array
     return $customer;
 }
 
-// Sends visitors who aren't logged in to the login page
-function requireCustomer(): array
+// Sends visitors who aren't logged in to the login page, which sends them back to $returnTo afterwards
+function requireCustomer(?string $returnTo = null): array
 {
     startSession(false);
     $customer = currentCustomer();
     if ($customer === null) {
-        header('Location: /userMgmt/login');
+        $returnTo = safeReturnPath($returnTo);
+        header('Location: /userMgmt/login' . ($returnTo !== null ? '?next=' . rawurlencode($returnTo) : ''));
         exit;
     }
     return $customer;
+}
+
+// A ?next= path from the URL, only if it's a plain path on this site (no "//evil.com", "/\evil.com", schemes or
+// query strings), so the login page can't be used to redirect people to another site
+function safeReturnPath(mixed $path): ?string
+{
+    return is_string($path) && preg_match('~^/(?:[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*)?$~', $path) ? $path : null;
 }
 
 // The logged-in employee (id, username), or null. Only works once startSession() has run.

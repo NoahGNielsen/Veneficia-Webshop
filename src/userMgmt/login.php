@@ -1,9 +1,12 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 startSession();
+// Where to go after logging in, e.g. back to /checkout
+$next = safeReturnPath($_GET['next'] ?? null);
+$nextQuery = $next !== null ? '?next=' . rawurlencode($next) : '';
 
 if (currentCustomer() !== null) {
-    header('Location: /');
+    header('Location: ' . ($next ?? '/'));
     exit;
 }
 
@@ -27,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ->execute([password_hash($password, PASSWORD_DEFAULT), $customer['VeneficiaCustomerId']]);
             }
             loginCustomer((int)$customer['VeneficiaCustomerId'], !empty($_POST['rememberMe']));
-            header('Location: /');
+            header('Location: ' . ($next ?? '/'));
             exit;
         }
 
@@ -51,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <main class="auth-page">
-        <form class="auth-form" method="post" action="/userMgmt/login">
+        <form class="auth-form" method="post" action="/userMgmt/login<?= htmlspecialchars($nextQuery) ?>">
             <h1>Log ind</h1>
             <?php if ($error !== ''): ?>
                 <p class="auth-error" role="alert"><?= htmlspecialchars($error) ?></p>
@@ -69,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </label>
 
             <button type="submit">Log ind</button>
-            <p class="auth-switch">Har du ikke en konto? <a href="/userMgmt/signup">Opret en her</a></p>
+            <p class="auth-switch">Har du ikke en konto? <a href="/userMgmt/signup<?= htmlspecialchars($nextQuery) ?>">Opret en her</a></p>
         </form>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
