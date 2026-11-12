@@ -56,7 +56,7 @@
             el('th', { textContent: 'Standard' }),
             el('th', { textContent: 'Navn (valgfrit)' }),
             el('th', { textContent: 'Pris (kr.)' }),
-            el('th', { textContent: 'Vægt (gram, min. 10, valgfrit)' }),
+            el('th', { textContent: 'Vægt (gram, min. 10)' }),
             ...(state.showStock ? [el('th', { textContent: 'Lager' })] : []),
             ...state.types.map((type, j) => el('th', { id: 'typeHead' + j, textContent: type || 'Type ' + (j + 1) })),
             el('th'),
@@ -91,6 +91,7 @@
                     ariaLabel: 'Pris, variant ' + (i + 1),
                 })]),
                 el('td', {}, [field('weight', 'weight', {
+                    required: true,
                     inputMode: 'numeric',
                     pattern: '0*[1-9]\\d{1,6}', // at least 10 g (0,01 kg), checked again on the server
                     title: 'Mindst 10 gram (0,01 kg)',

@@ -195,9 +195,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!preg_match('/^\d{1,8}(\.\d{1,2})?$/', $variant['price'])) {
                 $errors[] = $label . 'skriv en gyldig pris, fx 149,95.';
             }
-            if ($variant['weight'] !== '' && !preg_match('/^\d{1,7}$/', $variant['weight'])) {
+            if (!preg_match('/^\d{1,7}$/', $variant['weight'])) {
                 $errors[] = $label . 'skriv vægten som et helt antal gram, fx 250.';
-            } elseif ($variant['weight'] !== '' && (int)$variant['weight'] < 10) {
+            } elseif ((int)$variant['weight'] < 10) {
                 $errors[] = $label . 'vægten skal være mindst 10 gram (0,01 kg).';
             }
             if (!preg_match('/^\d{1,9}$/', $variant['stock'])) {
@@ -322,7 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($form['variants'] as $i => $variant) {
                 // (object) so it's always a JSON object, even if a type is named "0"
                 $types = json_encode((object)array_combine($form['types'], $variant['values']), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-                $weight = $variant['weight'] === '' ? null : (int)$variant['weight'];
+                $weight = (int)$variant['weight'];
                 if ($variant['id'] === null) {
                     $insertVariant->execute([$itemId, $types, $variantNames[$i], $variant['price'], $weight]);
                     $variantId = (int)$db->lastInsertId();
