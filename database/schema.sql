@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS VeneficiaItemVariants (
     varriantName VARCHAR(150) NOT NULL,
     varriantPrice DECIMAL(10,2) NOT NULL,
     inventoryCount INT UNSIGNED NOT NULL DEFAULT 0,
+    varriantWeight INT UNSIGNED NULL COMMENT 'grams, NULL when not set',
     PRIMARY KEY (itemVariantId),
     CONSTRAINT fk_VeneficiaItemVariants_item
         FOREIGN KEY (itemId) REFERENCES VeneficiaItems (itemId)

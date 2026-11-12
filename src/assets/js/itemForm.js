@@ -56,6 +56,7 @@
             el('th', { textContent: 'Standard' }),
             el('th', { textContent: 'Navn (valgfrit)' }),
             el('th', { textContent: 'Pris (kr.)' }),
+            el('th', { textContent: 'Vægt (gram, valgfrit)' }),
             ...(state.showStock ? [el('th', { textContent: 'Lager' })] : []),
             ...state.types.map((type, j) => el('th', { id: 'typeHead' + j, textContent: type || 'Type ' + (j + 1) })),
             el('th'),
@@ -88,6 +89,12 @@
                     pattern: '\\d{1,8}([.,]\\d{1,2})?',
                     placeholder: '149,95',
                     ariaLabel: 'Pris, variant ' + (i + 1),
+                })]),
+                el('td', {}, [field('weight', 'weight', {
+                    inputMode: 'numeric',
+                    pattern: '\\d{1,7}',
+                    placeholder: '250',
+                    ariaLabel: 'Vægt i gram, variant ' + (i + 1),
                 })]),
                 ...(state.showStock ? [el('td', {}, [field('stock', 'stock', {
                     required: true,
@@ -125,7 +132,7 @@
             typesSection(),
             variantTable(),
             button('Tilføj variant (' + state.variants.length + '/' + state.maxVariants + ')', () => {
-                state.variants.push({ id: null, name: '', price: '', stock: '0', values: state.types.map(() => '') });
+                state.variants.push({ id: null, name: '', price: '', weight: '', stock: '0', values: state.types.map(() => '') });
             }, state.variants.length >= state.maxVariants),
         );
     }

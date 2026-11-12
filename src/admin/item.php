@@ -37,7 +37,7 @@ $form = [
     'categories' => [],
     'tags' => '',
     'types' => [],
-    'variants' => [['id' => null, 'name' => '', 'price' => '', 'stock' => '0', 'values' => []]],
+    'variants' => [['id' => null, 'name' => '', 'price' => '', 'weight' => '', 'stock' => '0', 'values' => []]],
     'defaultVariant' => 0,
     'imageOrder' => [],
     'removeImages' => [],
@@ -56,7 +56,7 @@ if (isset($_GET['id'])) {
     $options = json_decode($item['itemOptions'] ?? '', true) ?: [];
     $types = $options['variantTypes'] ?? [];
 
-    $stmt = $db->prepare('SELECT itemVariantId, varriantType, varriantName, varriantPrice, inventoryCount FROM VeneficiaItemVariants WHERE itemId = ? ORDER BY itemVariantId');
+    $stmt = $db->prepare('SELECT itemVariantId, varriantType, varriantName, varriantPrice, varriantWeight, inventoryCount FROM VeneficiaItemVariants WHERE itemId = ? ORDER BY itemVariantId');
     $stmt->execute([$itemId]);
     foreach ($stmt->fetchAll() as $row) {
         $variantTypes = json_decode($row['varriantType'], true) ?: [];
@@ -66,6 +66,7 @@ if (isset($_GET['id'])) {
             // An automatic name stays automatic, so it follows the type values when they are changed
             'name' => $row['varriantName'] === variantName('', $values) ? '' : $row['varriantName'],
             'price' => $row['varriantPrice'],
+            'weight' => (string)($row['varriantWeight'] ?? ''),
             'stock' => (string)$row['inventoryCount'],
             'values' => $values,
         ];
@@ -131,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'id' => $isStored ? (int)$id : null,
                 'name' => postedString($variant['name'] ?? ''),
                 'price' => str_replace(',', '.', postedString($variant['price'] ?? '')),
+                'weight' => postedString($variant['weight'] ?? ''),
                 'stock' => $itemId === null ? '0' : postedString($variant['stock'] ?? ''),
                 'values' => array_map(fn($i) => postedString($values[$i] ?? ''), array_keys($form['types'])),
             ];
@@ -192,6 +194,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $label = 'Variant ' . ($i + 1) . ': ';
             if (!preg_match('/^\d{1,8}(\.\d{1,2})?$/', $variant['price'])) {
                 $errors[] = $label . 'skriv en gyldig pris, fx 149,95.';
+            }
+            if ($variant['weight'] !== '' && !preg_match('/^\d{1,7}$/', $variant['weight'])) {
+                $errors[] = $label . 'skriv vægten som et helt antal gram, fx 250.';
             }
             if (!preg_match('/^\d{1,9}$/', $variant['stock'])) {
                 $errors[] = $label . 'skriv et gyldigt lagerantal.';
@@ -307,20 +312,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // New variants start on the default inventoryCount of 0
-            $insertVariant = $db->prepare('INSERT INTO VeneficiaItemVariants (itemId, varriantType, varriantName, varriantPrice) VALUES (?, ?, ?, ?)');
-            $updateVariant = $db->prepare('UPDATE VeneficiaItemVariants SET varriantType = ?, varriantName = ?, varriantPrice = ? WHERE itemVariantId = ? AND itemId = ?');
+            $insertVariant = $db->prepare('INSERT INTO VeneficiaItemVariants (itemId, varriantType, varriantName, varriantPrice, varriantWeight) VALUES (?, ?, ?, ?, ?)');
+            $updateVariant = $db->prepare('UPDATE VeneficiaItemVariants SET varriantType = ?, varriantName = ?, varriantPrice = ?, varriantWeight = ? WHERE itemVariantId = ? AND itemId = ?');
             $updateStock = $db->prepare('UPDATE VeneficiaItemVariants SET inventoryCount = ? WHERE itemVariantId = ? AND itemId = ?');
             $logStock = $db->prepare("INSERT INTO VeneficiaWarehouseLog (itemVariantId, employeeId, changeType, quantityChange, note) VALUES (?, ?, 'adjustment', ?, 'Rettet i admin')");
             $defaultVariantId = null;
             foreach ($form['variants'] as $i => $variant) {
                 // (object) so it's always a JSON object, even if a type is named "0"
                 $types = json_encode((object)array_combine($form['types'], $variant['values']), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+                $weight = $variant['weight'] === '' ? null : (int)$variant['weight'];
                 if ($variant['id'] === null) {
-                    $insertVariant->execute([$itemId, $types, $variantNames[$i], $variant['price']]);
+                    $insertVariant->execute([$itemId, $types, $variantNames[$i], $variant['price'], $weight]);
                     $variantId = (int)$db->lastInsertId();
                 } else {
                     $variantId = $variant['id'];
-                    $updateVariant->execute([$types, $variantNames[$i], $variant['price'], $variantId, $itemId]);
+                    $updateVariant->execute([$types, $variantNames[$i], $variant['price'], $weight, $variantId, $itemId]);
                 }
 
                 $stockChange = (int)$variant['stock'] - (int)($stockNow[$variantId] ?? 0);
