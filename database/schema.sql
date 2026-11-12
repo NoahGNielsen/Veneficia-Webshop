@@ -119,6 +119,8 @@ CREATE TABLE IF NOT EXISTS VeneficiaOrdre (
     addressPostalCode VARCHAR(20) NOT NULL,
     addressCity VARCHAR(100) NOT NULL,
     discountCodeId BIGINT UNSIGNED NULL,
+    -- kr. taken off by the discount code when ordered, kept even if the code is deleted later
+    discountAmount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     shippingPrice DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     shippingWeight DECIMAL(10,3) NOT NULL DEFAULT 0.000,
     PRIMARY KEY (ordreID),

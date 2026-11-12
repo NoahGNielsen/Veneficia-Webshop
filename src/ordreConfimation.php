@@ -9,8 +9,9 @@ $order = false;
 if ($orderId !== false && $orderId !== null) {
     // customerId in the WHERE, so guessing another order number shows nothing
     $stmt = getDb()->prepare(
-        'SELECT ordreID, ordredAt, addressLine, addressPostalCode, addressCity, shippingPrice
-         FROM VeneficiaOrdre WHERE ordreID = ? AND customerId = ?'
+        'SELECT o.ordreID, o.ordredAt, o.addressLine, o.addressPostalCode, o.addressCity, o.shippingPrice, o.discountAmount, d.code
+         FROM VeneficiaOrdre o LEFT JOIN VeneficiaDiscountCodes d ON d.discountCodeID = o.discountCodeId
+         WHERE o.ordreID = ? AND o.customerId = ?'
     );
     $stmt->execute([$orderId, $customer['VeneficiaCustomerId']]);
     $order = $stmt->fetch();
@@ -30,7 +31,7 @@ $stmt = getDb()->prepare(
 );
 $stmt->execute([$order['ordreID']]);
 $lines = $stmt->fetchAll();
-$total = (float)$order['shippingPrice'];
+$total = (float)$order['shippingPrice'] - (float)$order['discountAmount'];
 foreach ($lines as $line) {
     $total += (float)$line['itemPrice'] * $line['quantity'];
 }
@@ -76,6 +77,9 @@ foreach ($lines as $line) {
                 <?php endforeach; ?>
             </tbody>
             <tfoot>
+                <?php if ($order['code'] !== null || (float)$order['discountAmount'] > 0): ?>
+                    <tr><th colspan="3">Rabat<?= $order['code'] !== null ? ' (' . htmlspecialchars($order['code']) . ')' : '' ?></th><th>-<?= formatPrice($order['discountAmount']) ?></th></tr>
+                <?php endif; ?>
                 <tr><th colspan="3">Fragt</th><th><?= formatPrice($order['shippingPrice']) ?></th></tr>
                 <tr><th colspan="3">Total</th><th><?= formatPrice($total) ?></th></tr>
             </tfoot>
