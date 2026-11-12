@@ -8,7 +8,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/discounts.php';
 $customer = requireCustomer('/checkout');
 $customerId = (int)$customer['VeneficiaCustomerId'];
 
-const SHIPPING_PRICE = 0.00; // no shipping prices yet (variants have no weight)
+const SHIPPING_PRICE = 39.00; // standard shipping price in kr. (0 with a free-shipping discount code)
 
 // Fingerprint of what the customer saw (variants, amounts, prices and discount code). The order is only placed if it
 // still matches, so a price change or a basket/code changed in another tab never orders something they didn't see.
