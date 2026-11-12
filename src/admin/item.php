@@ -197,6 +197,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             if ($variant['weight'] !== '' && !preg_match('/^\d{1,7}$/', $variant['weight'])) {
                 $errors[] = $label . 'skriv vægten som et helt antal gram, fx 250.';
+            } elseif ($variant['weight'] !== '' && (int)$variant['weight'] < 10) {
+                $errors[] = $label . 'vægten skal være mindst 10 gram (0,01 kg).';
             }
             if (!preg_match('/^\d{1,9}$/', $variant['stock'])) {
                 $errors[] = $label . 'skriv et gyldigt lagerantal.';
