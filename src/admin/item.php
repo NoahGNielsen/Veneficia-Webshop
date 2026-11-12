@@ -236,6 +236,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // The images are checked by their content, not by the name or type the browser sent
         $images = [];
         $files = $_FILES['images'] ?? null;
+        // A new image's placement among all the images, by its place in images[]. Without one it goes last.
+        $postedNewOrder = is_array($_POST['newImageOrder'] ?? null) ? $_POST['newImageOrder'] : [];
         if (is_array($files) && is_array($files['error'] ?? null)) {
             foreach ($files['error'] as $key => $error) {
                 if ($error === UPLOAD_ERR_NO_FILE) {
@@ -256,7 +258,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } elseif ($size[0] > 10000 || $size[1] > 10000) {
                     $errors[] = 'Billedet "' . $fileName . '" er større end 10000x10000 pixels.';
                 } else {
+                    $position = postedString($postedNewOrder[$key] ?? '');
                     $images[] = [
+                        'position' => ctype_digit($position) ? (int)$position : PHP_INT_MAX,
                         'tmpName' => $tmpName,
                         'fileName' => mb_substr(basename(str_replace('\\', '/', $fileName)), 0, 255) ?: 'billede',
                         'mimeType' => $mimeType,
@@ -277,8 +281,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $itemOptions = json_encode(['categories' => $form['categories'], 'variantTypes' => $form['types']], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         $description = $form['description'] === '' ? null : $form['description'];
-        $keptImages = array_diff_key($form['imageOrder'], array_flip($form['removeImages']));
-        asort($keptImages);
+        // Kept and new images in one list, sorted by placement. usort is stable, so on a tie the kept image goes first.
+        $imageSlots = [];
+        foreach (array_diff_key($form['imageOrder'], array_flip($form['removeImages'])) as $id => $position) {
+            $imageSlots[] = ['position' => $position, 'id' => $id];
+        }
+        foreach ($images as $image) {
+            $imageSlots[] = ['position' => $image['position'], 'image' => $image];
+        }
+        usort($imageSlots, fn($a, $b) => $a['position'] <=> $b['position']);
         $isNew = $itemId === null;
         $movedFiles = [];
         $removedFiles = [];
@@ -358,22 +369,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $removedFiles[] = $uploadDir . '/' . basename($storedImages[$id]['fileUrl']);
             }
 
-            $position = 0;
             $sortImage = $db->prepare('UPDATE VeneficiaItemAttachments SET sortOrder = ? WHERE itemId = ? AND attachmentId = ?');
-            foreach (array_keys($keptImages) as $id) {
-                $sortImage->execute([$position++, $itemId, $id]);
-            }
-
             $insertAttachment = $db->prepare('INSERT INTO VeneficiaAttachments (fileName, fileUrl, mimeType, fileSize, altText) VALUES (?, ?, ?, ?, ?)');
             $linkAttachment = $db->prepare('INSERT INTO VeneficiaItemAttachments (itemId, attachmentId, sortOrder) VALUES (?, ?, ?)');
-            foreach ($images as $image) {
+            foreach ($imageSlots as $position => $slot) {
+                if (isset($slot['id'])) {
+                    $sortImage->execute([$position, $itemId, $slot['id']]);
+                    continue;
+                }
+                $image = $slot['image'];
                 $storedName = bin2hex(random_bytes(16)) . '.' . ITEM_IMAGE_TYPES[$image['mimeType']];
                 if (!move_uploaded_file($image['tmpName'], $uploadDir . '/' . $storedName)) {
                     throw new RuntimeException('Could not move uploaded image');
                 }
                 $movedFiles[] = $uploadDir . '/' . $storedName;
                 $insertAttachment->execute([$image['fileName'], '/uploads/items/' . $storedName, $image['mimeType'], $image['fileSize'], mb_substr($form['name'], 0, 500)]);
-                $linkAttachment->execute([$itemId, (int)$db->lastInsertId(), $position++]);
+                $linkAttachment->execute([$itemId, (int)$db->lastInsertId(), $position]);
             }
 
             $db->commit();
@@ -450,10 +461,10 @@ $heading = $itemId === null ? 'Ny vare' : 'Ret vare';
                 <input type="text" id="tags" name="tags" maxlength="1100" placeholder="fx sommer, bomuld" value="<?= htmlspecialchars($form['tags']) ?>" data-known-tags="<?= htmlspecialchars(json_encode($knownTags, JSON_UNESCAPED_UNICODE)) ?>">
             </div>
 
-            <?php if ($storedImages): ?>
-                <fieldset>
-                    <legend>Nuværende billeder (laveste placering vises først)</legend>
-                    <div class="item-images">
+            <?php // Always here, so itemForm.js can show newly picked images in it before the item is saved ?>
+            <fieldset id="imageFieldset" <?= $storedImages ? '' : 'hidden' ?>>
+                    <legend>Billeder (laveste placering vises først)</legend>
+                    <div class="item-images" id="itemImages" data-count="<?= count($storedImages) ?>">
                         <?php foreach ($storedImages as $id => $image): ?>
                             <div class="item-image">
                                 <img src="<?= htmlspecialchars($image['fileUrl']) ?>" alt="<?= htmlspecialchars($image['fileName']) ?>" width="120" height="120" loading="lazy" decoding="async">
@@ -467,8 +478,7 @@ $heading = $itemId === null ? 'Ny vare' : 'Ret vare';
                             </div>
                         <?php endforeach; ?>
                     </div>
-                </fieldset>
-            <?php endif; ?>
+            </fieldset>
 
             <label for="images"><?= $storedImages ? 'Tilføj billeder' : 'Billeder' ?> (JPG, PNG, WebP eller GIF, højst <?= ITEM_MAX_IMAGES ?> á <?= ITEM_MAX_IMAGE_BYTES >> 20 ?> MB, i den rækkefølge de skal vises)</label>
             <?php if ($errors): ?>

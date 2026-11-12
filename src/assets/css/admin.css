@@ -196,6 +196,10 @@
     object-fit: contain;
 }
 
+.item-image-new span {
+    overflow-wrap: anywhere;
+}
+
 .item-image input[type="number"] {
     width: 100%;
     box-sizing: border-box;

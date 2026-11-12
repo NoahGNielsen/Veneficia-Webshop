@@ -233,6 +233,58 @@
         });
     }
 
+    // Picked images show up among the item's images right away, with a placement, before the item is saved. Each pick
+    // adds to the earlier ones (the browser's own file field would replace them), and a picked image can be taken out
+    // again. The file field is kept in step, so the form posts exactly the images shown here.
+    function imagePicker() {
+        const input = document.getElementById('images');
+        const grid = document.getElementById('itemImages');
+        const fieldset = document.getElementById('imageFieldset');
+        if (!input || !grid || !fieldset || typeof DataTransfer !== 'function') {
+            return;
+        }
+        const storedCount = Number(grid.dataset.count) || 0;
+        const picked = []; // { file, url, position }
+
+        const sync = () => {
+            const files = new DataTransfer();
+            picked.forEach((image) => files.items.add(image.file));
+            input.files = files.files;
+
+            grid.querySelectorAll('.item-image-new').forEach((node) => node.remove());
+            grid.append(...picked.map((image, i) => el('div', { className: 'item-image item-image-new' }, [
+                el('img', { src: image.url, alt: image.file.name, width: 120, height: 120, decoding: 'async' }),
+                el('span', { textContent: 'Ny: ' + image.file.name }),
+                el('label', {}, ['Placering', el('input', {
+                    type: 'number',
+                    name: 'newImageOrder[' + i + ']',
+                    min: 1,
+                    value: image.position,
+                    oninput: (e) => { image.position = e.target.value; },
+                })]),
+                el('button', {
+                    type: 'button',
+                    textContent: 'Fjern',
+                    onclick: () => {
+                        URL.revokeObjectURL(image.url);
+                        picked.splice(i, 1);
+                        sync();
+                    },
+                }),
+            ])));
+            fieldset.hidden = storedCount === 0 && picked.length === 0;
+        };
+
+        input.addEventListener('change', () => {
+            const start = storedCount + picked.length;
+            [...input.files].forEach((file, j) => {
+                picked.push({ file, url: URL.createObjectURL(file), position: start + j + 1 });
+            });
+            sync();
+        });
+    }
+
     render();
     tagSuggestions();
+    imagePicker();
 })();
