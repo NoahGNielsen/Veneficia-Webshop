@@ -1,0 +1,14 @@
+/* Functional only, the real design comes later */
+.status-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 48px 16px;
+    text-align: center;
+}
+
+.status-code {
+    margin: 0;
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--accent);
+}

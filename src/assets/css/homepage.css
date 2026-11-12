@@ -1,0 +1,6 @@
+/* Functional only, the real design comes later */
+.homepage {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem;
+}
