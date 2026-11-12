@@ -6,6 +6,7 @@ $navCustomer = currentCustomer();
 $navBasketCount = basketCount();
 ?>
 <nav class="navbar">
+    <a class="navbar-brand" href="/">Veneficia</a>
     <a href="/products">Produkter</a>
     <a href="/basket">Kurv<?= $navBasketCount > 0 ? ' (' . $navBasketCount . ')' : '' ?></a>
     <?php if ($navCustomer !== null): ?>

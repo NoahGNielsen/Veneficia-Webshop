@@ -41,8 +41,8 @@ if (http_response_code() === 200) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Follows the system theme before mainStyle.css has loaded, so a slow page load doesn't flash the wrong colour -->
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf8f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16131a" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/svg+xml" href="<?= $headerVersion('/assets/images/favicon.svg') ?>">
 <link rel="apple-touch-icon" href="<?= $headerVersion('/assets/images/appleTouchIcon.png') ?>">
 <link rel="manifest" href="<?= $headerVersion('/manifest.json') ?>">

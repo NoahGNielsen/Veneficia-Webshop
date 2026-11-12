@@ -31,85 +31,122 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --text: #000000;
-    --background: #ffffff;
-    --primary: #8fb3ff;
-    --accent: #d41d6d;
-  }
+/* Colours. --background must match the theme-color metas in header.php and theme_color/background_color in
+   manifest.json. --on-accent is the text colour on top of --accent (buttons). */
+:root {
+  --text: #1f1a24;
+  --muted: #6b6274;
+  --background: #faf8f5;
+  --surface: #ffffff;
+  --border: #e4dde9;
+  --primary: #d9cfe8;
+  --accent: #7a2e6b;
+  --on-accent: #ffffff;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --text: #ffffff;
-    --background: #000000;
-    --primary: #002470;
-    --accent: #e22c7b;
+  :root:not([data-theme="light"]) {
+    --text: #ece8f0;
+    --muted: #a69eae;
+    --background: #16131a;
+    --surface: #211c27;
+    --border: #352d3e;
+    --primary: #3a2f4a;
+    --accent: #d07fbf;
+    --on-accent: #16131a;
   }
 }
-
-:root[data-theme="light"] {
-  --text: #000000;
-  --background: #ffffff;
-  --primary: #8fb3ff;
-  --accent: #d41d6d;
-}
 :root[data-theme="dark"] {
-  --text: #ffffff;
-  --background: #000000;
-  --primary: #002470;
-  --accent: #e22c7b;
+  --text: #ece8f0;
+  --muted: #a69eae;
+  --background: #16131a;
+  --surface: #211c27;
+  --border: #352d3e;
+  --primary: #3a2f4a;
+  --accent: #d07fbf;
+  --on-accent: #16131a;
+}
+
+/* Basic shared design. Kept simple, the real design comes later */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
   font-family: "Raleway", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* Every page's content: centred column, footer pushed to the bottom */
+body > main {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+h1, h2, h3 {
+  margin: 1.5em 0 .5em;
+  line-height: 1.2;
+}
+h1 {
+  margin-top: 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+h2 {
+  font-size: 1.35rem;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 2px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 button,
 input,
 select,
 textarea {
-  font-family: inherit;
-}
-
-/* Basic shared defaults. Functional only, the real design comes later */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: var(--background);
-  color: var(--text);
-  line-height: 1.5;
-}
-
-a {
-  color: var(--accent);
-}
-
-img {
-  max-width: 100%;
+  font: inherit;
 }
 
 input,
 select,
 textarea {
-  padding: 6px 8px;
-  border: 1px solid var(--primary);
-  border-radius: 6px;
-  background: var(--background);
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
   color: var(--text);
 }
 
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--accent);
+}
+
 button {
-  padding: 8px 14px;
+  padding: 9px 16px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-weight: 600;
   cursor: pointer;
+}
+
+button:hover {
+  background: color-mix(in srgb, var(--accent) 85%, var(--text));
 }
 
 :focus-visible {
@@ -117,21 +154,96 @@ button {
   outline-offset: 2px;
 }
 
+table {
+  border-collapse: collapse;
+  background: var(--surface);
+}
+
+th,
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  background: color-mix(in srgb, var(--primary) 40%, var(--surface));
+}
+
+/* Messages (basket messages, checkout errors) */
+main [role="status"],
+main [role="alert"] {
+  padding: 10px 14px;
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--background));
+}
+
+main ul[role="alert"] {
+  padding-left: 32px;
+}
+
 /* Shared navbar (assets/php/navbar.php) */
 .navbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 16px;
-  padding: 12px 16px;
-  background: var(--primary);
+  gap: 8px 20px;
+  padding: 14px max(16px, calc((100% - 1100px) / 2 + 16px));
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .navbar a {
   color: inherit;
   font-weight: 600;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  color: var(--accent);
+}
+
+.navbar .navbar-brand {
+  margin-right: auto;
+  color: var(--accent);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: .02em;
 }
 
 .navbar form {
   margin: 0;
+}
+
+.navbar button {
+  padding: 6px 12px;
+}
+
+/* Shared footer (assets/php/footer.php) */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
+  padding: 20px max(16px, calc((100% - 1100px) / 2 + 16px));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer a {
+  color: inherit;
 }

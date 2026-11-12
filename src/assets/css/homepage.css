@@ -1,6 +1,28 @@
-/* Functional only, the real design comes later */
-.homepage {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 1rem;
+/* Basic design, the real design comes later */
+.hero {
+    padding: 64px 32px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--primary) 45%, var(--surface));
+    text-align: center;
+}
+
+.hero p {
+    max-width: 60ch;
+    margin: 0 auto 24px;
+    color: var(--muted);
+    font-size: 1.1rem;
+}
+
+.hero-button {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.hero-button:hover {
+    background: color-mix(in srgb, var(--accent) 85%, var(--text));
 }

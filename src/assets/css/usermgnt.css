@@ -9,11 +9,16 @@
     flex-direction: column;
     gap: 8px;
     width: 100%;
-    max-width: 380px;
+    max-width: 420px;
+    padding: 32px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
 }
 
 .auth-form h1 {
     margin: 0 0 8px;
+    font-size: 1.75rem;
 }
 
 .auth-form label {
@@ -25,9 +30,9 @@
 .auth-form input[type="password"] {
     padding: 10px;
     margin-bottom: 8px;
-    border: 1px solid var(--primary);
-    border-radius: 6px;
-    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
     color: var(--text);
     font: inherit;
 }
@@ -45,7 +50,7 @@
     border: 0;
     border-radius: 6px;
     background: var(--accent);
-    color: #fff;
+    color: var(--on-accent);
     font: inherit;
     font-weight: 600;
     cursor: pointer;
