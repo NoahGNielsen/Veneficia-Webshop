@@ -38,18 +38,6 @@ CREATE TABLE IF NOT EXISTS VeneficiaEmployees (
     UNIQUE KEY uq_VeneficiaEmployees_employeeUsername (employeeUsername)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS VeneficiaDiscountCodes (
-    discountCodeID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    codeName VARCHAR(150) NOT NULL,
-    code VARCHAR(100) NOT NULL,
-    validAt DATETIME NOT NULL,
-    validUntil DATETIME NULL,
-    discountType VARCHAR(30) NOT NULL,
-    discountAmount DECIMAL(10,2) NOT NULL,
-    PRIMARY KEY (discountCodeID),
-    UNIQUE KEY uq_VeneficiaDiscountCodes_code (code)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS VeneficiaSuppliers (
     supplierId BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     companyName VARCHAR(200) NOT NULL,
@@ -100,6 +88,27 @@ ALTER TABLE VeneficiaItems
     ADD CONSTRAINT fk_VeneficiaItems_defaultVariant
         FOREIGN KEY (itemDefaultVariant) REFERENCES VeneficiaItemVariants (itemVariantId)
         ON DELETE SET NULL;
+
+-- After VeneficiaItems because of the itemId key. discountType is one of:
+--   'product'      discountAmount % off one item (all its variants), itemId says which
+--   'freeShipping' free shipping, discountAmount is 0
+--   'percent'      discountAmount % off the whole order
+--   'amount'       discountAmount kr. off the whole order
+CREATE TABLE IF NOT EXISTS VeneficiaDiscountCodes (
+    discountCodeID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    codeName VARCHAR(150) NOT NULL,
+    code VARCHAR(100) NOT NULL,
+    validAt DATETIME NOT NULL,
+    validUntil DATETIME NULL,
+    discountType VARCHAR(30) NOT NULL,
+    discountAmount DECIMAL(10,2) NOT NULL,
+    itemId BIGINT UNSIGNED NULL,
+    PRIMARY KEY (discountCodeID),
+    UNIQUE KEY uq_VeneficiaDiscountCodes_code (code),
+    CONSTRAINT fk_VeneficiaDiscountCodes_item
+        FOREIGN KEY (itemId) REFERENCES VeneficiaItems (itemId)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS VeneficiaOrdre (
     ordreID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
