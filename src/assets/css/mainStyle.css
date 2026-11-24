@@ -1,3 +1,15 @@
+/* Veneficia design system. design-system/veneficia/MASTER.md is the source of truth and /styleguide shows every
+   component. Material Design 3 with our own palette, type and shapes: organic, calm and a little mystic.
+
+   Everything lives in a cascade layer, the page stylesheets (homepage.css, products.css, ...) in "pages". Unlayered
+   CSS would beat every layer, so don't add any. Raw colours only appear in :root below; components use the semantic
+   tokens (--color-*) or the context tokens (--ctx-*), which .on-secondary switches for the moss-green surfaces. */
+@layer tokens, base, layout, components, pages, utilities;
+
+/* Fonts, all self-hosted in assets/fonts (OFL). Raleway is the body/UI face, Lora the headings, and Cinzel (the logo's
+   face) only the wordmark and the status codes: cinzel-wordmark.woff2 holds just "Veneficia" and 0-9, fetched from
+   Google Fonts' css2 API with text=Veneficia0123456789, so fetch it again if a brand element needs other letters.
+   header.php preloads raleway-latin and lora-latin. */
 @font-face {
   font-family: "Raleway";
   font-style: normal;
@@ -30,220 +42,526 @@
   src: url("/assets/fonts/raleway-italic-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
-/* Colours. --background must match the theme-color metas in header.php and theme_color/background_color in
-   manifest.json. --on-accent is the text colour on top of --accent (buttons). */
-:root {
-  --text: #1f1a24;
-  --muted: #6b6274;
-  --background: #faf8f5;
-  --surface: #ffffff;
-  --border: #e4dde9;
-  --primary: #d9cfe8;
-  --accent: #7a2e6b;
-  --on-accent: #ffffff;
+@font-face {
+  font-family: "Lora";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/assets/fonts/lora-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --text: #ece8f0;
-    --muted: #a69eae;
-    --background: #16131a;
-    --surface: #211c27;
-    --border: #352d3e;
-    --primary: #3a2f4a;
-    --accent: #d07fbf;
-    --on-accent: #16131a;
+@font-face {
+  font-family: "Lora";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/assets/fonts/lora-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Cinzel";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/cinzel-wordmark.woff2") format("woff2");
+  unicode-range: U+30-39, U+56, U+61, U+63, U+65-66, U+69, U+6E;
+}
+
+@layer tokens {
+  :root {
+    /* Raw palette (MASTER.md's Danish names in brackets). Only used right here, to build the tokens below.
+       theme-color in header.php and theme_color in manifest.json are --palette-moss (the top app bar);
+       background_color in manifest.json is --palette-parchment (--color-background). */
+    --palette-parchment: #F5F0E6; /* Pergament */
+    --palette-canvas: #FFFCF5; /* Lærred */
+    --palette-sand: #DED5C3; /* Sand */
+    --palette-moss: #3B4D2E; /* Mosgrøn */
+    --palette-amethyst: #733B9B; /* Ametyst */
+    --palette-amethyst-tint: #EFE7F6; /* Ametystskær */
+    --palette-lavender: #CFB8E8; /* Lavendel */
+    --palette-night: #1F2619; /* Nattegrøn */
+    --palette-olive: #5B6250; /* Oliven */
+    --palette-error: #B3261E; /* Fejl */
+    --palette-success: #297044; /* Succes */
+    --palette-white: #FFFFFF;
+
+    /* Semantic colours (M3 roles). Every pair is in MASTER.md's contrast table. */
+    --color-background: var(--palette-parchment);
+    --color-on-background: var(--palette-night);
+    --color-surface: var(--palette-canvas);
+    --color-on-surface: var(--palette-night);
+    --color-surface-variant: var(--palette-sand);
+    --color-on-surface-variant: var(--palette-olive); /* never as text on --color-surface-variant (4.35:1) */
+    --color-outline: var(--palette-olive); /* field and chip borders */
+    --color-outline-variant: var(--palette-sand); /* decorative borders only */
+    --color-primary: var(--palette-amethyst);
+    --color-on-primary: var(--palette-white);
+    --color-primary-container: var(--palette-amethyst-tint);
+    --color-on-primary-container: var(--palette-amethyst);
+    --color-secondary: var(--palette-moss);
+    --color-on-secondary: var(--palette-parchment);
+    --color-secondary-accent: var(--palette-lavender);
+    --color-error: var(--palette-error);
+    --color-on-error: var(--palette-white);
+    --color-error-container: color-mix(in srgb, var(--palette-error) 10%, var(--palette-canvas));
+    --color-success: var(--palette-success);
+    --color-on-success: var(--palette-white);
+    --color-success-container: color-mix(in srgb, var(--palette-success) 12%, var(--palette-canvas));
+    --color-shadow: 31 38 25; /* Nattegrøn as r g b, for the tinted shadows */
+
+    /* Context tokens: what text, links, focus rings and actions look like on the current surface. These are the
+       light-surface values; .on-secondary swaps them for the moss-green surfaces. */
+    --ctx-text: var(--color-on-background);
+    --ctx-text-muted: var(--color-on-surface-variant);
+    --ctx-link: var(--color-primary);
+    --ctx-focus: var(--color-primary);
+    --ctx-action: var(--color-primary);
+    --ctx-on-action: var(--color-on-primary);
+    --ctx-outline: var(--color-outline);
+    --ctx-state: var(--color-on-background);
+
+    /* Type */
+    --font-brand: "Cinzel", "Lora", Georgia, serif;
+    --font-serif: "Lora", Georgia, serif;
+    --font-sans: "Raleway", system-ui, sans-serif;
+    --font-size-display: clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem);
+    --font-size-headline-large: clamp(1.875rem, 1.4rem + 1.8vw, 2.5rem);
+    --font-size-headline-medium: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+    --font-size-title-large: 1.25rem;
+    --font-size-title-medium: 1.0625rem;
+    --font-size-body-large: 1.0625rem;
+    --font-size-body: 1rem;
+    --font-size-label-large: .9375rem;
+    --font-size-label-medium: .875rem;
+    --font-size-overline: .75rem;
+    --measure: 68ch;
+
+    /* Spacing, 4/8 grid */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+    --space-9: 96px;
+
+    /* Shape (M3 scale) and the arch, our signature shape: use sparingly */
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 28px;
+    --radius-full: 999px;
+    --shape-arch: 999px 999px var(--radius-lg) var(--radius-lg);
+
+    /* Elevation, shadows tinted with Nattegrøn */
+    --elevation-1: 0 1px 2px rgb(var(--color-shadow) / .08), 0 1px 3px 1px rgb(var(--color-shadow) / .06);
+    --elevation-2: 0 2px 6px rgb(var(--color-shadow) / .10), 0 6px 16px rgb(var(--color-shadow) / .08);
+    --elevation-3: 0 8px 24px rgb(var(--color-shadow) / .12), 0 2px 6px rgb(var(--color-shadow) / .08);
+
+    /* State layers: how much of the "on" colour is mixed into a surface */
+    --state-hover: 8%;
+    --state-focus: 10%;
+    --state-pressed: 10%;
+    --state-disabled-opacity: .38;
+
+    /* Motion. Only transform and opacity are animated; all of it is switched off for prefers-reduced-motion. */
+    --ease-standard: cubic-bezier(.2, 0, 0, 1);
+    --ease-decelerate: cubic-bezier(.05, .7, .1, 1);
+    --ease-accelerate: cubic-bezier(.3, 0, .8, .15);
+    --duration-short: 150ms;
+    --duration-medium: 250ms;
+    --duration-long: 400ms;
+
+    /* Layers */
+    --z-sticky: 10;
+    --z-header: 20;
+    --z-overlay: 40;
+    --z-toast: 100;
+
+    /* Layout. Window size classes: compact < 600px, medium >= 600px, expanded >= 840px, large >= 1200px. */
+    --content-max: 1200px;
+    --gutter: 16px;
+    --header-height: 64px;
+  }
+
+  @media (min-width: 600px) {
+    :root {
+      --gutter: 24px;
+    }
+  }
+
+  @media (min-width: 840px) {
+    :root {
+      --gutter: 32px;
+    }
   }
 }
-:root[data-theme="dark"] {
-  --text: #ece8f0;
-  --muted: #a69eae;
-  --background: #16131a;
-  --surface: #211c27;
-  --border: #352d3e;
-  --primary: #3a2f4a;
-  --accent: #d07fbf;
-  --on-accent: #16131a;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* The sticky top app bar never covers a focused element or an #anchor (WCAG 2.4.11) */
+    scroll-padding-top: calc(var(--header-height) + var(--space-4));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    margin: 0;
+    background: var(--color-background);
+    color: var(--ctx-text);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    line-height: 1.6;
+    /* Raleway's default figures are old-style (3, 4, 5, 7 and 9 hang below the line) */
+    font-variant-numeric: lining-nums;
+  }
+
+  /* The moss-green context (top app bar, footer, hero, admin bar): parchment text and lavender accents for
+     everything inside. Hover layers on moss only carry parchment text, never lavender (4.13:1). */
+  .on-secondary {
+    --ctx-text: var(--color-on-secondary);
+    --ctx-text-muted: var(--color-surface-variant);
+    --ctx-link: var(--color-secondary-accent);
+    --ctx-focus: var(--color-secondary-accent);
+    --ctx-action: var(--color-secondary-accent);
+    --ctx-on-action: var(--color-on-background);
+    --ctx-outline: var(--color-surface-variant);
+    --ctx-state: var(--color-on-secondary);
+    background-color: var(--color-secondary);
+    color: var(--ctx-text);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0 0 var(--space-3);
+    color: var(--ctx-text);
+    font-family: var(--font-serif);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--font-size-headline-large);
+    line-height: 1.15;
+  }
+
+  h2 {
+    margin-top: var(--space-7);
+    font-size: var(--font-size-headline-medium);
+    line-height: 1.2;
+  }
+
+  h3,
+  h4 {
+    margin-top: var(--space-5);
+    font-size: var(--font-size-title-large);
+    line-height: 1.3;
+  }
+
+  p,
+  ul,
+  ol,
+  dl,
+  table,
+  figure {
+    margin: 0 0 var(--space-4);
+  }
+
+  p,
+  li,
+  dd {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: var(--ctx-link);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ctx-focus);
+    outline-offset: 2px;
+  }
+
+  img,
+  svg {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    color: inherit;
+    font: inherit;
+  }
+
+  ::selection {
+    background: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-/* Basic shared design. Kept simple, the real design comes later */
-*, *::before, *::after {
-  box-sizing: border-box;
+@layer layout {
+  /* Every page's <main> is a centred column that pushes the footer down. A page that needs full-width bands (the
+     homepage) sets its own main rules and puts a .container in each band. */
+  body > main {
+    flex: 1;
+    width: 100%;
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding: var(--space-6) var(--gutter) var(--space-8);
+  }
+
+  .container {
+    width: 100%;
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  margin: 0;
-  background: var(--background);
-  color: var(--text);
-  font-family: "Raleway", system-ui, sans-serif;
-  line-height: 1.6;
+/* Interim component styles, carried over from the old design onto the new tokens so every page keeps working.
+   Phase 2 replaces them with the real components (buttons, fields, chips, cards, banners, tables, app bar, footer). */
+@layer components {
+  input,
+  select,
+  textarea {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--color-primary);
+  }
+
+  button {
+    padding: 9px var(--space-4);
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--ctx-action);
+    color: var(--ctx-on-action);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: color-mix(in srgb, var(--ctx-on-action) var(--state-hover), var(--ctx-action));
+  }
+
+  table {
+    border-collapse: collapse;
+    background: var(--color-surface);
+  }
+
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-outline-variant);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    background: var(--color-primary-container);
+  }
+
+  main [role="status"],
+  main [role="alert"] {
+    padding: 10px 14px;
+    border-left: 4px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    background: var(--color-primary-container);
+    color: var(--color-on-surface);
+  }
+
+  main ul[role="alert"] {
+    padding-left: var(--space-6);
+  }
+
+  .navbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) 20px;
+    padding: 14px max(var(--gutter), calc((100% - var(--content-max)) / 2));
+  }
+
+  .navbar a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .navbar a:hover {
+    color: var(--ctx-link);
+  }
+
+  .navbar .navbar-brand {
+    margin-right: auto;
+    font-family: var(--font-brand);
+    font-size: 1.375rem;
+    letter-spacing: .04em;
+  }
+
+  .navbar form {
+    margin: 0;
+  }
+
+  .navbar button {
+    padding: 6px var(--space-3);
+  }
+
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) 20px;
+    padding: 20px max(var(--gutter), calc((100% - var(--content-max)) / 2));
+    font-size: var(--font-size-label-medium);
+  }
+
+  .footer p {
+    margin: 0;
+  }
+
+  .footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .footer a {
+    color: inherit;
+  }
 }
 
-/* Every page's content: centred column, footer pushed to the bottom */
-body > main {
-  flex: 1;
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 32px 16px;
-}
+@layer utilities {
+  .visually-hidden:not(:focus-visible) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
 
-h1, h2, h3 {
-  margin: 1.5em 0 .5em;
-  line-height: 1.2;
-}
-h1 {
-  margin-top: 0;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-}
-h2 {
-  font-size: 1.35rem;
-}
+  /* Type roles (M3). Headings get theirs by default; these put a role on any element. */
+  .wordmark {
+    font-family: var(--font-brand);
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
 
-a {
-  color: var(--accent);
-  text-underline-offset: 2px;
-}
+  .type-display {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-display);
+    font-weight: 600;
+    line-height: 1.08;
+  }
 
-img {
-  max-width: 100%;
-  height: auto;
-}
+  .type-headline-large {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-headline-large);
+    font-weight: 600;
+    line-height: 1.15;
+  }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
+  .type-headline-medium {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-headline-medium);
+    font-weight: 600;
+    line-height: 1.2;
+  }
 
-input,
-select,
-textarea {
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--text);
-}
+  .type-title-large {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-title-large);
+    font-weight: 600;
+    line-height: 1.3;
+  }
 
-input[type="checkbox"],
-input[type="radio"] {
-  accent-color: var(--accent);
-}
+  .type-title-medium {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-title-medium);
+    font-weight: 600;
+    line-height: 1.35;
+  }
 
-button {
-  padding: 9px 16px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-weight: 600;
-  cursor: pointer;
-}
+  .type-body-large {
+    max-width: var(--measure);
+    font-size: var(--font-size-body-large);
+    line-height: 1.7;
+  }
 
-button:hover {
-  background: color-mix(in srgb, var(--accent) 85%, var(--text));
-}
+  .type-label-large {
+    font-size: var(--font-size-label-large);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: .01em;
+  }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+  .type-label-medium {
+    font-size: var(--font-size-label-medium);
+    font-weight: 500;
+    line-height: 1.4;
+  }
 
-table {
-  border-collapse: collapse;
-  background: var(--surface);
-}
+  .type-overline {
+    font-size: var(--font-size-overline);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
 
-th,
-td {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  vertical-align: top;
-}
-
-thead th {
-  background: color-mix(in srgb, var(--primary) 40%, var(--surface));
-}
-
-/* Messages (basket messages, checkout errors) */
-main [role="status"],
-main [role="alert"] {
-  padding: 10px 14px;
-  border-left: 4px solid var(--accent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--accent) 12%, var(--background));
-}
-
-main ul[role="alert"] {
-  padding-left: 32px;
-}
-
-/* Shared navbar (assets/php/navbar.php) */
-.navbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 20px;
-  padding: 14px max(16px, calc((100% - 1100px) / 2 + 16px));
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.navbar a {
-  color: inherit;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.navbar a:hover {
-  color: var(--accent);
-}
-
-.navbar .navbar-brand {
-  margin-right: auto;
-  color: var(--accent);
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: .02em;
-}
-
-.navbar form {
-  margin: 0;
-}
-
-.navbar button {
-  padding: 6px 12px;
-}
-
-/* Shared footer (assets/php/footer.php) */
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 20px;
-  padding: 20px max(16px, calc((100% - 1100px) / 2 + 16px));
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--muted);
-  font-size: .9rem;
-}
-
-.footer p {
-  margin: 0;
-}
-
-.footer nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.footer a {
-  color: inherit;
+  .text-muted {
+    color: var(--ctx-text-muted);
+  }
 }

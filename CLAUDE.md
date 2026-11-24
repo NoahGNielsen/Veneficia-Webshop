@@ -1,4 +1,4 @@
-Last updated 04/11-26
+Last updated 24/11-26
 # CLAUDE.md
 
 ## Rules (from the project owner)
@@ -13,11 +13,11 @@ Last updated 04/11-26
 - **Update sitemap**, when a new site that should be on visible on a search engine is added.
   Make sure to add it to sitemap.xml
 - **When the colours in `src/assets/css/mainStyle.css` change, update the header colours too.** The `theme-color`
-  metas in `src/assets/php/header.php` (light and dark) and `theme_color`/`background_color` in `src/manifest.json`
-  must match mainStyle's `--background`.
-- **Functionality first, not looks.** Right now the priority is only that the site works. A CSS designer will later
-  restyle the whole site with the proper CSS, so any CSS written now exists only to make pages usable and functional,
-  not pretty. Keep it minimal and don't spend effort on visual polish.
+  meta in `src/assets/php/header.php` and `theme_color` in `src/manifest.json` must match the top app bar's colour
+  (`--palette-moss`), and `background_color` in `src/manifest.json` must match `--color-background`.
+- **`design-system/veneficia/MASTER.md` is the source of truth for the design.** New UI uses the design system's
+  tokens and components, with no raw hex outside `:root` in `mainStyle.css`. New components go into `MASTER.md` and
+  `/styleguide` (`src/styleguide.html`) too.
 - **Security has very high priority.** Always check changes for security holes (SQL injection, XSS, CSRF, auth and
   access-control flaws, unsafe file handling, leaked secrets etc.) and fix them.
 - **Page speed has fairly high priority.** Always spend time optimising what you touch (efficient queries, no

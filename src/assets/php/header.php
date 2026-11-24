@@ -8,8 +8,9 @@
 // "maskable" ones (appIconMaskable192/512.png) are full-bleed with the logo inside the middle 80%, since Android crops
 // them to a circle or squircle. iOS uses appleTouchIcon.png instead.
 //
-// The colours in theme-color here and in manifest.json are mainStyle.css's --background, so they must be updated
-// together with it.
+// The site only has a light theme. theme-color here and theme_color in manifest.json are the top app bar's moss green
+// (mainStyle.css's --palette-moss), so the phone's browser bar blends into the navbar; background_color in
+// manifest.json is --color-background (parchment). Update them together with mainStyle.css.
 //
 // The ?v= on each file is its last change, so browsers fetch it again after an update. A file that doesn't exist yet
 // (the icons, until they're made) gets no ?v= instead of a warning.
@@ -19,9 +20,10 @@
 // URL picks the content (the product pages, /products?tag=...) sets $headerCanonicalPath to its own path and query
 // before including this.
 //
-// The font (Raleway, assets/fonts/, @font-face in mainStyle.css) is our own copy instead of Google Fonts', so the
-// first paint doesn't wait on two other servers. Its Latin file is preloaded, since the browser would otherwise only
-// find it after mainStyle.css has loaded.
+// The fonts (Raleway for text, Lora for headings, a tiny Cinzel subset for the wordmark; assets/fonts/, @font-face in
+// mainStyle.css) are our own copies instead of Google Fonts', so the first paint doesn't wait on two other servers.
+// The Latin files of Raleway and Lora are preloaded, since the browser would otherwise only find them after
+// mainStyle.css has loaded. Cinzel is only a few kB and isn't preloaded.
 $headerVersion = fn(string $path): string => is_file(__DIR__ . '/../..' . $path)
     ? $path . '?v=' . filemtime(__DIR__ . '/../..' . $path)
     : $path;
@@ -39,15 +41,15 @@ if (http_response_code() === 200) {
 ?>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Follows the system theme before mainStyle.css has loaded, so a slow page load doesn't flash the wrong colour -->
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#faf8f5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#16131a" media="(prefers-color-scheme: dark)">
+<!-- Light theme only, so the browser's own controls and scrollbars stay light even in dark mode -->
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#3B4D2E">
 <link rel="icon" type="image/svg+xml" href="<?= $headerVersion('/assets/images/favicon.svg') ?>">
 <link rel="apple-touch-icon" href="<?= $headerVersion('/assets/images/appleTouchIcon.png') ?>">
 <link rel="manifest" href="<?= $headerVersion('/manifest.json') ?>">
 <meta name="apple-mobile-web-app-title" content="Veneficia">
 <link rel="preload" href="/assets/fonts/raleway-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= $headerVersion('/assets/css/mainStyle.css') ?>">
 <link rel="terms-of-service" href="https://veneficia.noahgajnielsen.dk/legal/terms">
 <link rel="privacy-policy" href="https://veneficia.noahgajnielsen.dk/legal/privacy">

@@ -1,4 +1,4 @@
-<footer class="footer">
+<footer class="footer on-secondary">
     <p>&copy; <?= date('Y') ?> Veneficia</p>
     <nav aria-label="Juridisk">
         <a href="/legal/terms">Handelsbetingelser</a>

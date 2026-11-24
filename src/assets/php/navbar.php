@@ -5,8 +5,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/basket.php';
 $navCustomer = currentCustomer();
 $navBasketCount = basketCount();
 ?>
-<nav class="navbar">
-    <a class="navbar-brand" href="/">Veneficia</a>
+<nav class="navbar on-secondary">
+    <a class="navbar-brand wordmark" href="/">Veneficia</a>
     <a href="/products">Produkter</a>
     <a href="/basket">Kurv<?= $navBasketCount > 0 ? ' (' . $navBasketCount . ')' : '' ?></a>
     <?php if ($navCustomer !== null): ?>
