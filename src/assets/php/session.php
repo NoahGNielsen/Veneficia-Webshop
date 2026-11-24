@@ -7,9 +7,15 @@ const SESSION_COOKIE_NAME = 'VeneficiaSession';
 const SESSION_DEFAULT_LIFETIME = 7200;      // 2 hours since last activity
 const SESSION_REMEMBER_LIFETIME = 31536000; // 1 year when "Husk mig" is ticked
 
-class VeneficiaSessionHandler implements SessionHandlerInterface, SessionUpdateTimestampHandlerInterface
+class VeneficiaSessionHandler implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface
 {
     public int $lifetime = SESSION_DEFAULT_LIFETIME;
+
+    // New session ids: 256 bits from the CSPRNG. (session_create_id() can't be used here, it would call this method again.)
+    public function create_sid(): string
+    {
+        return bin2hex(random_bytes(32));
+    }
 
     // Only a hash of the session id is stored, so a leaked database can't be used to take over sessions
     public static function hashId(string $id): string
