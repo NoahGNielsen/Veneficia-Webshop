@@ -68,7 +68,7 @@ $token = session_status() === PHP_SESSION_ACTIVE ? csrfToken() : '';
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
-    <main class="basket-page">
+    <main id="indhold" class="basket-page">
         <h1>Kurv</h1>
         <?php if ($message !== null): ?>
             <p role="status"><?= htmlspecialchars($message) ?></p>

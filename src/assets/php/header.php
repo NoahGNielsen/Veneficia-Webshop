@@ -28,6 +28,20 @@ $headerVersion = fn(string $path): string => is_file(__DIR__ . '/../..' . $path)
     ? $path . '?v=' . filemtime(__DIR__ . '/../..' . $path)
     : $path;
 
+// uiIcon('shopping-bag') is an icon from assets/icons/icons.svg (Material Symbols Rounded + our moon artwork) for the
+// page's markup. Icons are decorative (aria-hidden): the text next to them, or the control's aria-label, says what they
+// mean. Defined here because every page includes this file before its <body>.
+if (!defined('UI_ICON_SPRITE')) {
+    define('UI_ICON_SPRITE', $headerVersion('/assets/icons/icons.svg'));
+}
+if (!function_exists('uiIcon')) {
+    function uiIcon(string $name, string $class = ''): string
+    {
+        return '<svg class="icon' . ($class !== '' ? ' ' . htmlspecialchars($class) : '') . '" aria-hidden="true" focusable="false">'
+            . '<use href="' . htmlspecialchars(UI_ICON_SPRITE . '#' . $name) . '"></use></svg>';
+    }
+}
+
 $headerCanonical = null;
 if (http_response_code() === 200) {
     if (isset($headerCanonicalPath)) {

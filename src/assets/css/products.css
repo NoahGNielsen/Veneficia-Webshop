@@ -1,14 +1,5 @@
 @layer pages {
-    /* Basic design, the real design comes later */
-    .product-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-    .product-card { display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid var(--color-outline-variant); border-radius: 12px; background: var(--color-surface); }
-    .product-card:hover { border-color: var(--color-primary); }
-    .product-card a { display: flex; flex-direction: column; gap: 8px; color: inherit; text-decoration: none; }
-    .product-card img, .product-noimage { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
-    .product-noimage { display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--color-primary-container) 40%, var(--color-surface)); color: var(--color-on-surface-variant); }
-    .product-name { font-weight: 700; }
-    .product-card .product-price { color: var(--color-primary); font-weight: 700; }
-    .product-stock { color: var(--color-on-surface-variant); font-size: .9rem; }
+    /* Old page rules, replaced in phase 3 and 4 of the redesign */
     .product-page > .product-price { font-size: 1.25rem; font-weight: 700; }
     .product-images { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
     .product-images img { width: min(400px, 80vw); height: auto; aspect-ratio: 1; object-fit: cover; flex: none; border-radius: 12px; }
@@ -25,4 +16,233 @@
     .basket-table tfoot tr:last-child th { font-size: 1.1rem; }
     .checkout-form { display: flex; flex-direction: column; gap: 6px; max-width: 420px; margin-top: 16px; }
     .checkout-form button { align-self: flex-start; margin-top: 8px; }
+
+    /* Checkout-flow components (basket, checkout, order confirmation, the variant table), see MASTER.md.
+       .data-table: compact = every row is a card whose cells show their data-label; from 600px a normal table. */
+    .data-table {
+      width: 100%;
+    }
+
+    .data-table tfoot .total-row > * {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 599.98px) {
+      .data-table,
+      .data-table tbody,
+      .data-table tfoot {
+        display: block;
+      }
+
+      .data-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+      }
+
+      .data-table tbody tr,
+      .data-table tfoot {
+        display: block;
+        margin-bottom: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        border: 1px solid var(--color-outline-variant);
+        border-radius: var(--radius-lg);
+        background: var(--color-surface);
+      }
+
+      .data-table tr > * {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-4);
+        padding: var(--space-1) 0;
+        border: 0;
+        text-align: right;
+      }
+
+      .data-table tbody tr > :first-child {
+        display: block;
+        padding-bottom: var(--space-2);
+        text-align: left;
+      }
+
+      .data-table [data-label]::before {
+        content: attr(data-label);
+        color: var(--color-on-surface-variant);
+        font-weight: 500;
+        text-align: left;
+      }
+
+      .data-table tfoot tr {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-4);
+      }
+
+      .data-table tfoot tr > * {
+        display: block;
+      }
+
+      .data-table tfoot th {
+        text-align: left;
+      }
+
+      .data-table :is(td, th):empty {
+        display: none;
+      }
+    }
+
+    @media (min-width: 600px) {
+      .data-table {
+        background: var(--color-surface);
+      }
+
+      .data-table tfoot :is(th, td) {
+        border-bottom: 0;
+      }
+    }
+
+    /* ---- Step indicator: Kurv · Levering · Bekræftelse ---- */
+    .steps {
+      display: flex;
+      gap: var(--space-2);
+      margin: 0 0 var(--space-6);
+      padding: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .steps li {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--color-on-surface-variant);
+      font-size: var(--font-size-label-medium);
+      font-weight: 500;
+      text-align: center;
+      counter-increment: step;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--color-outline);
+      border-radius: 50%;
+      background: var(--color-surface);
+      font-weight: 700;
+    }
+
+    /* Steps before the current one are done */
+    .steps li:has(~ [aria-current="step"]) {
+      color: var(--color-on-surface);
+    }
+
+    .steps li:has(~ [aria-current="step"])::before {
+      border-color: var(--color-primary);
+      background: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+    }
+
+    .steps [aria-current="step"] {
+      color: var(--color-on-surface);
+      font-weight: 700;
+    }
+
+    .steps [aria-current="step"]::before {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+    }
+
+    @media (min-width: 600px) {
+      .steps li {
+        flex-direction: row;
+        text-align: left;
+      }
+
+      .steps li:not(:last-child)::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        margin-inline: var(--space-2);
+        background: var(--color-outline-variant);
+      }
+    }
+
+    /* ---- Breadcrumbs ---- */
+    .breadcrumbs ol {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0 var(--space-1);
+      margin: 0 0 var(--space-4);
+      padding: 0;
+      list-style: none;
+      font-size: var(--font-size-label-medium);
+      font-weight: 500;
+    }
+
+    .breadcrumbs li {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .breadcrumbs li + li::before {
+      content: "";
+      width: 18px;
+      height: 18px;
+      background: var(--ctx-text-muted);
+      mask: var(--icon-chevron-right) center / contain no-repeat;
+    }
+
+    .breadcrumbs a {
+      display: inline-block;
+      padding-block: var(--space-1);
+      color: var(--ctx-text-muted);
+    }
+
+    .breadcrumbs [aria-current="page"] {
+      color: var(--ctx-text);
+      font-weight: 600;
+    }
+
+    /* ---- Pagination ---- */
+    .pagination {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3) var(--space-4);
+      margin: var(--space-7) 0 0;
+    }
+
+    .pagination__current {
+      color: var(--ctx-text-muted);
+      font-size: var(--font-size-label-medium);
+      font-weight: 600;
+    }
+
+    /* ---- Empty state: icon in an arch, a short text, one action ---- */
+    .empty-state {
+      display: grid;
+      justify-items: center;
+      gap: var(--space-3);
+      max-width: 44ch;
+      margin: var(--space-7) auto;
+      text-align: center;
+    }
+
+    .empty-state p {
+      margin: 0 0 var(--space-2);
+      color: var(--color-on-surface-variant);
+    }
 }

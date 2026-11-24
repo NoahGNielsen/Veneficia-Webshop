@@ -216,7 +216,7 @@ unset($_SESSION['checkoutMessage']);
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
-    <main class="basket-page">
+    <main id="indhold" class="basket-page">
         <h1>Kassen</h1>
         <?php if (is_string($message)): ?>
             <p role="status"><?= htmlspecialchars($message) ?></p>

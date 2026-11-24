@@ -14,7 +14,7 @@ startSession(false);
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
-    <main class="homepage">
+    <main id="indhold" class="homepage">
         <section class="hero">
             <h1>Velkommen til Veneficia</h1>
             <p>Dette er hjemmesiden for Veneficia. Udforsk vores website for at lære mere om vores tjenester og tilbud.</p>

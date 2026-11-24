@@ -219,7 +219,9 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 ```
 @layer tokens, base, layout, components, pages, utilities;
 ```
-- `mainStyle.css`: tokens, base, layout, fælles komponenter og utilities.
+- `mainStyle.css`: tokens, base, layout, fælles komponenter og utilities. Komponenter, der bruges på flere slags sider: ikoner, skip-link, knapper, felter, chips, kort, produktkort, billedramme, lagerstatus, badge, bannere, tabel-basis, buen, månefaser, top app bar og footer.
+- `products.css`: komponenter, der kun bruges på butikkens sider, som alle linker `products.css`: `.data-table`, trinindikator, brødkrummer, paginering og tom tilstand.
+- `styleguide.css`: kun `/styleguide`, plus de **kommende** komponenter (søgefelt, fri-fragt-bar og dialog). Når en af dem bygges, skal dens CSS flyttes til `mainStyle.css`.
 - Side-CSS (`homepage.css`, `products.css`, `usermgnt.css`, `statusCodePage.css`, `admin.css`) ligger i `@layer pages`.
 - **Al CSS ligger i et lag.** CSS uden lag vinder ellers over alt.
 - Hold specificiteten lav med `:where()`, og brug klassenavne i kebab-case.
@@ -231,7 +233,10 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 ### Ikoner
 - Ét sæt: **Material Symbols Rounded** (Apache-2.0, vægt 400). Kun de ikoner, vi bruger, i én sprite `src/assets/icons/icons.svg` (`<symbol id="…">` + `<svg><use href="/assets/icons/icons.svg#…"></svg>`). Licensen ligger ved siden af.
-- Størrelser: 20px (inline), 24px (standard), 40px (kategori-buer).
+- I PHP indsættes et ikon med `uiIcon('navn')` (defineret i `header.php`). Spriten får `?v=` til cache-busting.
+- Ikonerne i spriten: `menu`, `close`, `shopping-bag`, `chevron-left`, `chevron-right`, `keyboard-arrow-down`, `check`, `check-circle`, `error`, `info`, `delete`, `diamond` (krystaller og pladsholder), `local-shipping`, `menu-book`, `home`, `search`, `candle`, `psychiatry` (urter), `auto-stories` (bøger) og `wand-stars` (generisk kategori). Dertil kommer de egne symboler `crescent` og `moon-phases`.
+- Ikoner, som CSS selv tegner (chip-check, brødkrumme-chevron og banner-ikoner), er mask-tokens (`--icon-*`) i `:root`. De har ingen farve og arver `currentColor`. Select-pilen er den eneste med farve i (Oliven).
+- Størrelser: 20px (`.icon--20`, inline), 24px (standard), 40px (`.icon--40`).
 - `fill: currentColor`, så ikonet arver kontekstens farve.
 - Dekorative ikoner får `aria-hidden="true"`. Ikon-knapper får en dansk `aria-label`.
 - Ingen emoji som ikoner.
@@ -256,14 +261,14 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 | Komponent | Klasse(r) | Spec | Bruges på |
 |---|---|---|---|
-| **Top app bar** | `.navbar.on-secondary` | Sticky, Mosgrøn, 64px. Skip-link "Spring til indhold" → `#indhold`. Wordmark "Veneficia" (Cinzel 600, `.wordmark`) + halvmåne. Expanded: Produkter · Log ind/Opret konto eller "Hej, navn"/Log ud · kurv-ikon med Lavendel-badge (`aria-label` "Kurv, 3 varer"). Compact: wordmark, kurv og menuknap → navigation drawer med **Popover API**. Menuikonet bliver et kryds via `:has(#menu:popover-open)`. Aktiv side: `aria-current="page"` + Lavendel indikator. | alle kundesider |
-| **Footer** | `.footer.on-secondary` | Månefase-skillelinje, wordmark + tagline, links (Produkter, Kurv, Handelsbetingelser, Privatlivspolitik), ©-år | alle sider |
+| **Top app bar** | `header.navbar.on-secondary` > `.navbar__inner.container`: `.skip-link`, `.brand`, `nav#menu.nav-drawer[popover]` > `.nav-list` > `.nav-link`, `.cart-link` + `.badge`, `.menu-button` | Sticky, Mosgrøn, 64px, svag skygge ved scroll. Skip-link "Spring til indhold" → `#indhold`. Wordmark "Veneficia" (Cinzel 600, `.brand`) + halvmåne. Expanded: Produkter · Log ind/Opret konto eller "Hej, navn"/Log ud · kurv-ikon med Lavendel-badge (`aria-label` "Kurv, 3 varer"). Compact: wordmark, kurv og menuknap → navigation drawer med **Popover API**. Menuikonet bliver et kryds via `:has(#menu:popover-open)`. Aktiv side: `aria-current="page"` + Lavendel indikator. | alle kundesider |
+| **Footer** | `.footer.on-secondary` > `.container`: `.moon-phases`, `.footer__grid`, `.footer__links`, `.footer__copy` | Månefase-skillelinje, wordmark + tagline, links (Produkter, Kurv, Handelsbetingelser, Privatlivspolitik), ©-år | alle sider |
 | **Knapper** | `.button` + `--tonal` `--outlined` `--text` + `--large` `--block` | Fuldt runde, min-højde 44px (48 med `--large`), label-large, state layers, fokusring 2px/2px offset (`--ctx-focus`), tryk `scale(.98)`, disabled. `<a class="button">` = `<button>`. `<button>` uden klasse = filled. Filled på mosgrøn = Lavendel med Nattegrøn tekst. | overalt |
 | **Links** | `a` | `--ctx-link`, altid understreget i brødtekst, `text-underline-offset: 3px`, tykkere ved hover. Nav-links uden understregning. | overalt |
 | **Tekstfelter** | `.field`, `input`, `select`, `textarea` | M3 outlined: label over feltet, 48px, Lærred, 1px Oliven, radius 8. Hover Nattegrøn kant. Fokus 2px Ametyst (via `box-shadow`, intet layout-skift). `:user-invalid` giver Fejl-kant + hjælpetekst. Påkrævet markeres via `:has(:required)`. `<select>` med egen pil. Antalsfelt ca. 5,5rem. | formularer |
 | **Checkbox/radio** | `.check` | `accent-color`, 20px, hele labelrækken er klikbar og ≥ 44px høj | kasse, log ind, opret |
 | **Chips** | `.chip` (+ `[aria-current]`, `:checked`) | 36px, fuldt runde, 1px Oliven. Assist/link: Lærred + Nattegrøn. Valgt/aktuel: Ametystskær + Ametyst + check-ikon. | tags, kategorier, varianter |
-| **Produktkort** | `.product-card` | M3 outlined → elevated ved hover. Lærred, Sand-kant, radius 16. 1:1-billede i `.media-frame`, overline (kategori, kan mangle), navn i title-medium, pris Raleway 600, lagerstatus med prik + tekst. Hele kortet klikbart (`a::after`), fokusring på kortet via `:has(a:focus-visible)`. Hover: elevation 2, `translateY(-2px)`, billede `scale(1.03)`. | produktliste |
+| **Produktkort** | `ul.product-grid` > `li.product-card` > `.media-frame` (+ `--empty`), `.product-card__body` > `__category`, `__name` > `a.product-card__link`, `__price`, `.stock` | M3 outlined → elevated ved hover. Lærred, Sand-kant, radius 16. 1:1-billede i `.media-frame`, overline (kategori, kan mangle), navn i title-medium, pris Raleway 600, lagerstatus med prik + tekst. Hele kortet klikbart (`.product-card__link::after`), fokusring på kortet via `:has(.product-card__link:focus-visible)`. Skyggen ligger på `::before`, så kun dens opacity animeres. Hover: elevation 2, `translateY(-2px)`, billede `scale(1.03)`. | produktliste |
 | **Lagerstatus** | `.stock` + `--in` / `--out` | prik + tekst (label-medium). "På lager" Succes, "Udsolgt" rolig Oliven | kort, produktside |
 | **Bannere** | `.banner` + `--info` `--success` `--error`, `[role=status]`, `[role=alert]`, `.auth-error`, `.admin-success` | Radius 12, ikon + tekst, Nattegrøn brødtekst. Info: Ametystskær. Succes: success-container. Fejl: error-container + 4px venstrekant. | beskeder overalt |
 | **Tabeller** | `.data-table`, `.table-scroll` | Compact: rækker bliver kort (grid, `data-label` + `::before`). Fra 600px: tabel, højrestillede tal, total i `tfoot` (Lora 600 1.25rem). | kurv, kasse, bekræftelse, varianter |
@@ -334,6 +339,8 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | `--motion`-dialens GSAP-snippets | Ren CSS | Ingen JS-biblioteker. |
 | `spring-physics` | M3's cubic-bezier-easing | Ren CSS uden JS. M3 easing er vores motion-system. |
 | Stack-råd (React, Tailwind osv.) | Springes over | Ingen af skillets stacks passer til ren PHP + vanilla CSS. |
+| *(prompten)* Hero-obelisken som inline SVG | `src/assets/images/obelisk.svg` vist med `<img alt="">` | En Blender-render kan senere erstatte den ved blot at skifte `src`, og filen caches. Den bruges også som demobillede i styleguiden. |
+| *(prompten)* Al fælles komponent-CSS i `mainStyle.css` | Butiksflowets komponenter i `products.css`, kommende i `styleguide.css` | Så holdes `mainStyle.css` på ca. 40 kB, og besøgende henter ikke CSS, de ikke bruger. |
 
 *`search.py` kunne ikke køre (ingen Python på maskinen). Anbefalingerne ovenfor er hentet direkte fra skillets datafiler (`products.csv`, `ui-reasoning.csv`, `typography.csv`, `styles.csv`, `ux-guidelines.csv`, `landing.csv`).*
 

@@ -106,7 +106,7 @@ $structuredData = array_filter($structuredData, fn($v) => $v !== null);
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
-    <main class="product-page">
+    <main id="indhold" class="product-page">
         <p>
             <a href="/products">Alle produkter</a>
             <?php if (($categoryPath = categoryPagePath((string)$item['categoryName'])) !== null): ?>

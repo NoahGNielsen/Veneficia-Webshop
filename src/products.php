@@ -113,7 +113,7 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
-    <main class="products-page">
+    <main id="indhold" class="products-page">
         <?php if ($category !== null): ?>
             <p>
                 <a href="/products">Alle produkter</a>
