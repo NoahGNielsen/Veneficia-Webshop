@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <!-- Veneficia's living styleguide: every component of the design system (design-system/veneficia/MASTER.md).
+         Static HTML, so the top app bar and footer are copies of navbar.php and footer.php: keep them in step. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#3B4D2E">
+    <link rel="preload" href="/assets/fonts/raleway-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/assets/css/mainStyle.css">
+    <link rel="stylesheet" href="/assets/css/products.css">
+    <link rel="stylesheet" href="/assets/css/styleguide.css">
+    <title>Styleguide - Veneficia</title>
+</head>
+<body>
+<header class="navbar on-secondary">
+    <a class="skip-link" href="#indhold">Spring til indhold</a>
+    <div class="navbar__inner container">
+        <a class="brand" href="/"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg>Veneficia</a>
+        <nav id="menu" class="nav-drawer" popover aria-label="Hovedmenu">
+            <div class="nav-drawer__header">
+                <span class="brand"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg>Veneficia</span>
+                <button type="button" class="icon-button" popovertarget="menu" popovertargetaction="hide" aria-label="Luk menu"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#close"></use></svg></button>
+            </div>
+            <ul class="nav-list">
+                <li><a class="nav-link" href="/products" aria-current="page">Produkter</a></li>
+                <li><a class="nav-link" href="/userMgmt/login">Log ind</a></li>
+                <li><a class="nav-link" href="/userMgmt/signup">Opret konto</a></li>
+            </ul>
+        </nav>
+        <a class="cart-link" href="/basket" aria-label="Kurv, 3 varer">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#shopping-bag"></use></svg>
+            <span class="badge" aria-hidden="true">3</span>
+        </a>
+        <button type="button" class="icon-button menu-button" popovertarget="menu" aria-label="Menu"><svg class="icon icon--menu" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#menu"></use></svg><svg class="icon icon--close" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#close"></use></svg></button>
+    </div>
+</header>
+
+<main id="indhold" class="styleguide">
+    <p class="type-overline text-muted">Designsystem</p>
+    <h1>Styleguide</h1>
+    <p class="type-body-large">Veneficias designsystem: Material Design 3 med vores egen palet, typografi og former. Stemningen er organisk, rolig og mystisk. Reglerne står i <code>design-system/veneficia/MASTER.md</code>, og her ser du komponenterne i brug.</p>
+    <nav aria-label="Indhold">
+        <ul class="chip-set">
+            <li><a class="chip" href="#farver">Farver</a></li>
+            <li><a class="chip" href="#typografi">Typografi</a></li>
+            <li><a class="chip" href="#knapper">Knapper</a></li>
+            <li><a class="chip" href="#felter">Felter</a></li>
+            <li><a class="chip" href="#chips">Chips</a></li>
+            <li><a class="chip" href="#kort">Produktkort</a></li>
+            <li><a class="chip" href="#bannere">Bannere</a></li>
+            <li><a class="chip" href="#tabeller">Tabeller</a></li>
+            <li><a class="chip" href="#navigation">Navigation</a></li>
+            <li><a class="chip" href="#signaturer">Signaturer og ikoner</a></li>
+            <li><a class="chip" href="#billeder">Billeder</a></li>
+            <li><a class="chip" href="#kommende">Kommende</a></li>
+        </ul>
+    </nav>
+
+    <section id="farver" aria-labelledby="farver-titel">
+        <h2 id="farver-titel">Farver (60-30-10)</h2>
+        <p>Komponenter bruger kun de semantiske tokens, aldrig rå hex. Ametyst er kun til det, man kan klikke på. Mosgrøn rammer siden ind, og Pergament og Lærred er resten.</p>
+        <ul class="sg-grid">
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-background)"></div><div class="sg-swatch__body"><p><strong>Pergament</strong> #F5F0E6</p><p><code>--color-background</code></p><p class="text-muted">60 %: sidebaggrund. Nattegrøn 13,70:1</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-surface)"></div><div class="sg-swatch__body"><p><strong>Lærred</strong> #FFFCF5</p><p><code>--color-surface</code></p><p class="text-muted">60 %: kort og felter. Nattegrøn 15,18:1</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-surface-variant)"></div><div class="sg-swatch__body"><p><strong>Sand</strong> #DED5C3</p><p><code>--color-surface-variant</code>, <code>--color-outline-variant</code></p><p class="text-muted">Kun pynt. Aldrig Oliven-tekst på Sand (4,35:1)</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-secondary)"></div><div class="sg-swatch__body"><p><strong>Mosgrøn</strong> #3B4D2E</p><p><code>--color-secondary</code></p><p class="text-muted">30 %: ramme og hero. Pergament 8,08:1, Lavendel 5,10:1</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-primary)"></div><div class="sg-swatch__body"><p><strong>Ametyst</strong> #733B9B</p><p><code>--color-primary</code></p><p class="text-muted">10 %: primærhandling og links. Hvid 7,42:1, på Pergament 6,53:1</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-primary-container)"></div><div class="sg-swatch__body"><p><strong>Ametystskær</strong> #EFE7F6</p><p><code>--color-primary-container</code></p><p class="text-muted">Tonale knapper og valgte chips. Ametyst 6,16:1</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-secondary-accent)"></div><div class="sg-swatch__body"><p><strong>Lavendel</strong> #CFB8E8</p><p><code>--color-secondary-accent</code></p><p class="text-muted">Accent på mosgrøn. Nattegrøn 8,65:1</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-on-background)"></div><div class="sg-swatch__body"><p><strong>Nattegrøn</strong> #1F2619</p><p><code>--color-on-background</code>, <code>--color-on-surface</code></p><p class="text-muted">Brødtekst og overskrifter</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-outline)"></div><div class="sg-swatch__body"><p><strong>Oliven</strong> #5B6250</p><p><code>--color-on-surface-variant</code>, <code>--color-outline</code></p><p class="text-muted">Sekundær tekst og feltkanter. 6,19:1 på Lærred</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-error)"></div><div class="sg-swatch__body"><p><strong>Fejl</strong> #B3261E</p><p><code>--color-error</code>, <code>--color-error-container</code></p><p class="text-muted">6,37:1 på Lærred</p></div></li>
+            <li class="sg-swatch"><div class="sg-swatch__color" style="background: var(--color-success)"></div><div class="sg-swatch__body"><p><strong>Succes</strong> #297044</p><p><code>--color-success</code>, <code>--color-success-container</code></p><p class="text-muted">"På lager". 5,86:1 på Lærred</p></div></li>
+        </ul>
+        <p>Den fulde kontrasttabel står i <code>MASTER.md</code>. Alle par bruges kun, hvis de klarer 4,5:1 for tekst og 3:1 for kanter og fokus. Aldrig Ametyst eller Oliven på Mosgrøn.</p>
+    </section>
+
+    <section id="typografi" aria-labelledby="typografi-titel">
+        <h2 id="typografi-titel">Typografi</h2>
+        <p>Lora til overskrifter og produktnavne, Raleway til brødtekst og UI. Cinzel (logoets font) kun til wordmarket og statuskoder.</p>
+        <div class="sg-type">
+            <p class="wordmark" style="font-size: 2rem">Veneficia 404</p>
+            <p class="text-muted">brand · Cinzel 600</p>
+            <p class="type-display">Redskaber til din praksis</p>
+            <p class="text-muted">display · Lora 600 · clamp(2.25rem → 3.5rem) / 1.08</p>
+            <p class="type-headline-large">Ametyst-obelisk</p>
+            <p class="text-muted">headline-large · h1 · Lora 600 · clamp(1.875rem → 2.5rem) / 1.15</p>
+            <p class="type-headline-medium">Beskrivelse</p>
+            <p class="text-muted">headline-medium · h2 · Lora 600 · clamp(1.5rem → 1.875rem) / 1.2</p>
+            <p class="type-title-large">Sådan handler du</p>
+            <p class="text-muted">title-large · h3 · Lora 600 · 1.25rem / 1.3</p>
+            <p class="type-title-medium">Røgelse, salvie</p>
+            <p class="text-muted">title-medium · produktnavne på kort · Lora 600 · 1.0625rem / 1.35</p>
+            <p class="type-body-large">Body-large til produktbeskrivelser: højst 68 tegn pr. linje og luftig linjehøjde, så længere tekst er rolig at læse. Tal står på linjen: 1234567890.</p>
+            <p class="text-muted">body-large · Raleway 400 · 1.0625rem / 1.7</p>
+            <p>Body til almindelig tekst og formularer.</p>
+            <p class="text-muted">body · Raleway 400 · 1rem / 1.6</p>
+            <p class="type-label-large">Læg i kurv</p>
+            <p class="text-muted">label-large · knapper og chips · Raleway 600 · 0.9375rem</p>
+            <p class="type-label-medium">Alle produkter · På lager</p>
+            <p class="text-muted">label-medium · meta og lagerstatus · Raleway 500 · 0.875rem</p>
+            <p class="type-overline">Krystaller · Røgelse</p>
+            <p class="text-muted">overline · Raleway 700 · 0.75rem, versaler, +0.12em</p>
+        </div>
+    </section>
+
+    <section id="knapper" aria-labelledby="knapper-titel">
+        <h2 id="knapper-titel">Knapper</h2>
+        <p>Én primær (filled) handling pr. skærm. Knapperne er fuldt runde og mindst 44 px høje (48 px med <code>--large</code>).</p>
+        <h3>Varianter</h3>
+        <div class="sg-row">
+            <button type="button">Filled</button>
+            <button type="button" class="button--tonal">Tonal</button>
+            <button type="button" class="button--outlined">Outlined</button>
+            <button type="button" class="button--text">Text</button>
+            <a class="button" href="#knapper">Link som knap</a>
+            <button type="button" class="button--text"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#delete"></use></svg>Fjern</button>
+        </div>
+        <h3>Tilstande</h3>
+        <div class="sg-row">
+            <button type="button">Normal</button>
+            <button type="button" class="demo-hover">Hover</button>
+            <button type="button" class="demo-focus">Fokus</button>
+            <button type="button" class="demo-pressed">Tryk</button>
+            <button type="button" disabled>Disabled</button>
+        </div>
+        <div class="sg-row">
+            <button type="button" class="button--outlined">Normal</button>
+            <button type="button" class="button--outlined demo-hover">Hover</button>
+            <button type="button" class="button--outlined demo-focus">Fokus</button>
+            <button type="button" class="button--outlined" disabled>Disabled</button>
+        </div>
+        <h3>Størrelser</h3>
+        <div class="sg-stack">
+            <button type="button" class="button--large button--block">Læg i kurv</button>
+        </div>
+        <h3>På mosgrøn (<code>.on-secondary</code>)</h3>
+        <div class="sg-panel on-secondary">
+            <div class="sg-row">
+                <a class="button button--large" href="/products">Se alle produkter</a>
+                <a class="button button--outlined button--large" href="#kategorier">Find en kategori</a>
+                <a href="#knapper">Et link på mosgrøn</a>
+            </div>
+            <div class="sg-row">
+                <button type="button" class="demo-focus">Fokus på mosgrøn</button>
+                <button type="button" class="button--outlined demo-hover">Hover</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="felter" aria-labelledby="felter-titel">
+        <h2 id="felter-titel">Felter</h2>
+        <p>M3 outlined text field: label over feltet, 48 px, Oliven-kant. Fokus giver 2 px Ametyst uden at layoutet hopper. Felter med <span aria-hidden="true">*</span> skal udfyldes.</p>
+        <form class="sg-stack" action="#">
+            <div class="field">
+                <label for="sg-name">Normal</label>
+                <input type="text" id="sg-name" autocomplete="off">
+            </div>
+            <div class="field">
+                <label for="sg-req">Påkrævet med hjælpetekst</label>
+                <input type="text" id="sg-req" required aria-describedby="sg-req-hint" autocomplete="off">
+                <p class="field-hint" id="sg-req-hint">Hjælpetekst under feltet.</p>
+            </div>
+            <div class="field">
+                <label for="sg-focus">Fokus</label>
+                <input type="text" id="sg-focus" class="demo-focus" value="Skovvej 3" autocomplete="off">
+            </div>
+            <div class="field demo-error">
+                <label for="sg-error">Fejl</label>
+                <input type="email" id="sg-error" value="hej@" aria-describedby="sg-error-text" autocomplete="off">
+                <p class="field-error" id="sg-error-text">Skriv en gyldig e-mailadresse.</p>
+            </div>
+            <div class="field">
+                <label for="sg-disabled">Disabled</label>
+                <input type="text" id="sg-disabled" value="Kan ikke ændres" disabled>
+            </div>
+            <div class="field">
+                <label for="sg-select">Select</label>
+                <select id="sg-select">
+                    <option>Lille</option>
+                    <option>Stor</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="sg-amount">Antal</label>
+                <input type="number" id="sg-amount" value="1" min="1" max="99">
+            </div>
+            <div>
+                <label><input type="checkbox" checked> Gem adressen til næste gang</label>
+                <label><input type="checkbox"> Jeg accepterer <a href="/legal/terms">handelsbetingelserne</a></label>
+                <label><input type="radio" name="sg-radio" checked> Radio valgt</label>
+                <label><input type="radio" name="sg-radio"> Radio</label>
+            </div>
+        </form>
+    </section>
+
+    <section id="chips" aria-labelledby="chips-titel">
+        <h2 id="chips-titel">Chips</h2>
+        <h3>Kategorier og tags (link-chips)</h3>
+        <ul class="chip-set">
+            <li><a class="chip" href="#chips" aria-current="page">Alle</a></li>
+            <li><a class="chip" href="#chips">Krystaller</a></li>
+            <li><a class="chip" href="#chips">Røgelse</a></li>
+            <li><a class="chip" href="#chips">Urter</a></li>
+            <li><a class="chip demo-focus" href="#chips">Fokus</a></li>
+        </ul>
+        <h3>Variantvalg (radio-chips)</h3>
+        <fieldset class="chip-fieldset">
+            <legend>Vælg variant</legend>
+            <div class="chip-set">
+                <label class="chip"><input type="radio" name="sg-variant" value="1" checked>Lille · 49,00 kr.</label>
+                <label class="chip"><input type="radio" name="sg-variant" value="2">Mellem · 79,00 kr.</label>
+                <label class="chip"><input type="radio" name="sg-variant" value="3" disabled>Stor · udsolgt</label>
+            </div>
+        </fieldset>
+    </section>
+
+    <section id="kort" aria-labelledby="kort-titel">
+        <h2 id="kort-titel">Produktkort</h2>
+        <p>Hele kortet er klikbart, og fokusringen ligger om hele kortet. Billedet er 1:1 på en mosgrøn flade med ametyst-glød.</p>
+        <ul class="product-grid">
+            <li class="product-card">
+                <div class="media-frame"><img src="/assets/images/obelisk.svg" alt="Stiliseret ametyst-obelisk på mos" width="300" height="300"></div>
+                <div class="product-card__body">
+                    <p class="product-card__category type-overline">Krystaller</p>
+                    <h3 class="product-card__name"><a class="product-card__link" href="#kort">Ametyst-obelisk</a></h3>
+                    <p class="product-card__price">Fra 149,00 kr.</p>
+                    <p class="stock stock--in">På lager</p>
+                </div>
+            </li>
+            <li class="product-card">
+                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg><span class="media-frame__label">Intet billede</span></div>
+                <div class="product-card__body">
+                    <p class="product-card__category type-overline">Røgelse</p>
+                    <h3 class="product-card__name"><a class="product-card__link" href="#kort">Røgelse, salvie</a></h3>
+                    <p class="product-card__price">39,00 kr.</p>
+                    <p class="stock">Udsolgt</p>
+                </div>
+            </li>
+            <li class="product-card">
+                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg><span class="media-frame__label">Intet billede</span></div>
+                <div class="product-card__body">
+                    <h3 class="product-card__name"><a class="product-card__link" href="#kort">Produkt uden kategori med et langt navn, der ombrydes</a></h3>
+                    <p class="product-card__price">129,00 kr.</p>
+                    <p class="stock stock--in">På lager</p>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <section id="bannere" aria-labelledby="bannere-titel">
+        <h2 id="bannere-titel">Bannere og beskeder</h2>
+        <p class="banner">Info: Rabatkoden gælder ikke for varerne i din kurv.</p>
+        <p class="banner banner--success">1 lagt i kurven. <a href="/basket">Gå til kurven</a></p>
+        <div class="banner banner--error">
+            <p class="banner__title">Ordren kunne ikke gennemføres</p>
+            <ul>
+                <li>Skriv din adresse (højst 255 tegn).</li>
+                <li>Du skal acceptere handelsbetingelserne.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="tabeller" aria-labelledby="tabeller-titel">
+        <h2 id="tabeller-titel">Tabeller</h2>
+        <p>Under 600 px bliver hver række et kort, og cellerne viser deres label. Tal står til højre.</p>
+        <table class="data-table">
+            <thead>
+                <tr><th scope="col">Produkt</th><th scope="col" class="num">Pris</th><th scope="col" class="num">Antal</th><th scope="col" class="num">I alt</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><a href="#tabeller">Ametyst-obelisk</a><br><span class="text-muted">Stor</span></td><td class="num" data-label="Pris">149,00 kr.</td><td class="num" data-label="Antal">2</td><td class="num" data-label="I alt">298,00 kr.</td></tr>
+                <tr><td><a href="#tabeller">Røgelse, salvie</a></td><td class="num" data-label="Pris">39,00 kr.</td><td class="num" data-label="Antal">1</td><td class="num" data-label="I alt">39,00 kr.</td></tr>
+            </tbody>
+            <tfoot>
+                <tr><th colspan="3">Fragt - GLS Pakkeshop</th><td class="num">45,00 kr.</td></tr>
+                <tr class="total-row"><th colspan="3">Total</th><td class="num">382,00 kr.</td></tr>
+            </tfoot>
+        </table>
+        <h3>Varianttabel (<code>.table-scroll</code>)</h3>
+        <div class="table-scroll" role="region" aria-label="Varianter" tabindex="0">
+            <table>
+                <thead><tr><th scope="col">Størrelse</th><th scope="col">Farve</th><th scope="col" class="num">Pris</th><th scope="col">Lager</th></tr></thead>
+                <tbody>
+                    <tr><td>Lille</td><td>Lilla</td><td class="num">49,00 kr.</td><td><span class="stock stock--in">På lager</span></td></tr>
+                    <tr><td>Stor</td><td>Lilla</td><td class="num">79,00 kr.</td><td><span class="stock">Udsolgt</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="navigation" aria-labelledby="navigation-titel">
+        <h2 id="navigation-titel">Navigation</h2>
+        <h3>Brødkrumme</h3>
+        <nav class="breadcrumbs" aria-label="Brødkrumme">
+            <ol>
+                <li><a href="/products">Alle produkter</a></li>
+                <li><a href="#navigation">Krystaller</a></li>
+                <li><span aria-current="page">Ametyst-obelisk</span></li>
+            </ol>
+        </nav>
+        <h3>Paginering</h3>
+        <nav class="pagination" aria-label="Sider">
+            <a class="button button--outlined" href="#navigation" rel="prev"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#chevron-left"></use></svg>Forrige side</a>
+            <span class="pagination__current">Side 2</span>
+            <a class="button button--outlined" href="#navigation" rel="next">Næste side<svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#chevron-right"></use></svg></a>
+        </nav>
+        <h3>Trinindikator</h3>
+        <ol class="steps">
+            <li>Kurv</li>
+            <li aria-current="step">Levering</li>
+            <li>Bekræftelse</li>
+        </ol>
+        <h3>Tom tilstand</h3>
+        <div class="empty-state">
+            <span class="arch-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#shopping-bag"></use></svg></span>
+            <p class="type-title-large">Din kurv er tom</p>
+            <p>Find noget, der passer til din praksis.</p>
+            <a class="button" href="/products">Se produkterne</a>
+        </div>
+    </section>
+
+    <section id="signaturer" aria-labelledby="signaturer-titel">
+        <h2 id="signaturer-titel">Signaturer og ikoner</h2>
+        <h3>Buen</h3>
+        <p>Signaturformen. Bruges sparsomt: hero-visualet, kategori-ikonerne og ordrebekræftelsen. Altid på en 4:5-boks.</p>
+        <div class="sg-row">
+            <div class="arch arch--glow sg-arch"><img src="/assets/images/obelisk.svg" alt="" width="400" height="500"></div>
+            <span class="arch-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg></span>
+        </div>
+        <h3>Månefaser</h3>
+        <p>Dekorativ skillelinje i footeren og på forsiden. Den henviser til månens cyklus.</p>
+        <div class="moon-phases" aria-hidden="true"><svg viewBox="0 0 248 24" width="186" height="18" focusable="false"><use href="/assets/icons/icons.svg#moon-phases"></use></svg></div>
+        <h3>Ikoner</h3>
+        <p>Material Symbols Rounded (Apache-2.0) i én sprite, <code>/assets/icons/icons.svg</code>. Dekorative ikoner har <code>aria-hidden="true"</code>, og ikon-knapper har en dansk <code>aria-label</code>.</p>
+        <ul class="sg-grid sg-icons">
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#menu"></use></svg><figcaption>menu</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#close"></use></svg><figcaption>close</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#shopping-bag"></use></svg><figcaption>shopping-bag</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#chevron-left"></use></svg><figcaption>chevron-left</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#chevron-right"></use></svg><figcaption>chevron-right</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#delete"></use></svg><figcaption>delete</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg><figcaption>diamond (krystaller, pladsholder)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#local-shipping"></use></svg><figcaption>local-shipping</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#menu-book"></use></svg><figcaption>menu-book (beskrivelser, trylleformularer)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#home"></use></svg><figcaption>home</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#search"></use></svg><figcaption>search</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#candle"></use></svg><figcaption>candle (lys)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#psychiatry"></use></svg><figcaption>psychiatry (urter)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#auto-stories"></use></svg><figcaption>auto-stories (bøger)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#wand-stars"></use></svg><figcaption>wand-stars (stave)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#experiment"></use></svg><figcaption>experiment (eliksirer)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#star"></use></svg><figcaption>star (symboler)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#wine-bar"></use></svg><figcaption>wine-bar (rituelle genstande)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#local-fire-department"></use></svg><figcaption>local-fire-department (røgelse)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#category"></use></svg><figcaption>category (generisk kategori)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg><figcaption>crescent (egen: wordmark, stjernetegn)</figcaption></figure></li>
+        </ul>
+    </section>
+
+    <section id="billeder" aria-labelledby="billeder-titel">
+        <h2 id="billeder-titel">Billedregler</h2>
+        <ul>
+            <li>Produktbilleder er kvadratiske (1:1). Eksportér renders i 1200 × 1200 px som WebP på højst ca. 200 kB.</li>
+            <li>Motivet er en mørk, mystisk krystal på mos, der lyser indefra. Hold motivet i midten med luft til kanten, for billedet beskæres med <code>object-fit: cover</code>.</li>
+            <li>Bag billedet ligger en mosgrøn flade med en svag lavendel glød, så mørke renders flyder sammen med kortet.</li>
+            <li>Alle <code>&lt;img&gt;</code> har <code>width</code> og <code>height</code>. Det første billede får <code>fetchpriority="high"</code>, resten <code>loading="lazy"</code>.</li>
+            <li>Alt-teksten er billedets beskrivelse fra admin, ellers produktnavnet.</li>
+        </ul>
+    </section>
+
+    <section id="kommende" aria-labelledby="kommende-titel">
+        <h2 id="kommende-titel">Kommende komponenter (kræver backend)</h2>
+        <p>Designet er klar, men funktionerne findes ikke endnu. CSS'en ligger i <code>styleguide.css</code>, indtil de bygges.</p>
+        <h3>Søgefelt</h3>
+        <form class="search-bar" role="search" action="#">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#search"></use></svg>
+            <label class="visually-hidden" for="sg-search">Søg i butikken</label>
+            <input type="search" id="sg-search" placeholder="Søg efter krystaller, røgelse …" autocomplete="off">
+        </form>
+        <h3>Fri-fragt-bar (eksempel)</h3>
+        <div class="sg-stack">
+            <p style="margin: 0">Du mangler 151,00 kr. til fri fragt.</p>
+            <progress class="progress" max="500" value="349">349 af 500 kr.</progress>
+        </div>
+        <h3>Ofte købt sammen</h3>
+        <ul class="product-grid">
+            <li class="product-card">
+                <div class="media-frame"><img src="/assets/images/obelisk.svg" alt="Stiliseret ametyst-obelisk på mos" width="300" height="300" loading="lazy"></div>
+                <div class="product-card__body">
+                    <h4 class="product-card__name"><a class="product-card__link" href="#kommende">Ametyst-obelisk</a></h4>
+                    <p class="product-card__price">149,00 kr.</p>
+                </div>
+            </li>
+            <li class="product-card">
+                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#candle"></use></svg><span class="media-frame__label">Intet billede</span></div>
+                <div class="product-card__body">
+                    <h4 class="product-card__name"><a class="product-card__link" href="#kommende">Røgelsesholder</a></h4>
+                    <p class="product-card__price">59,00 kr.</p>
+                </div>
+            </li>
+        </ul>
+        <h3>Mersalg ved kassen (dialog)</h3>
+        <div class="sg-scrim">
+            <dialog class="dialog" open aria-labelledby="sg-dialog-title">
+                <h4 id="sg-dialog-title" class="type-title-large">Vil du tilføje en røgelsesholder?</h4>
+                <div class="sg-upsell">
+                    <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#candle"></use></svg></div>
+                    <p><strong>Røgelsesholder</strong><br>59,00 kr.</p>
+                </div>
+                <div class="dialog__actions">
+                    <button type="button" class="button--text">Nej tak</button>
+                    <button type="button">Læg i kurv</button>
+                </div>
+            </dialog>
+        </div>
+    </section>
+</main>
+
+<footer class="footer on-secondary">
+    <div class="container">
+        <div class="moon-phases" aria-hidden="true">
+            <svg viewBox="0 0 248 24" width="186" height="18" focusable="false"><use href="/assets/icons/icons.svg#moon-phases"></use></svg>
+        </div>
+        <div class="footer__grid">
+            <div>
+                <a class="brand" href="/"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg>Veneficia</a>
+                <p class="footer__tagline">Krystaller, røgelse, urter og bøger til din praksis.</p>
+            </div>
+            <nav aria-label="Sidefod">
+                <ul class="footer__links">
+                    <li><a href="/products">Produkter</a></li>
+                    <li><a href="/basket">Kurv</a></li>
+                    <li><a href="/legal/terms">Handelsbetingelser</a></li>
+                    <li><a href="/legal/privacy">Privatlivspolitik</a></li>
+                </ul>
+            </nav>
+            <p class="footer__copy">&copy; 2026 Veneficia</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

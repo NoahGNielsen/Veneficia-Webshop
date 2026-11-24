@@ -6,18 +6,23 @@ if (!headers_sent()) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/header.php'; ?>
     <link rel="stylesheet" href="/assets/css/statusCodePage.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/statusCodePage.css') ?>">
-    <title>Something went wrong - Veneficia</title>
+    <title>Noget gik galt - Veneficia</title>
     <meta name="robots" content="noindex">
 </head>
 <body>
     <main class="status-page">
-        <p class="status-code">500</p>
-        <h1>Something went wrong</h1>
-        <p class="status-message">Something went wrong on our end. Please try again later.</p>
+        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <p class="status-code"><span class="visually-hidden">Fejl </span>500</p>
+        <h1>Noget gik galt hos os</h1>
+        <p class="status-message">Der skete en fejl hos os. Prøv igen om lidt.</p>
+        <div class="status-actions">
+            <a class="button" href="/">Til forsiden</a>
+            <a class="button button--outlined" href="/products">Se produkterne</a>
+        </div>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>

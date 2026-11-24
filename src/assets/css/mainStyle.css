@@ -1,3 +1,15 @@
+/* Veneficia design system. design-system/veneficia/MASTER.md is the source of truth and /styleguide shows every
+   component. Material Design 3 with our own palette, type and shapes: organic, calm and a little mystic.
+
+   Everything lives in a cascade layer, the page stylesheets (homepage.css, products.css, ...) in "pages". Unlayered
+   CSS would beat every layer, so don't add any. Raw colours only appear in :root below; components use the semantic
+   tokens (--color-*) or the context tokens (--ctx-*), which .on-secondary switches for the moss-green surfaces. */
+@layer tokens, base, layout, components, pages, utilities;
+
+/* Fonts, all self-hosted in assets/fonts (OFL). Raleway is the body/UI face, Lora the headings, and Cinzel (the logo's
+   face) only the wordmark and the status codes: cinzel-wordmark.woff2 holds just "Veneficia" and 0-9, fetched from
+   Google Fonts' css2 API with text=Veneficia0123456789, so fetch it again if a brand element needs other letters.
+   header.php preloads raleway-latin and lora-latin. */
 @font-face {
   font-family: "Raleway";
   font-style: normal;
@@ -15,235 +27,1428 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: "Raleway";
-  font-style: italic;
-  font-weight: 100 900;
+  font-family: "Lora";
+  font-style: normal;
+  font-weight: 400 700;
   font-display: swap;
-  src: url("/assets/fonts/raleway-italic-latin-ext.woff2") format("woff2");
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url("/assets/fonts/lora-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: "Raleway";
-  font-style: italic;
-  font-weight: 100 900;
+  font-family: "Lora";
+  font-style: normal;
+  font-weight: 400 700;
   font-display: swap;
-  src: url("/assets/fonts/raleway-italic-latin.woff2") format("woff2");
+  src: url("/assets/fonts/lora-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
-/* Colours. --background must match the theme-color metas in header.php and theme_color/background_color in
-   manifest.json. --on-accent is the text colour on top of --accent (buttons). */
-:root {
-  --text: #1f1a24;
-  --muted: #6b6274;
-  --background: #faf8f5;
-  --surface: #ffffff;
-  --border: #e4dde9;
-  --primary: #d9cfe8;
-  --accent: #7a2e6b;
-  --on-accent: #ffffff;
+@font-face {
+  font-family: "Cinzel";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/cinzel-wordmark.woff2") format("woff2");
+  unicode-range: U+30-39, U+56, U+61, U+63, U+65-66, U+69, U+6E;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --text: #ece8f0;
-    --muted: #a69eae;
-    --background: #16131a;
-    --surface: #211c27;
-    --border: #352d3e;
-    --primary: #3a2f4a;
-    --accent: #d07fbf;
-    --on-accent: #16131a;
+
+@layer tokens {
+  :root {
+    /* Raw palette (MASTER.md's Danish names in brackets). Only used right here, to build the tokens below.
+       theme-color in header.php and theme_color in manifest.json are --palette-moss (the top app bar);
+       background_color in manifest.json is --palette-parchment (--color-background). */
+    --palette-parchment: #F5F0E6; /* Pergament */
+    --palette-canvas: #FFFCF5; /* Lærred */
+    --palette-sand: #DED5C3; /* Sand */
+    --palette-moss: #3B4D2E; /* Mosgrøn */
+    --palette-amethyst: #733B9B; /* Ametyst */
+    --palette-amethyst-tint: #EFE7F6; /* Ametystskær */
+    --palette-lavender: #CFB8E8; /* Lavendel */
+    --palette-night: #1F2619; /* Nattegrøn */
+    --palette-olive: #5B6250; /* Oliven */
+    --palette-error: #B3261E; /* Fejl */
+    --palette-success: #297044; /* Succes */
+    --palette-white: #FFFFFF;
+
+    /* Semantic colours (M3 roles). Every pair is in MASTER.md's contrast table. */
+    --color-background: var(--palette-parchment);
+    --color-on-background: var(--palette-night);
+    --color-surface: var(--palette-canvas);
+    --color-on-surface: var(--palette-night);
+    --color-surface-variant: var(--palette-sand);
+    --color-on-surface-variant: var(--palette-olive); /* never as text on --color-surface-variant (4.35:1) */
+    --color-outline: var(--palette-olive); /* field and chip borders */
+    --color-outline-variant: var(--palette-sand); /* decorative borders only */
+    --color-primary: var(--palette-amethyst);
+    --color-on-primary: var(--palette-white);
+    --color-primary-container: var(--palette-amethyst-tint);
+    --color-on-primary-container: var(--palette-amethyst);
+    --color-secondary: var(--palette-moss);
+    --color-on-secondary: var(--palette-parchment);
+    --color-secondary-accent: var(--palette-lavender);
+    --color-error: var(--palette-error);
+    --color-on-error: var(--palette-white);
+    --color-error-container: color-mix(in srgb, var(--palette-error) 10%, var(--palette-canvas));
+    --color-success: var(--palette-success);
+    --color-on-success: var(--palette-white);
+    --color-success-container: color-mix(in srgb, var(--palette-success) 12%, var(--palette-canvas));
+    --color-shadow: 31 38 25; /* Nattegrøn as r g b, for the tinted shadows */
+
+    /* Context tokens: what text, links, focus rings and actions look like on the current surface. These are the
+       light-surface values; .on-secondary swaps them for the moss-green surfaces. */
+    --ctx-text: var(--color-on-background);
+    --ctx-text-muted: var(--color-on-surface-variant);
+    --ctx-link: var(--color-primary);
+    --ctx-focus: var(--color-primary);
+    --ctx-action: var(--color-primary);
+    --ctx-on-action: var(--color-on-primary);
+    --ctx-outline: var(--color-outline);
+    --ctx-outlined: var(--color-primary); /* text of outlined buttons */
+    --ctx-state: var(--color-on-background);
+    --scrim: rgb(var(--color-shadow) / .45);
+
+    /* Icons that CSS draws itself (as a mask in currentColor, so they hold no colour). The <svg><use> icons live in
+       /assets/icons/icons.svg. Paths: Material Symbols Rounded 400 (Apache-2.0). */
+    --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='m378-332 363-363q9-9 21.5-9t21.5 9q9 9 9 21.5t-9 21.5L399-267q-9 9-21 9t-21-9L175-449q-9-9-8.5-21.5T176-492q9-9 21.5-9t21.5 9l159 160Z'/%3E%3C/svg%3E");
+    --icon-chevron-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='M530-481 353-658q-9-9-8.5-21t9.5-21q9-9 21.5-9t21.5 9l198 198q5 5 7 10t2 11q0 6-2 11t-7 10L396-261q-9 9-21 8.5t-21-9.5q-9-9-9-21.5t9-21.5l176-176Z'/%3E%3C/svg%3E");
+    --icon-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='M504.5-288.63q8.5-8.62 8.5-21.37v-180q0-12.75-8.68-21.38-8.67-8.62-21.5-8.62-12.82 0-21.32 8.62-8.5 8.63-8.5 21.38v180q0 12.75 8.68 21.37 8.67 8.63 21.5 8.63 12.82 0 21.32-8.63Zm-1-314.57q9.5-9.2 9.5-22.8 0-14.45-9.48-24.22-9.48-9.78-23.5-9.78t-23.52 9.78Q447-640.45 447-626q0 13.6 9.48 22.8 9.48 9.2 23.5 9.2t23.52-9.2ZM480.27-80q-82.74 0-155.5-31.5Q252-143 197.5-197.5t-86-127.34Q80-397.68 80-480.5t31.5-155.66Q143-709 197.5-763t127.34-85.5Q397.68-880 480.5-880t155.66 31.5Q709-817 763-763t85.5 127Q880-563 880-480.27q0 82.74-31.5 155.5Q817-252 763-197.68q-54 54.31-127 86Q563-80 480.27-80Zm.23-60Q622-140 721-239.5t99-241Q820-622 721.19-721T480-820q-141 0-240.5 98.81T140-480q0 141 99.5 240.5t241 99.5Zm-.5-340Z'/%3E%3C/svg%3E");
+    --icon-check-circle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='m421-389-98-98q-9-9-22-9t-23 10q-9 9-9 22t9 22l122 123q9 9 21 9t21-9l239-239q10-10 10-23t-10-23q-10-9-23.5-8.5T635-603L421-389Zm59 309q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-156t86-127Q252-817 325-848.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82-31.5 155T763-197.5q-54 54.5-127 86T480-80Zm0-60q142 0 241-99.5T820-480q0-142-99-241t-241-99q-141 0-240.5 99T140-480q0 141 99.5 240.5T480-140Zm0-340Z'/%3E%3C/svg%3E");
+    --icon-error: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='M503.5-289.48q9.5-9.48 9.5-23.5t-9.48-23.52q-9.48-9.5-23.5-9.5t-23.52 9.48q-9.5 9.48-9.5 23.5t9.48 23.52q9.48 9.5 23.5 9.5t23.52-9.48Zm1-152.15q8.5-8.62 8.5-21.37v-193q0-12.75-8.68-21.38-8.67-8.62-21.5-8.62-12.82 0-21.32 8.62-8.5 8.63-8.5 21.38v193q0 12.75 8.68 21.37 8.67 8.63 21.5 8.63 12.82 0 21.32-8.63ZM480.27-80q-82.74 0-155.5-31.5Q252-143 197.5-197.5t-86-127.34Q80-397.68 80-480.5t31.5-155.66Q143-709 197.5-763t127.34-85.5Q397.68-880 480.5-880t155.66 31.5Q709-817 763-763t85.5 127Q880-563 880-480.27q0 82.74-31.5 155.5Q817-252 763-197.68q-54 54.31-127 86Q563-80 480.27-80Zm.23-60Q622-140 721-239.5t99-241Q820-622 721.19-721T480-820q-141 0-240.5 98.81T140-480q0 141 99.5 240.5t241 99.5Zm-.5-340Z'/%3E%3C/svg%3E");
+    /* The select arrow is a background image, so it carries its colour (Oliven, --color-outline) */
+    --icon-select: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath fill='%235B6250' d='M469-358q-5-2-10-7L261-563q-9-9-8.5-21.5T262-606q9-9 21.5-9t21.5 9l175 176 176-176q9-9 21-8.5t21 9.5q9 9 9 21.5t-9 21.5L501-365q-5 5-10 7t-11 2q-6 0-11-2Z'/%3E%3C/svg%3E");
+
+    /* Type */
+    --font-brand: "Cinzel", "Lora", Georgia, serif;
+    --font-serif: "Lora", Georgia, serif;
+    --font-sans: "Raleway", system-ui, sans-serif;
+    --font-size-display: clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem);
+    --font-size-headline-large: clamp(1.875rem, 1.4rem + 1.8vw, 2.5rem);
+    --font-size-headline-medium: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+    --font-size-title-large: 1.25rem;
+    --font-size-title-medium: 1.0625rem;
+    --font-size-body-large: 1.0625rem;
+    --font-size-body: 1rem;
+    --font-size-label-large: .9375rem;
+    --font-size-label-medium: .875rem;
+    --font-size-overline: .75rem;
+    --measure: 68ch;
+
+    /* Spacing, 4/8 grid */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+    --space-9: 96px;
+
+    /* Shape (M3 scale) and the arch, our signature shape: use sparingly */
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 28px;
+    --radius-full: 999px;
+    --shape-arch: 999px 999px var(--radius-lg) var(--radius-lg);
+
+    /* Elevation, shadows tinted with Nattegrøn */
+    --elevation-1: 0 1px 2px rgb(var(--color-shadow) / .08), 0 1px 3px 1px rgb(var(--color-shadow) / .06);
+    --elevation-2: 0 2px 6px rgb(var(--color-shadow) / .10), 0 6px 16px rgb(var(--color-shadow) / .08);
+    --elevation-3: 0 8px 24px rgb(var(--color-shadow) / .12), 0 2px 6px rgb(var(--color-shadow) / .08);
+
+    /* State layers: how much of the "on" colour is mixed into a surface */
+    --state-hover: 8%;
+    --state-focus: 10%;
+    --state-pressed: 10%;
+    --state-disabled-opacity: .38;
+
+    /* Motion. Only transform and opacity are animated; all of it is switched off for prefers-reduced-motion. */
+    --ease-standard: cubic-bezier(.2, 0, 0, 1);
+    --ease-decelerate: cubic-bezier(.05, .7, .1, 1);
+    --ease-accelerate: cubic-bezier(.3, 0, .8, .15);
+    --duration-short: 150ms;
+    --duration-medium: 250ms;
+    --duration-long: 400ms;
+
+    /* Layers */
+    --z-sticky: 10;
+    --z-header: 20;
+    --z-overlay: 40;
+    --z-toast: 100;
+
+    /* Layout. Window size classes: compact < 600px, medium >= 600px, expanded >= 840px, large >= 1200px. */
+    --content-max: 1200px;
+    --gutter: 16px;
+    --header-height: 64px;
+  }
+
+  @media (min-width: 600px) {
+    :root {
+      --gutter: 24px;
+    }
+  }
+
+  @media (min-width: 840px) {
+    :root {
+      --gutter: 32px;
+    }
   }
 }
-:root[data-theme="dark"] {
-  --text: #ece8f0;
-  --muted: #a69eae;
-  --background: #16131a;
-  --surface: #211c27;
-  --border: #352d3e;
-  --primary: #3a2f4a;
-  --accent: #d07fbf;
-  --on-accent: #16131a;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* The sticky top app bar never covers a focused element or an #anchor (WCAG 2.4.11) */
+    scroll-padding-top: calc(var(--header-height) + var(--space-4));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    margin: 0;
+    background: var(--color-background);
+    color: var(--ctx-text);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    line-height: 1.6;
+    /* Raleway's default figures are old-style (3, 4, 5, 7 and 9 hang below the line) */
+    font-variant-numeric: lining-nums;
+  }
+
+  /* The moss-green context (top app bar, footer, hero, admin bar): parchment text and lavender accents for
+     everything inside. Hover layers on moss only carry parchment text, never lavender (4.13:1). */
+  .on-secondary {
+    --ctx-text: var(--color-on-secondary);
+    --ctx-text-muted: var(--color-surface-variant);
+    --ctx-link: var(--color-secondary-accent);
+    --ctx-focus: var(--color-secondary-accent);
+    --ctx-action: var(--color-secondary-accent);
+    --ctx-on-action: var(--color-on-background);
+    --ctx-outline: var(--color-surface-variant);
+    --ctx-outlined: var(--color-on-secondary);
+    --ctx-state: var(--color-on-secondary);
+    background-color: var(--color-secondary);
+    color: var(--ctx-text);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0 0 var(--space-3);
+    color: var(--ctx-text);
+    font-family: var(--font-serif);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--font-size-headline-large);
+    line-height: 1.15;
+  }
+
+  h2 {
+    margin-top: var(--space-7);
+    font-size: var(--font-size-headline-medium);
+    line-height: 1.2;
+  }
+
+  h3,
+  h4 {
+    margin-top: var(--space-5);
+    font-size: var(--font-size-title-large);
+    line-height: 1.3;
+  }
+
+  p,
+  ul,
+  ol,
+  dl,
+  table,
+  figure {
+    margin: 0 0 var(--space-4);
+  }
+
+  p,
+  li,
+  dd {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: var(--ctx-link);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ctx-focus);
+    outline-offset: 2px;
+  }
+
+  img,
+  svg {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    color: inherit;
+    font: inherit;
+  }
+
+  ::selection {
+    background: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-/* Basic shared design. Kept simple, the real design comes later */
-*, *::before, *::after {
-  box-sizing: border-box;
+@layer layout {
+  /* Every page's <main> is a centred column that pushes the footer down. A page that needs full-width bands (the
+     homepage) sets its own main rules and puts a .container in each band. */
+  body > main {
+    flex: 1;
+    width: 100%;
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding: var(--space-6) var(--gutter) var(--space-8);
+  }
+
+  .container {
+    width: 100%;
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  margin: 0;
-  background: var(--background);
-  color: var(--text);
-  font-family: "Raleway", system-ui, sans-serif;
-  line-height: 1.6;
+/* Shared components; MASTER.md has the specs and /styleguide shows them. State layers (::before in currentColor) and
+   lifts only animate opacity and transform. */
+@layer components {
+  /* ---- Icons: <svg class="icon" aria-hidden="true"><use href="/assets/icons/icons.svg#name"></use></svg> ---- */
+  .icon {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+
+  .icon--20 {
+    width: 20px;
+    height: 20px;
+  }
+
+  .icon--40 {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* ---- Skip link: first thing in the top app bar, visible once focused ---- */
+  .skip-link {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    z-index: var(--z-toast);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-primary);
+    font-weight: 600;
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  /* ---- Buttons. A <button> without a class is a filled button; <a class="button"> looks the same. ---- */
+  :where(button, .button) {
+    --button-bg: var(--ctx-action);
+    --button-fg: var(--ctx-on-action);
+    --button-border: transparent;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: 10px var(--space-5);
+    overflow: hidden;
+    border: 1px solid var(--button-border);
+    border-radius: var(--radius-full);
+    background: var(--button-bg);
+    color: var(--button-fg);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-label-large);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: .01em;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform var(--duration-short) var(--ease-standard);
+  }
+
+  /* The state layer */
+  :where(button, .button, .chip, .nav-link, .icon-button, .cart-link)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity var(--duration-short) var(--ease-standard);
+    pointer-events: none;
+  }
+
+  :where(button, .button, .chip, .nav-link, .icon-button, .cart-link):hover::before {
+    opacity: .08;
+  }
+
+  :where(button, .button, .chip, .nav-link, .icon-button, .cart-link):is(:focus-visible, :active, :has(:focus-visible))::before {
+    opacity: .1;
+  }
+
+  :where(button, .button):active {
+    transform: scale(.98);
+  }
+
+  .button--tonal {
+    --button-bg: var(--color-primary-container);
+    --button-fg: var(--color-on-primary-container);
+  }
+
+  .button--outlined {
+    --button-bg: transparent;
+    --button-fg: var(--ctx-outlined);
+    --button-border: var(--ctx-outline);
+  }
+
+  .button--text {
+    --button-bg: transparent;
+    --button-fg: var(--ctx-link);
+    padding-inline: var(--space-3);
+  }
+
+  .button--large {
+    min-height: 48px;
+    padding-inline: var(--space-6);
+    font-size: 1rem;
+  }
+
+  .button--block {
+    display: flex;
+    width: 100%;
+  }
+
+  :where(button, .button, .chip):is(:disabled, [aria-disabled="true"]),
+  .chip:has(:disabled) {
+    opacity: var(--state-disabled-opacity);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  :where(button, .button, .chip):is(:disabled, [aria-disabled="true"])::before,
+  .chip:has(:disabled)::before {
+    display: none;
+  }
+
+  .icon-button {
+    --button-bg: transparent;
+    --button-fg: var(--ctx-text);
+    width: 48px;
+    height: 48px;
+    min-height: 48px;
+    padding: 0;
+  }
+
+  /* ---- Text fields (M3 outlined): label above, 48px, Oliven border, 2px Ametyst on focus ---- */
+  label {
+    font-size: var(--font-size-label-large);
+    font-weight: 600;
+  }
+
+  :where(input:not([type="checkbox"], [type="radio"], [type="hidden"], [type="submit"], [type="file"]), select, textarea) {
+    min-height: 48px;
+    max-width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  :where(input:not([type="checkbox"], [type="radio"]), select, textarea):hover {
+    border-color: var(--color-on-surface);
+  }
+
+  /* 1px border + 1px inset shadow = 2px, so focus never shifts the layout */
+  :where(input:not([type="checkbox"], [type="radio"]), select, textarea):focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+  }
+
+  :where(input, select, textarea):user-invalid {
+    border-color: var(--color-error);
+  }
+
+  :where(input, select, textarea):user-invalid:focus {
+    box-shadow: inset 0 0 0 1px var(--color-error);
+  }
+
+  :where(input, select, textarea):disabled {
+    opacity: var(--state-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  ::placeholder {
+    color: var(--color-on-surface-variant);
+    opacity: 1;
+  }
+
+  input[type="number"] {
+    width: 5.5rem;
+  }
+
+  select {
+    appearance: none;
+    padding-right: 44px;
+    background-image: var(--icon-select);
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 24px;
+    cursor: pointer;
+  }
+
+  textarea {
+    min-height: 7rem;
+    resize: vertical;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /* Required fields get an asterisk (hidden from screen readers, which announce "required" themselves) */
+  :is(.field:has(:required) > label, label:has(+ :is(input, select, textarea):required))::after {
+    content: " *";
+    content: " *" / "";
+    color: var(--color-error);
+  }
+
+  .field-hint,
+  .field-error {
+    margin: 0;
+    color: var(--ctx-text-muted);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .field-error {
+    display: none;
+    color: var(--color-error);
+  }
+
+  .field:has(:user-invalid) .field-error {
+    display: block;
+  }
+
+  .form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  /* Checkbox and radio: 20px, and the whole label row is the target (at least 44px high) */
+  input[type="checkbox"],
+  input[type="radio"] {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
+  /* Not flex: the text and links inside must wrap as one paragraph */
+  label:has(> input[type="checkbox"], > input[type="radio"]):not(.chip) {
+    position: relative;
+    display: block;
+    min-height: 44px;
+    padding: 11px 0 11px 32px;
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    line-height: 1.4;
+    cursor: pointer;
+  }
+
+  label:not(.chip) > :is(input[type="checkbox"], input[type="radio"]) {
+    position: absolute;
+    top: 12px;
+    left: 0;
+  }
+
+  /* ---- Chips: tags, categories and variant choices. Selected = Ametystskær + check. ---- */
+  .chip {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 36px;
+    padding: 6px var(--space-4);
+    overflow: hidden;
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    font-size: var(--font-size-label-large);
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .chip:is([aria-current], [aria-pressed="true"], :has(:checked)) {
+    border-color: var(--color-primary);
+    background: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  .chip:is([aria-current], [aria-pressed="true"], :has(:checked))::after {
+    content: "";
+    order: -1;
+    width: 18px;
+    height: 18px;
+    margin-left: -4px;
+    background: currentColor;
+    mask: var(--icon-check) center / contain no-repeat;
+  }
+
+  /* A radio chip: the real radio covers the chip, invisible, so clicks and the keyboard still work */
+  .chip > input[type="radio"],
+  .chip > input[type="checkbox"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: inherit;
+  }
+
+  .chip:has(:focus-visible) {
+    outline: 2px solid var(--ctx-focus);
+    outline-offset: 2px;
+  }
+
+  .chip-set {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip-fieldset {
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    border: 0;
+  }
+
+  .chip-fieldset legend {
+    margin-bottom: var(--space-2);
+    padding: 0;
+    font-size: var(--font-size-label-large);
+    font-weight: 600;
+  }
+
+  /* ---- Cards ---- */
+  .card {
+    padding: var(--space-5);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+  }
+
+  .card--form {
+    border-color: transparent;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--elevation-1);
+  }
+
+  /* ---- Product image frame: moss green with an amethyst glow, so dark renders melt into it ---- */
+  .media-frame {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 56%, color-mix(in srgb, var(--color-secondary-accent) 32%, transparent),
+        color-mix(in srgb, var(--color-primary) 20%, transparent) 36%, transparent 66%),
+      var(--color-secondary);
+    color: var(--color-on-secondary);
+  }
+
+  .media-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-long) var(--ease-standard);
+  }
+
+  .media-frame--empty {
+    display: grid;
+    place-items: center;
+  }
+
+  .media-frame--empty .icon {
+    width: 30%;
+    height: 30%;
+    color: var(--color-secondary-accent);
+    opacity: .85;
+  }
+
+  .media-frame__label {
+    position: absolute;
+    bottom: var(--space-3);
+    left: 0;
+    right: 0;
+    color: var(--color-surface-variant);
+    font-size: var(--font-size-label-medium);
+    font-weight: 500;
+    text-align: center;
+  }
+
+  /* ---- Product card (M3 outlined card, elevated on hover). The link's ::after makes the whole card clickable. ---- */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin: 0 0 var(--space-7);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 600px) {
+    .product-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+  }
+
+  @media (min-width: 840px) {
+    .product-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .product-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    transition: transform var(--duration-short) var(--ease-standard);
+  }
+
+  /* The hover shadow lives on its own layer, so only its opacity animates */
+  .product-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    box-shadow: var(--elevation-2);
+    opacity: 0;
+    transition: opacity var(--duration-short) var(--ease-standard);
+    pointer-events: none;
+  }
+
+  .product-card .media-frame {
+    border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+  }
+
+  .product-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-3) var(--space-4);
+  }
+
+  @media (min-width: 600px) {
+    .product-card__body {
+      padding: var(--space-4);
+    }
+  }
+
+  .product-card__body > * {
+    margin: 0;
+  }
+
+  .product-card__category {
+    color: var(--color-on-surface-variant);
+  }
+
+  .product-card__name {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--font-size-title-medium);
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .product-card__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .product-card__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  .product-card__link:focus-visible {
+    outline: none;
+  }
+
+  .product-card:has(.product-card__link:focus-visible) {
+    outline: 2px solid var(--ctx-focus);
+    outline-offset: 2px;
+  }
+
+  .product-card__price {
+    margin-top: auto;
+    padding-top: var(--space-2);
+    font-weight: 600;
+  }
+
+  .product-card:hover::before {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .product-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .product-card:hover .media-frame img {
+      transform: scale(1.03);
+    }
+  }
+
+  /* ---- Stock status: dot + text, never colour alone ---- */
+  .stock {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+    font-weight: 500;
+  }
+
+  .stock::before {
+    content: "";
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .stock--in {
+    color: var(--color-success);
+  }
+
+  /* ---- Badge (count on the basket icon) ---- */
+  .badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-full);
+    background: var(--ctx-action);
+    color: var(--ctx-on-action);
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* ---- Banners: icon + text, never colour alone. Info is the default; role="alert" and .auth-error are errors. ---- */
+  :where(.banner, main [role="status"], main [role="alert"], .auth-error, .admin-success) {
+    --banner-bg: var(--color-primary-container);
+    --banner-accent: var(--color-primary);
+    --banner-icon: var(--icon-info);
+    position: relative;
+    margin: 0 0 var(--space-5);
+    padding: var(--space-3) var(--space-4) var(--space-3) 52px;
+    border-radius: var(--radius-md);
+    background: var(--banner-bg);
+    color: var(--color-on-surface);
+  }
+
+  :where(.banner, main [role="status"], main [role="alert"], .auth-error, .admin-success)::before {
+    content: "";
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-4);
+    width: 24px;
+    height: 24px;
+    background: var(--banner-accent);
+    mask: var(--banner-icon) center / contain no-repeat;
+  }
+
+  :where(.banner, main [role="status"], main [role="alert"], .auth-error, .admin-success) > :last-child {
+    margin-bottom: 0;
+  }
+
+  :where(ul, ol):where(.banner, [role="status"], [role="alert"], .auth-error) {
+    padding-left: calc(52px + 1.1em);
+  }
+
+  .banner--success,
+  .admin-success {
+    --banner-bg: var(--color-success-container);
+    --banner-accent: var(--color-success);
+    --banner-icon: var(--icon-check-circle);
+  }
+
+  :is(.banner--error, main [role="alert"], .auth-error) {
+    --banner-bg: var(--color-error-container);
+    --banner-accent: var(--color-error);
+    --banner-icon: var(--icon-error);
+    border-left: 4px solid var(--color-error);
+  }
+
+  .banner :is(ul, ol) {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+
+  .banner__title {
+    margin: 0 0 var(--space-1);
+    font-weight: 700;
+  }
+
+  /* ---- Tables (the responsive .data-table is in products.css) ---- */
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-outline-variant);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+    font-weight: 600;
+  }
+
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .table-scroll {
+    max-width: 100%;
+    margin: 0 0 var(--space-5);
+    overflow-x: auto;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .table-scroll table {
+    width: 100%;
+    margin: 0;
+  }
+
+  .table-scroll tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  /* ---- The arch (signature shape). Only on a 4:5 box, so the top is an exact half circle. ---- */
+  .arch {
+    aspect-ratio: 4 / 5;
+    border-radius: var(--shape-arch);
+  }
+
+  .arch--glow {
+    background:
+      radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--color-secondary-accent) 34%, transparent),
+        color-mix(in srgb, var(--color-primary) 22%, transparent) 40%, transparent 70%),
+      var(--color-secondary);
+  }
+
+  .arch-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--shape-arch);
+    background:
+      radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--color-secondary-accent) 30%, transparent), transparent 70%),
+      var(--color-secondary);
+    color: var(--color-secondary-accent);
+  }
+
+  .arch-icon .icon {
+    margin-top: 8px;
+  }
+
+  /* ---- Moon phases: a decorative divider (aria-hidden) ---- */
+  .moon-phases {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    color: var(--ctx-text-muted);
+  }
+
+  .moon-phases::before,
+  .moon-phases::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: .4;
+  }
+
+  .moon-phases svg {
+    flex: none;
+    width: 186px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  /* ---- Top app bar (navbar.php). Compact: wordmark, basket and a menu button that opens the navigation drawer
+     (Popover API: no JavaScript, Esc and a click outside close it). From 840px the same <nav> sits in the bar. ---- */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+  }
+
+  /* A soft shadow once the page scrolls (scroll-driven, opacity only) */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .navbar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        box-shadow: var(--elevation-2);
+        opacity: 0;
+        pointer-events: none;
+        animation: fade-in linear both;
+        animation-timeline: scroll();
+        animation-range: 0 var(--header-height);
+      }
+    }
+  }
+
+  @keyframes fade-in {
+    to {
+      opacity: 1;
+    }
+  }
+
+  .navbar__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: var(--header-height);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 48px;
+    color: var(--ctx-text);
+    font-family: var(--font-brand);
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-decoration: none;
+  }
+
+  .brand .icon {
+    width: 22px;
+    height: 22px;
+    color: var(--ctx-link);
+  }
+
+  .navbar .brand {
+    margin-right: auto;
+  }
+
+  .nav-drawer {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(320px, 86vw);
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: var(--space-3) var(--space-4) var(--space-6);
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    background: var(--color-secondary);
+    color: var(--ctx-text);
+    box-shadow: var(--elevation-3);
+  }
+
+  .nav-drawer::backdrop {
+    background: var(--scrim);
+  }
+
+  .nav-drawer__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+  }
+
+  .nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nav-list form {
+    margin: 0;
+  }
+
+  .nav-link {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: 56px;
+    padding: 0 var(--space-5);
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--ctx-text);
+    font-size: var(--font-size-label-large);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  button.nav-link {
+    justify-content: flex-start;
+  }
+
+  /* Active page: a lavender pill with Nattegrøn text (never lavender text on a moss hover, 4.13:1) */
+  .nav-link[aria-current="page"] {
+    background: var(--color-secondary-accent);
+    color: var(--color-on-background);
+  }
+
+  .nav-greeting {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0 var(--space-5);
+    color: var(--ctx-text-muted);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .cart-link {
+    position: relative;
+    isolation: isolate;
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    color: var(--ctx-text);
+  }
+
+  .cart-link[aria-current="page"] {
+    background: var(--color-secondary-accent);
+    color: var(--color-on-background);
+  }
+
+  .cart-link .badge {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    box-shadow: 0 0 0 2px var(--color-secondary);
+  }
+
+  /* The menu icon turns into a cross while the drawer is open */
+  .menu-button {
+    display: inline-grid;
+  }
+
+  .menu-button .icon {
+    grid-area: 1 / 1;
+    transition: opacity var(--duration-short) var(--ease-standard), transform var(--duration-medium) var(--ease-standard);
+  }
+
+  .menu-button .icon--close,
+  .navbar:has(.nav-drawer:popover-open) .menu-button .icon--menu {
+    opacity: 0;
+    transform: rotate(-90deg);
+  }
+
+  .navbar:has(.nav-drawer:popover-open) .menu-button .icon--close {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 839.98px) and (prefers-reduced-motion: no-preference) {
+    .nav-drawer {
+      transform: translateX(-100%);
+      transition: transform 175ms var(--ease-accelerate), overlay 175ms allow-discrete, display 175ms allow-discrete;
+    }
+
+    .nav-drawer:popover-open {
+      transform: none;
+      transition-duration: var(--duration-medium);
+      transition-timing-function: var(--ease-decelerate);
+    }
+
+    @starting-style {
+      .nav-drawer:popover-open {
+        transform: translateX(-100%);
+      }
+    }
+  }
+
+  @media (min-width: 840px) {
+    .nav-drawer {
+      position: static;
+      display: flex;
+      width: auto;
+      height: auto;
+      padding: 0;
+      overflow: visible;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+    }
+
+    .nav-drawer__header,
+    .menu-button {
+      display: none;
+    }
+
+    .nav-list {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .nav-link {
+      min-height: 44px;
+      padding: 0 var(--space-4);
+    }
+
+    .nav-greeting {
+      padding: 0 var(--space-2) 0 var(--space-4);
+    }
+  }
+
+  /* ---- Footer ---- */
+  .footer {
+    padding: var(--space-6) 0 var(--space-7);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .footer .moon-phases {
+    margin-bottom: var(--space-6);
+  }
+
+  .footer__grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .footer__tagline {
+    margin: var(--space-1) 0 0;
+    color: var(--ctx-text-muted);
+  }
+
+  .footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .footer__copy {
+    margin: 0;
+    color: var(--ctx-text-muted);
+  }
+
+  @media (min-width: 840px) {
+    .footer__grid {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+
+    .footer__copy {
+      grid-column: 1 / -1;
+    }
+  }
+
 }
 
-/* Every page's content: centred column, footer pushed to the bottom */
-body > main {
-  flex: 1;
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 32px 16px;
-}
+@layer utilities {
+  .visually-hidden:not(:focus-visible) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
 
-h1, h2, h3 {
-  margin: 1.5em 0 .5em;
-  line-height: 1.2;
-}
-h1 {
-  margin-top: 0;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-}
-h2 {
-  font-size: 1.35rem;
-}
+  /* Type roles (M3). Headings get theirs by default; these put a role on any element. */
+  .wordmark {
+    font-family: var(--font-brand);
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
 
-a {
-  color: var(--accent);
-  text-underline-offset: 2px;
-}
+  .type-display {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-display);
+    font-weight: 600;
+    line-height: 1.08;
+  }
 
-img {
-  max-width: 100%;
-  height: auto;
-}
+  .type-headline-large {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-headline-large);
+    font-weight: 600;
+    line-height: 1.15;
+  }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
+  .type-headline-medium {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-headline-medium);
+    font-weight: 600;
+    line-height: 1.2;
+  }
 
-input,
-select,
-textarea {
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--text);
-}
+  .type-title-large {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-title-large);
+    font-weight: 600;
+    line-height: 1.3;
+  }
 
-input[type="checkbox"],
-input[type="radio"] {
-  accent-color: var(--accent);
-}
+  .type-title-medium {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-title-medium);
+    font-weight: 600;
+    line-height: 1.35;
+  }
 
-button {
-  padding: 9px 16px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-weight: 600;
-  cursor: pointer;
-}
+  .type-body-large {
+    max-width: var(--measure);
+    font-size: var(--font-size-body-large);
+    line-height: 1.7;
+  }
 
-button:hover {
-  background: color-mix(in srgb, var(--accent) 85%, var(--text));
-}
+  .type-label-large {
+    font-size: var(--font-size-label-large);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: .01em;
+  }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+  .type-label-medium {
+    font-size: var(--font-size-label-medium);
+    font-weight: 500;
+    line-height: 1.4;
+  }
 
-table {
-  border-collapse: collapse;
-  background: var(--surface);
-}
+  .type-overline {
+    font-size: var(--font-size-overline);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
 
-th,
-td {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  vertical-align: top;
-}
-
-thead th {
-  background: color-mix(in srgb, var(--primary) 40%, var(--surface));
-}
-
-/* Messages (basket messages, checkout errors) */
-main [role="status"],
-main [role="alert"] {
-  padding: 10px 14px;
-  border-left: 4px solid var(--accent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--accent) 12%, var(--background));
-}
-
-main ul[role="alert"] {
-  padding-left: 32px;
-}
-
-/* Shared navbar (assets/php/navbar.php) */
-.navbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 20px;
-  padding: 14px max(16px, calc((100% - 1100px) / 2 + 16px));
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.navbar a {
-  color: inherit;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.navbar a:hover {
-  color: var(--accent);
-}
-
-.navbar .navbar-brand {
-  margin-right: auto;
-  color: var(--accent);
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: .02em;
-}
-
-.navbar form {
-  margin: 0;
-}
-
-.navbar button {
-  padding: 6px 12px;
-}
-
-/* Shared footer (assets/php/footer.php) */
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 20px;
-  padding: 20px max(16px, calc((100% - 1100px) / 2 + 16px));
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--muted);
-  font-size: .9rem;
-}
-
-.footer p {
-  margin: 0;
-}
-
-.footer nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.footer a {
-  color: inherit;
+  .text-muted {
+    color: var(--ctx-text-muted);
+  }
 }

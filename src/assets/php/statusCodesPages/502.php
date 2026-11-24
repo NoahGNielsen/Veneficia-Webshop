@@ -6,18 +6,23 @@ if (!headers_sent()) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/header.php'; ?>
     <link rel="stylesheet" href="/assets/css/statusCodePage.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/statusCodePage.css') ?>">
-    <title>Bad gateway - Veneficia</title>
+    <title>Forbindelsesfejl - Veneficia</title>
     <meta name="robots" content="noindex">
 </head>
 <body>
     <main class="status-page">
-        <p class="status-code">502</p>
-        <h1>Bad gateway</h1>
-        <p class="status-message">The server got an invalid response while handling your request. Please try again.</p>
+        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <p class="status-code"><span class="visually-hidden">Fejl </span>502</p>
+        <h1>Noget gik galt undervejs</h1>
+        <p class="status-message">Serveren fik et ugyldigt svar. Prøv igen.</p>
+        <div class="status-actions">
+            <a class="button" href="/">Til forsiden</a>
+            <a class="button button--outlined" href="/products">Se produkterne</a>
+        </div>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>

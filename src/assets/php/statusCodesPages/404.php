@@ -5,18 +5,23 @@ if (!headers_sent()) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/header.php'; ?>
     <link rel="stylesheet" href="/assets/css/statusCodePage.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/statusCodePage.css') ?>">
-    <title>Page not found - Veneficia</title>
+    <title>Siden findes ikke - Veneficia</title>
     <meta name="robots" content="noindex">
 </head>
 <body>
     <main class="status-page">
-        <p class="status-code">404</p>
-        <h1>Page not found</h1>
-        <p class="status-message">The page you're looking for doesn't exist or has been moved.</p>
+        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <p class="status-code"><span class="visually-hidden">Fejl </span>404</p>
+        <h1>Vi kan ikke finde siden</h1>
+        <p class="status-message">Siden findes ikke, eller den er blevet flyttet.</p>
+        <div class="status-actions">
+            <a class="button" href="/">Til forsiden</a>
+            <a class="button button--outlined" href="/products">Se produkterne</a>
+        </div>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>

@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <main class="auth-page">
+        <a class="brand auth-brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
         <form class="auth-form" method="post" action="/userMgmt/login<?= htmlspecialchars($nextQuery) ?>">
             <h1>Log ind</h1>
             <?php if ($error !== ''): ?>
@@ -61,17 +62,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
             <input type="hidden" name="csrfToken" value="<?= htmlspecialchars(csrfToken()) ?>">
 
-            <label for="email">E-mail</label>
-            <input type="email" id="email" name="email" autocomplete="email" required value="<?= htmlspecialchars($email) ?>">
+            <div class="field">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" autocomplete="email" required value="<?= htmlspecialchars($email) ?>">
+            </div>
 
-            <label for="password">Adgangskode</label>
-            <input type="password" id="password" name="password" autocomplete="current-password" required>
+            <div class="field">
+                <label for="password">Adgangskode</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required>
+            </div>
 
             <label class="auth-checkbox">
                 <input type="checkbox" name="rememberMe" value="1"> Husk mig
             </label>
 
-            <button type="submit">Log ind</button>
+            <button type="submit" class="button--large button--block">Log ind</button>
             <p class="auth-switch">Har du ikke en konto? <a href="/userMgmt/signup<?= htmlspecialchars($nextQuery) ?>">Opret en her</a></p>
         </form>
     </main>

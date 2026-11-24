@@ -1,7 +1,7 @@
 <?php
 // The bar at the top of every admin page. Needs $employee from requireEmployee().
 ?>
-<header class="admin-bar">
+<header class="admin-bar on-secondary">
     <a href="/admin/">Admin forside</a>
     <span>Logget ind som <strong><?= htmlspecialchars($employee['employeeUsername']) ?></strong></span>
     <form method="post" action="/admin/logout">

@@ -1,216 +1,277 @@
-.admin-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 16px;
-    background: var(--primary);
-}
-
-.admin-bar a {
-    color: inherit;
-    font-weight: 600;
-}
-
-.admin-bar form {
-    margin: 0;
-}
-
-.admin-bar button {
-    padding: 8px 14px;
-    border: 0;
-    border-radius: 6px;
-    background: var(--accent);
-    color: var(--on-accent);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.admin-page {
+/* The admin pages (admin/): a light hand. The same layout and behaviour as before, on the design system's tokens and
+   components. The bar on top is moss green like the shop's top app bar (.on-secondary in adminBar.php). */
+@layer pages {
+  .admin-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 48px;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    min-height: 56px;
+    padding: var(--space-2) var(--gutter);
+  }
+
+  .admin-bar a {
+    font-weight: 600;
+  }
+
+  .admin-bar form {
+    margin: 0;
+  }
+
+  .admin-bar button {
+    --button-bg: transparent;
+    --button-fg: var(--ctx-outlined);
+    --button-border: var(--ctx-outline);
+  }
+
+  body > main.admin-page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-7);
     justify-content: center;
     align-items: flex-start;
-    padding: 48px 16px;
-}
+    padding: var(--space-7) var(--gutter) var(--space-8);
+  }
 
-.admin-page h1,
-.admin-page h2 {
-    margin: 0 0 8px;
-}
+  .admin-page :is(h1, h2) {
+    margin: 0 0 var(--space-2);
+  }
 
-.admin-home {
+  body > main.admin-home {
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-}
+    gap: var(--space-4);
+  }
 
-.admin-buttons {
+  /* The admin home page's tiles */
+  .admin-buttons {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
     width: 100%;
     max-width: 720px;
-}
+  }
 
-.admin-button {
+  .admin-buttons .admin-button {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding: 16px;
-    border: 1px solid var(--primary);
-    border-radius: 6px;
-    color: var(--text);
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
     text-decoration: none;
-}
+  }
 
-.admin-button:hover {
-    background: color-mix(in srgb, var(--primary) 25%, var(--background));
-}
+  .admin-buttons .admin-button:hover {
+    border-color: var(--color-outline);
+  }
 
-.admin-table {
-    border-collapse: collapse;
+  .admin-buttons .admin-button span {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+  }
+
+  /* Tables */
+  .admin-table {
     min-width: 280px;
-}
+    border: 1px solid var(--color-outline-variant);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-surface);
+  }
 
-.admin-table th,
-.admin-table td {
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--primary);
-    text-align: left;
-}
+  /* On small screens a wide table scrolls inside itself instead of the page */
+  .admin-page > * {
+    min-width: 0;
+    max-width: 100%;
+  }
 
-.admin-list {
+  @media (max-width: 839.98px) {
+    .admin-table {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  }
+
+  .admin-table tr:last-child > td {
+    border-bottom: 0;
+  }
+
+  .admin-table td form {
+    margin: 0;
+  }
+
+  /* A destructive action stands out in the error colour */
+  .admin-page button[name="delete"] {
+    --button-bg: transparent;
+    --button-fg: var(--color-error);
+    --button-border: var(--color-error);
+    min-height: 36px;
+    padding: 6px var(--space-4);
+  }
+
+  /* Lists: the link covers the whole row, so a click anywhere opens the item */
+  body > main.admin-list {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
-    gap: 16px;
-}
+    gap: var(--space-4);
+  }
 
-.admin-list-head {
+  .admin-list-head {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
-}
+    gap: var(--space-3) var(--space-4);
+  }
 
-.admin-list .admin-table {
+  form.admin-list-head {
+    justify-content: flex-start;
+  }
+
+  .admin-list .admin-table {
     width: 100%;
-}
+  }
 
-/* The link in the row covers the whole row, so a click anywhere opens the item */
-.admin-row {
+  .admin-row {
     position: relative;
-}
+  }
 
-.admin-row a::after {
+  .admin-row a::after {
     content: "";
     position: absolute;
     inset: 0;
-}
+  }
 
-.admin-row:hover {
-    background: color-mix(in srgb, var(--primary) 25%, var(--background));
-}
+  .admin-row:hover > td {
+    background: var(--color-primary-container);
+  }
 
-.admin-success {
-    margin: 0 0 8px;
-    padding: 10px;
-    border-left: 4px solid var(--primary);
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--primary) 25%, var(--background));
-}
-
-.item-form {
+  /* The item form (admin/item, with itemForm.js): 8px from label to field, more between the groups */
+  .item-form {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
     width: 100%;
     max-width: 960px;
-}
+  }
 
-.item-form > label,
-.item-form legend {
-    font-weight: 600;
-}
+  .item-form > * + :is(label, fieldset) {
+    margin-top: var(--space-3);
+  }
 
-.item-form fieldset {
+  .item-form > h2 {
+    margin-top: var(--space-6);
+  }
+
+  .item-form > button[type="submit"] {
+    align-self: flex-start;
+    margin-top: var(--space-5);
+  }
+
+  .item-form fieldset {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-}
-
-.item-row {
-    display: flex;
-    gap: 8px;
-}
-
-.item-tags {
-    position: relative;
-}
-
-.item-tags input {
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.item-tag-list {
-    position: absolute;
-    z-index: 1;
-    left: 0;
-    right: 0;
+    gap: var(--space-2);
     margin: 0;
-    padding: 0;
-    border: 1px solid var(--primary);
-    background: var(--background);
-    list-style: none;
-}
+    padding: var(--space-4);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+  }
 
-.item-tag-list li {
-    padding: 8px;
-    cursor: pointer;
-}
+  .item-form legend {
+    padding: 0 var(--space-1);
+    font-weight: 600;
+  }
 
-.item-tag-list li:hover,
-.item-tag-list li[aria-selected="true"] {
-    background: color-mix(in srgb, var(--primary) 25%, var(--background));
-}
+  /* itemForm.js's buttons (add or remove types and variants) are secondary to "Gem" */
+  .item-form button[type="button"] {
+    --button-bg: var(--color-primary-container);
+    --button-fg: var(--color-on-primary-container);
+    min-height: 36px;
+    padding: 6px var(--space-4);
+  }
 
-.item-images {
+  .item-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
-}
+    align-items: center;
+    gap: var(--space-2);
+  }
 
-.item-image {
+  .item-tags {
+    position: relative;
+  }
+
+  .item-tags input {
+    width: 100%;
+  }
+
+  .item-tag-list {
+    position: absolute;
+    z-index: var(--z-sticky);
+    left: 0;
+    right: 0;
+    margin: var(--space-1) 0 0;
+    padding: var(--space-1) 0;
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    box-shadow: var(--elevation-2);
+    list-style: none;
+  }
+
+  .item-tag-list li {
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+  }
+
+  .item-tag-list li:hover,
+  .item-tag-list li[aria-selected="true"] {
+    background: var(--color-primary-container);
+  }
+
+  .item-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .item-image {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-1);
     width: 120px;
-}
+  }
 
-.item-image img {
+  .item-image img {
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-variant);
     object-fit: contain;
-}
+  }
 
-.item-image-new span {
+  .item-image-new span {
     overflow-wrap: anywhere;
-}
+  }
 
-.item-image input[type="number"] {
+  .item-image input[type="number"] {
     width: 100%;
-    box-sizing: border-box;
-}
+  }
 
-.item-variants {
+  .item-variants {
     overflow-x: auto;
-}
+  }
 
-.item-variants input[type="text"] {
+  .item-variants input[type="text"] {
     width: 100%;
     min-width: 80px;
-    box-sizing: border-box;
+  }
 }

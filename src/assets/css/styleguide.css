@@ -1,0 +1,242 @@
+/* Only for /styleguide: the page's own layout and the demo states, plus the upcoming components that need a backend
+   first (search, the free-shipping bar and the upsell dialog). When one of them is built, move its rules into
+   mainStyle.css's components layer and link it from the page that uses it. */
+@layer components {
+  /* ---- Dialog (M3): radius 28, elevation 3, scrim ---- */
+  .dialog {
+    width: min(560px, calc(100vw - 2 * var(--gutter)));
+    padding: var(--space-6);
+    border: 0;
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    box-shadow: var(--elevation-3);
+  }
+
+  .dialog::backdrop {
+    background: var(--scrim);
+  }
+
+  .dialog__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+
+  /* ---- Search bar (M3) ---- */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 56px;
+    padding: 0 var(--space-1) 0 var(--space-4);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-on-surface-variant);
+  }
+
+  .search-bar:focus-within {
+    outline: 2px solid var(--ctx-focus);
+    outline-offset: 2px;
+  }
+
+  .search-bar input {
+    flex: 1;
+    min-width: 0;
+    padding-inline: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .search-bar input:focus {
+    box-shadow: none;
+  }
+
+  /* ---- Free-shipping bar (goal-gradient) ---- */
+  .progress {
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-variant);
+    appearance: none;
+  }
+
+  .progress::-webkit-progress-bar {
+    background: var(--color-surface-variant);
+  }
+
+  .progress::-webkit-progress-value {
+    border-radius: var(--radius-full);
+    background: var(--color-success);
+  }
+
+  .progress::-moz-progress-bar {
+    border-radius: var(--radius-full);
+    background: var(--color-success);
+  }
+}
+
+@layer pages {
+  .styleguide > section {
+    margin-top: var(--space-8);
+  }
+
+  .styleguide h3 {
+    margin-top: var(--space-6);
+  }
+
+  .styleguide code {
+    padding: 1px 6px;
+    border-radius: var(--radius-xs);
+    background: var(--color-surface-variant);
+    color: var(--color-on-surface);
+    font-size: .875em;
+  }
+
+  .sg-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+
+  .sg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: var(--space-4);
+    margin: 0 0 var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .sg-swatch {
+    overflow: hidden;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .sg-swatch__color {
+    height: 72px;
+    border-bottom: 1px solid var(--color-outline-variant);
+  }
+
+  .sg-swatch__body {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .sg-swatch__body p {
+    margin: 0 0 var(--space-1);
+  }
+
+  .sg-panel {
+    margin-bottom: var(--space-5);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+  }
+
+  .sg-stack {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 420px;
+  }
+
+  .sg-type > * {
+    margin: 0 0 var(--space-1);
+  }
+
+  .sg-type .text-muted {
+    margin-bottom: var(--space-5);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .sg-icons figure {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: 0;
+    font-size: var(--font-size-label-medium);
+  }
+
+  .sg-arch {
+    width: min(240px, 60%);
+  }
+
+  .sg-arch img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .sg-scrim {
+    display: grid;
+    place-items: center;
+    padding: var(--space-7) var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--scrim);
+  }
+
+  .sg-scrim .dialog {
+    position: static;
+    margin: 0;
+  }
+
+  .sg-upsell {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .sg-upsell .media-frame {
+    flex: none;
+    width: 72px;
+    border-radius: var(--radius-md);
+  }
+
+  .sg-upsell p {
+    margin: 0;
+  }
+
+  /* Demo states, so hover, focus, pressed and errors show without interacting */
+  .demo-hover::before {
+    opacity: .08;
+  }
+
+  .demo-focus:not(input) {
+    outline: 2px solid var(--ctx-focus);
+    outline-offset: 2px;
+  }
+
+  .demo-focus::before {
+    opacity: .1;
+  }
+
+  .demo-pressed {
+    transform: scale(.98);
+  }
+
+  .demo-pressed::before {
+    opacity: .1;
+  }
+
+  input.demo-focus {
+    border-color: var(--color-primary);
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+  }
+
+  .demo-error input {
+    border-color: var(--color-error);
+  }
+
+  .demo-error .field-error {
+    display: block;
+  }
+}

@@ -1,78 +1,62 @@
-.auth-page {
-    display: flex;
-    justify-content: center;
-    padding: 48px 16px;
-}
-
-.auth-form {
+/* Log in and sign up (userMgmt/), and the admin pages that use the same form card (admin/login, resetPassword, ...).
+   No top app bar here, so the wordmark above the card leads back to the shop. The admin forms put label and input
+   straight after each other, ours wrap each pair in a .field; both get the same spacing. */
+@layer pages {
+  .auth-page {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    max-width: 420px;
-    padding: 32px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: var(--surface);
-}
+    align-items: center;
+    gap: var(--space-5);
+    padding-block: var(--space-7) var(--space-8);
+  }
 
-.auth-form h1 {
-    margin: 0 0 8px;
+  .auth-brand {
     font-size: 1.75rem;
-}
+  }
 
-.auth-form label {
-    font-weight: 600;
-}
-
-.auth-form input[type="text"],
-.auth-form input[type="email"],
-.auth-form input[type="password"] {
-    padding: 10px;
-    margin-bottom: 8px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--text);
-    font: inherit;
-}
-
-.auth-form .auth-checkbox {
+  /* M3 form card: canvas, radius 28, elevation 1 */
+  .auth-form {
     display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    font-weight: normal;
-}
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 440px;
+    padding: var(--space-6) var(--space-5);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    box-shadow: var(--elevation-1);
+  }
 
-.auth-form button {
-    margin-top: 8px;
-    padding: 12px;
-    border: 0;
-    border-radius: 6px;
-    background: var(--accent);
-    color: var(--on-accent);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-}
+  @media (min-width: 600px) {
+    .auth-form {
+      padding: var(--space-7) var(--space-6);
+    }
+  }
 
-.auth-form button:hover {
-    background: color-mix(in srgb, var(--accent) 80%, var(--text));
-}
+  /* Admin forms on the same card use an h2 */
+  .auth-form :is(h1, h2) {
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-size-headline-medium);
+  }
 
-.auth-error {
-    margin: 0 0 8px;
-    padding: 10px 10px 10px 28px;
-    border-left: 4px solid var(--accent);
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--accent) 15%, var(--background));
-    color: var(--text);
-}
+  /* 8px from label to field, 20px from one field to the next */
+  .auth-form > .field + .field,
+  .auth-form > :is(input, select, textarea) + label,
+  .auth-form > .field + .auth-checkbox {
+    margin-top: var(--space-3);
+  }
 
-p.auth-error {
-    padding-left: 10px;
-}
+  .auth-form > .auth-error {
+    margin: 0 0 var(--space-3);
+  }
 
-.auth-switch {
+  .auth-form > button {
+    margin-top: var(--space-4);
+  }
+
+  .auth-switch {
+    margin: var(--space-3) 0 0;
     text-align: center;
+  }
 }
