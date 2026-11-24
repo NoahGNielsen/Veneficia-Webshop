@@ -1,6 +1,7 @@
 <?php
 // One item: /admin/item adds a new one, /admin/item?id=5 edits item 5.
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/sitemapProducts.php';
 $employee = requireEmployee();
 
 const ITEM_MAX_VARIANTS = 25;
@@ -393,6 +394,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             array_map('unlink', $movedFiles);
             throw $e;
         }
+
+        // A new product (or a new name or category) gets its address in /sitemap-products.xml
+        updateProductSitemap($db);
 
         // Only now, so a failed save can't lose images that are still in use
         array_map('unlink', array_filter($removedFiles, 'is_file'));

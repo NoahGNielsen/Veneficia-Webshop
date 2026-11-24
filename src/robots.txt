@@ -50,3 +50,4 @@ Disallow: /admin/
 
 Sitemap: https://veneficia.noahgajnielsen.dk/sitemap.xml
 Sitemap: https://veneficia.noahgajnielsen.dk/sitemap-categories.xml
+Sitemap: https://veneficia.noahgajnielsen.dk/sitemap-products.xml

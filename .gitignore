@@ -3,6 +3,8 @@ config.php
 database/migrations/*
 # Uploaded product images live only on the server
 src/uploads/*
+# Built by the server (assets/php/sitemapProducts.php), so a deploy must not overwrite it
+/src/sitemap-products.xml
 !src/uploads/.htaccess
 # Real site config (has the database password) - copied from config-examples/, never commit it
 /hbHubSiteConfig.php

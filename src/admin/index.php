@@ -8,6 +8,7 @@ $adminPages = [
     ['href' => '/admin/items', 'title' => 'Varer', 'description' => 'Se, tilføj og ret varer med varianter og billeder.'],
     ['href' => '/admin/categories', 'title' => 'Kategorier', 'description' => 'Se, opret, ret og slet kategorier.'],
     ['href' => '/admin/discountCodes', 'title' => 'Rabatkoder', 'description' => 'Se, opret og slet rabatkoder.'],
+    ['href' => '/admin/sitemap', 'title' => 'Sitemap', 'description' => 'Byg sitemappet med alle produkter.'],
     ['href' => '/admin/employees', 'title' => 'Medarbejdere', 'description' => 'Se og tilføj medarbejdere.'],
     ['href' => '/admin/resetPassword', 'title' => 'Skift adgangskode', 'description' => 'Skift din egen adgangskode.'],
 ];

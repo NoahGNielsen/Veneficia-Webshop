@@ -2,6 +2,7 @@
 // Categories: list, add, edit and delete. Items pick their categories in /admin/item (stored in itemOptions.categories).
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/products.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/sitemapProducts.php';
 $employee = requireEmployee();
 
 // A posted value as a trimmed string. An array where a single value was expected counts as empty.
@@ -88,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db->commit();
             $message = 'Kategorien ' . $categories[$deleteId]['categoryName'] . ' er slettet.';
             $categories = loadCategories($db);
+            updateProductSitemap($db); // product URLs hold the category name
         }
     } else {
         $form['categoryId'] = postedId($_POST['categoryId'] ?? '');
@@ -141,6 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $form = $emptyForm;
             $categories = loadCategories($db);
+            updateProductSitemap($db); // product URLs hold the category name
         }
     }
 } elseif (($editId = postedId($_GET['edit'] ?? '')) !== null && isset($categories[$editId])) {
