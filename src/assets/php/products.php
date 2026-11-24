@@ -7,11 +7,68 @@ function formatPrice(float|string $price): string
     return number_format((float)$price, 2, ',', '.') . ' kr.';
 }
 
-// URL of the product list, optionally filtered by tag and paged. Page 1 and no tag give plain /products.
-function productsUrl(?string $tag = null, int $page = 1): string
+// URL of the product list (or of a category's list, given its path from loadShopCategories()), optionally filtered by
+// tag and paged. Page 1 and no tag give the plain path.
+function productsUrl(?string $tag = null, int $page = 1, string $path = '/products'): string
 {
     $query = array_filter(['tag' => $tag, 'page' => $page > 1 ? $page : null], fn($v) => $v !== null && $v !== '');
-    return '/products' . ($query ? '?' . http_build_query($query) : '');
+    return $path . ($query ? '?' . http_build_query($query) : '');
+}
+
+// True when /slug already is something else: a folder (admin, assets, ...), a file or a page (basket, products, ...).
+// Those win over the category rewrite in .htaccess, so a category can't use that address.
+function slugIsTaken(string $slug): bool
+{
+    $path = $_SERVER['DOCUMENT_ROOT'] . '/' . $slug;
+    return file_exists($path) || is_file("$path.php") || is_file("$path.html") || is_file("$path.htm");
+}
+
+// Category pages live at /category-name (.htaccess sends every other /a-b-c to products.php). null when the name has
+// no letters or digits, or its address is taken by a real page.
+function categoryPagePath(string $categoryName): ?string
+{
+    $slug = urlSlug($categoryName);
+    return $slug === '' || slugIsTaken($slug) ? null : '/' . $slug;
+}
+
+// Every category keyed by id, sorted by name, with its page path ("path", null for none). When two categories give the
+// same path (data from before /admin/categories refused that) the oldest one gets it.
+function loadShopCategories(PDO $db): array
+{
+    $categories = [];
+    $usedPaths = [];
+    foreach ($db->query('SELECT categoryId, categoryName, categoryDescription, parentCategoryId FROM VeneficiaCategories ORDER BY categoryId') as $row) {
+        $path = categoryPagePath($row['categoryName']);
+        if ($path !== null && isset($usedPaths[$path])) {
+            $path = null;
+        } elseif ($path !== null) {
+            $usedPaths[$path] = true;
+        }
+        $categories[(int)$row['categoryId']] = [
+            'name' => $row['categoryName'],
+            'description' => trim((string)$row['categoryDescription']),
+            'parent' => $row['parentCategoryId'] === null ? null : (int)$row['parentCategoryId'],
+            'path' => $path,
+        ];
+    }
+    uasort($categories, fn($a, $b) => strcasecmp($a['name'], $b['name']));
+    return $categories;
+}
+
+// The category's id and the ids of every category below it
+function categoryWithDescendants(array $categories, int $id): array
+{
+    $found = [$id => true];
+    do {
+        $added = false;
+        foreach ($categories as $catId => $category) {
+            if (!isset($found[$catId]) && $category['parent'] !== null && isset($found[$category['parent']])) {
+                $found[$catId] = true;
+                $added = true;
+            }
+        }
+    } while ($added);
+    return array_keys($found);
 }
 
 // Product pages live at /category/product-name-5: the item's first category (see PRODUCT_CATEGORY_JOIN) and its name

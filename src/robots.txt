@@ -49,3 +49,4 @@ Disallow: /.well-known/
 Disallow: /admin/
 
 Sitemap: https://veneficia.noahgajnielsen.dk/sitemap.xml
+Sitemap: https://veneficia.noahgajnielsen.dk/sitemap-categories.xml

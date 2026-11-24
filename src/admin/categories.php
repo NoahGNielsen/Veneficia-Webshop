@@ -1,6 +1,7 @@
 <?php
 // Categories: list, add, edit and delete. Items pick their categories in /admin/item (stored in itemOptions.categories).
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/products.php';
 $employee = requireEmployee();
 
 // A posted value as a trimmed string. An array where a single value was expected counts as empty.
@@ -100,6 +101,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         if ($form['categoryName'] === '' || mb_strlen($form['categoryName']) > 150) {
             $errors[] = 'Skriv et navn til kategorien (højst 150 tegn).';
+        } else {
+            // The name is the category's address (/name, see categoryPagePath()), so it must give one that is free
+            $slug = urlSlug($form['categoryName']);
+            if ($slug === '') {
+                $errors[] = 'Navnet skal indeholde mindst ét bogstav eller tal, så kategorien kan få en adresse.';
+            } elseif (slugIsTaken($slug)) {
+                $errors[] = "Navnet giver adressen /$slug, som allerede bruges af en anden side. Vælg et andet navn.";
+            } else {
+                foreach ($categories as $id => $other) {
+                    if ($id !== $form['categoryId'] && urlSlug($other['categoryName']) === $slug) {
+                        $errors[] = 'Kategorien ' . $other['categoryName'] . " har allerede adressen /$slug. Vælg et andet navn.";
+                        break;
+                    }
+                }
+            }
         }
         if (mb_strlen($form['categoryDescription']) > 5000) {
             $errors[] = 'Beskrivelsen må højst være 5000 tegn.';

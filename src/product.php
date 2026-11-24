@@ -107,7 +107,12 @@ $structuredData = array_filter($structuredData, fn($v) => $v !== null);
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
     <main class="product-page">
-        <p><a href="/products">Alle produkter</a></p>
+        <p>
+            <a href="/products">Alle produkter</a>
+            <?php if (($categoryPath = categoryPagePath((string)$item['categoryName'])) !== null): ?>
+                · <a href="<?= htmlspecialchars($categoryPath) ?>"><?= htmlspecialchars($item['categoryName']) ?></a>
+            <?php endif; ?>
+        </p>
         <h1><?= htmlspecialchars($item['itemName']) ?></h1>
         <p class="product-price">
             <?= min($prices) === max($prices) ? formatPrice(min($prices)) : 'Fra ' . formatPrice(min($prices)) ?>

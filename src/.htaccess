@@ -33,6 +33,9 @@ ErrorDocument 504 /assets/php/statusCodesPages/504.php
     # Block common backup, configuration, and log files.
     RewriteRule \.(?:bak|config|sql|ini|log|sh|inc|swp|dist|env|ya?ml)$ - [F,NC,L]
 
+    # The category sitemap is built from the database
+    RewriteRule ^sitemap-categories\.xml$ sitemapCategories.php [L]
+
     # Redirect direct extension URLs to their clean versions for page requests.
     RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
     RewriteCond %{REQUEST_FILENAME} -f
@@ -57,4 +60,10 @@ ErrorDocument 504 /assets/php/statusCodesPages/504.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^[a-z0-9-]+/[a-z0-9-]+-([0-9]{1,19})/?$ product.php?id=$1 [NC,L]
+
+    # Category pages: /category-name is products.php, which reads the category from the path (not the query string,
+    # so ?tag= and ?page= still work and can't change the category) and 404s for names that aren't a category.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^[a-z0-9-]{1,80}/?$ products.php [NC,L]
 </IfModule>
