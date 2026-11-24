@@ -51,4 +51,10 @@ ErrorDocument 504 /assets/php/statusCodesPages/504.php
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME}.htm -f
     RewriteRule ^(.+?)/?$ $1.htm [L]
+
+    # Product pages: /category/product-name-5 is product.php?id=5 (product.php redirects other spellings to the real
+    # one). The visitor's own query string is dropped, so it can't override the id.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^[a-z0-9-]+/[a-z0-9-]+-([0-9]{1,19})/?$ product.php?id=$1 [NC,L]
 </IfModule>

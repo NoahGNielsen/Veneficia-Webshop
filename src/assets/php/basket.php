@@ -3,6 +3,7 @@
 // A guest's basket lives in their session ($_SESSION['basket'] = [itemVariantId => amount]) and is moved into the
 // database when they log in or sign up (see mergeGuestBasket(), called from loginCustomer()).
 require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/products.php';
 
 const BASKET_MAX_AMOUNT = 99; // per variant
 const BASKET_MAX_LINES = 50;  // different variants in one basket, so a session can't be stuffed endlessly
@@ -46,8 +47,8 @@ function basketItems(): array
     }
     $placeholders = implode(',', array_fill(0, count($lines), '?'));
     $stmt = getDb()->prepare(
-        "SELECT v.itemVariantId, v.itemId, v.varriantName, v.varriantPrice, v.varriantWeight, v.inventoryCount, i.itemName
-         FROM VeneficiaItemVariants v JOIN VeneficiaItems i ON i.itemId = v.itemId
+        "SELECT v.itemVariantId, v.itemId, v.varriantName, v.varriantPrice, v.varriantWeight, v.inventoryCount, i.itemName, pc.categoryName
+         FROM VeneficiaItemVariants v JOIN VeneficiaItems i ON i.itemId = v.itemId " . PRODUCT_CATEGORY_JOIN . "
          WHERE v.itemVariantId IN ($placeholders)"
     );
     $stmt->execute(array_keys($lines));

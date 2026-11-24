@@ -1,5 +1,5 @@
 <?php
-// The basket: /basket shows it, and POSTs here add to it (from /product), change amounts or remove lines.
+// The basket: /basket shows it, and POSTs here add to it (from the product pages), change amounts or remove lines.
 // Every POST redirects afterwards, so reloading the page never adds the same thing twice.
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/basket.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/products.php';
@@ -24,11 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         startSession();
         csrfToken(); // from now on this visitor's basket forms carry a token
         if ($action === 'add') {
-            $stmt = getDb()->prepare('SELECT itemId FROM VeneficiaItemVariants WHERE itemVariantId = ?');
+            $stmt = getDb()->prepare(
+                'SELECT i.itemId, i.itemName, pc.categoryName
+                 FROM VeneficiaItemVariants v JOIN VeneficiaItems i ON i.itemId = v.itemId ' . PRODUCT_CATEGORY_JOIN . '
+                 WHERE v.itemVariantId = ?'
+            );
             $stmt->execute([$variantId]);
-            $itemId = $stmt->fetchColumn();
-            if ($itemId !== false) {
-                $redirect = '/product?id=' . (int)$itemId;
+            $product = $stmt->fetch();
+            if ($product) {
+                $redirect = productUrl((int)$product['itemId'], $product['itemName'], $product['categoryName']);
             }
             $added = addToBasket($variantId, $amount === false || $amount === null || $amount < 1 ? 1 : $amount);
             setBasketMessage(match (true) {
@@ -81,7 +85,7 @@ $token = session_status() === PHP_SESSION_ACTIVE ? csrfToken() : '';
                     <?php foreach ($items as $item): ?>
                         <tr>
                             <td>
-                                <a href="/product?id=<?= (int)$item['itemId'] ?>"><?= htmlspecialchars($item['itemName']) ?></a>
+                                <a href="<?= htmlspecialchars(productUrl((int)$item['itemId'], $item['itemName'], $item['categoryName'])) ?>"><?= htmlspecialchars($item['itemName']) ?></a>
                                 <?php if ($item['varriantName'] !== ''): ?>
                                     <br><?= htmlspecialchars($item['varriantName']) ?>
                                 <?php endif; ?>

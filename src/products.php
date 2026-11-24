@@ -16,8 +16,9 @@ $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_
 
 $db = getDb();
 // One row more than a page is fetched, so we know whether there is a next page without a separate COUNT query
-$sql = 'SELECT i.itemId, i.itemName, MIN(v.varriantPrice) AS minPrice, MAX(v.varriantPrice) AS maxPrice, SUM(v.inventoryCount) AS stock
-        FROM VeneficiaItems i JOIN VeneficiaItemVariants v ON v.itemId = i.itemId';
+$sql = 'SELECT i.itemId, i.itemName, MIN(v.varriantPrice) AS minPrice, MAX(v.varriantPrice) AS maxPrice, SUM(v.inventoryCount) AS stock,
+               MIN(pc.categoryName) AS categoryName
+        FROM VeneficiaItems i ' . PRODUCT_CATEGORY_JOIN . ' JOIN VeneficiaItemVariants v ON v.itemId = i.itemId';
 $params = [];
 if ($tag !== '') {
     $sql .= ' JOIN VeneficiaItemTags it ON it.itemId = i.itemId JOIN VeneficiaTags t ON t.tagId = it.tagId AND t.tagName = ?';
@@ -85,7 +86,7 @@ $description = $tag !== '' ? "Se alle Veneficias produkter med tagget $tag." : '
                     $samePrice = (float)$product['minPrice'] === (float)$product['maxPrice'];
                 ?>
                     <li class="product-card">
-                        <a href="/product?id=<?= $id ?>">
+                        <a href="<?= htmlspecialchars(productUrl($id, $product['itemName'], $product['categoryName'])) ?>">
                             <?php if ($image !== null): ?>
                                 <img src="<?= htmlspecialchars($image['fileUrl']) ?>" alt="<?= htmlspecialchars($image['altText'] ?: $product['itemName']) ?>"
                                      width="300" height="300" decoding="async" <?= $i < 4 ? 'fetchpriority="high"' : 'loading="lazy"' ?>>

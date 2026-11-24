@@ -1,5 +1,5 @@
 <?php
-// One product: /product?id=5. Shows its images, description, tags and every variant with price and stock.
+// One product: /category/product-name-5 (see productUrl()). Shows its images, description, tags and every variant with price and stock.
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/products.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/basket.php';
@@ -11,7 +11,10 @@ $db = getDb();
 $itemId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $item = false;
 if ($itemId) {
-    $stmt = $db->prepare('SELECT itemName, itemDescription, itemOptions, itemDefaultVariant FROM VeneficiaItems WHERE itemId = ?');
+    $stmt = $db->prepare(
+        'SELECT i.itemName, i.itemDescription, i.itemOptions, i.itemDefaultVariant, pc.categoryName
+         FROM VeneficiaItems i ' . PRODUCT_CATEGORY_JOIN . ' WHERE i.itemId = ?'
+    );
     $stmt->execute([$itemId]);
     $item = $stmt->fetch();
 }
@@ -27,6 +30,14 @@ if ($item) {
 // Unknown product, or one without variants (it can't be bought, and the shop list hides it too)
 if (!$item || !$variants) {
     include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/statusCodesPages/404.php';
+    exit;
+}
+
+// Any other spelling of the URL (an old /product?id=5 link, a renamed product or category, wrong case) moves to the
+// real one, so each product has exactly one URL
+$headerCanonicalPath = productUrl($itemId, $item['itemName'], $item['categoryName']);
+if (parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) !== $headerCanonicalPath) {
+    header('Location: ' . $headerCanonicalPath, true, 301);
     exit;
 }
 
@@ -57,7 +68,6 @@ $metaDescription = $descriptionText !== ''
     ? mb_strimwidth(preg_replace('/\s+/u', ' ', $descriptionText), 0, 160, '…')
     : $item['itemName'] . ' hos Veneficia.';
 $siteUrl = 'https://veneficia.noahgajnielsen.dk';
-$headerCanonicalPath = '/product?id=' . $itemId;
 $title = $item['itemName'] . ' - Veneficia';
 
 // Structured data, so search engines can show price and stock. The JSON_HEX_* flags keep "</script>" in a name or
