@@ -205,6 +205,8 @@ $shipping = shippingFor($code, $weight);
 $total = $subtotal - $discount + $shipping;
 $message = $_SESSION['checkoutMessage'] ?? null;
 unset($_SESSION['checkoutMessage']);
+// Only a code that was just accepted is good news (and gets the little "magic dust" animation)
+$messageOk = $message === 'Rabatkoden er tilføjet.';
 ?>
 <!DOCTYPE html>
 <html lang="da">
@@ -216,99 +218,134 @@ unset($_SESSION['checkoutMessage']);
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
-    <main id="indhold" class="basket-page">
-        <h1>Kassen</h1>
-        <?php if (is_string($message)): ?>
-            <p role="status"><?= htmlspecialchars($message) ?></p>
+    <main id="indhold" class="basket-page checkout-page">
+        <?php if ($items): ?>
+            <ol class="steps">
+                <li>Kurv</li>
+                <li aria-current="step">Levering</li>
+                <li>Bekræftelse</li>
+            </ol>
         <?php endif; ?>
+        <h1>Kassen</h1>
         <?php if ($errors): ?>
-            <ul role="alert">
-                <?php foreach ($errors as $error): ?>
-                    <li><?= htmlspecialchars($error) ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <?php // The summary takes focus when the page loads (autofocus), so a screen reader reads it out first ?>
+            <div class="banner banner--error error-summary" role="alert" tabindex="-1" autofocus>
+                <p class="banner__title">Ordren blev ikke sendt</p>
+                <ul>
+                    <?php foreach ($errors as $error): ?>
+                        <li><?= htmlspecialchars($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         <?php endif; ?>
 
         <?php if (!$items): ?>
-            <p>Din kurv er tom. <a href="/products">Se produkterne</a></p>
+            <div class="empty-state">
+                <span class="arch-icon"><?= uiIcon('shopping-bag') ?></span>
+                <p class="type-title-large">Din kurv er tom</p>
+                <p>Find noget, der passer til din praksis.</p>
+                <a class="button" href="/products">Se produkterne</a>
+            </div>
         <?php else: ?>
-            <h2>Din ordre</h2>
-            <table class="basket-table">
-                <thead>
-                    <tr><th>Produkt</th><th>Pris</th><th>Antal</th><th>I alt</th></tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($items as $item): ?>
-                        <tr>
-                            <td>
-                                <?= htmlspecialchars($item['itemName']) ?>
-                                <?php if ($item['varriantName'] !== ''): ?>
-                                    <br><?= htmlspecialchars($item['varriantName']) ?>
+            <div class="checkout-layout">
+                <aside class="summary" aria-labelledby="din-ordre">
+                    <h2 id="din-ordre" class="type-title-large">Din ordre</h2>
+                    <table class="data-table order-table">
+                        <thead>
+                            <tr><th scope="col">Produkt</th><th scope="col" class="num">Pris</th><th scope="col" class="num">Antal</th><th scope="col" class="num">I alt</th></tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($items as $item): ?>
+                                <tr>
+                                    <td>
+                                        <span class="line-name"><?= htmlspecialchars($item['itemName']) ?></span>
+                                        <?php if ($item['varriantName'] !== ''): ?>
+                                            <br><span class="line-variant"><?= htmlspecialchars($item['varriantName']) ?></span>
+                                        <?php endif; ?>
+                                        <?php if ($item['amount'] > (int)$item['inventoryCount']): ?>
+                                            <br><strong class="line-warning">Kun <?= max(0, (int)$item['inventoryCount']) ?> på lager</strong>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="num" data-label="Pris"><?= formatPrice($item['varriantPrice']) ?></td>
+                                    <td class="num" data-label="Antal"><?= (int)$item['amount'] ?></td>
+                                    <td class="num" data-label="I alt"><?= formatPrice((float)$item['varriantPrice'] * $item['amount']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <tfoot>
+                            <tr><th scope="row" colspan="3">Varer</th><td class="num"><?= formatPrice($subtotal) ?></td></tr>
+                            <?php if ($code !== null): ?>
+                                <tr><th scope="row" colspan="3">Rabat: <?= htmlspecialchars(describeDiscountCode($code)) ?></th><td class="num">-<?= formatPrice($discount) ?></td></tr>
+                            <?php endif; ?>
+                            <tr><th scope="row" colspan="3">Fragt - GLS Pakkeshop (<?= htmlspecialchars(number_format($weight / 1000, 1, ',', '.')) ?> kg)</th><td class="num"><?= formatPrice($shipping) ?></td></tr>
+                            <tr class="total-row"><th scope="row" colspan="3">Total</th><td class="num"><?= formatPrice($total) ?></td></tr>
+                        </tfoot>
+                    </table>
+                    <p><a href="/basket">Ret kurven</a></p>
+
+                    <div class="discount">
+                        <?php if (is_string($message)): ?>
+                            <p class="banner <?= $messageOk ? 'banner--success' : 'banner--error' ?>" role="status"><?= htmlspecialchars($message) ?><?php if ($messageOk): ?><span class="magic-dust" aria-hidden="true"></span><?php endif; ?></p>
+                        <?php endif; ?>
+                        <form class="discount-form" method="post" action="/checkout">
+                            <input type="hidden" name="csrfToken" value="<?= htmlspecialchars(csrfToken()) ?>">
+                            <?php if ($code === null): ?>
+                                <input type="hidden" name="action" value="applyCode">
+                                <div class="field">
+                                    <label for="discountCode">Rabatkode</label>
+                                    <div class="discount-form__row">
+                                        <input type="text" id="discountCode" name="discountCode" autocomplete="off" maxlength="100" required>
+                                        <button type="submit" class="button--tonal">Brug rabatkode</button>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <input type="hidden" name="action" value="removeCode">
+                                <?php if ($code['discountType'] === 'product' && $discount <= 0): ?>
+                                    <p class="banner">Rabatkoden gælder ikke for varerne i din kurv.</p>
                                 <?php endif; ?>
-                                <?php if ($item['amount'] > (int)$item['inventoryCount']): ?>
-                                    <br><strong>Kun <?= max(0, (int)$item['inventoryCount']) ?> på lager</strong>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= formatPrice($item['varriantPrice']) ?></td>
-                            <td><?= (int)$item['amount'] ?></td>
-                            <td><?= formatPrice((float)$item['varriantPrice'] * $item['amount']) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr><th colspan="3">Varer</th><th><?= formatPrice($subtotal) ?></th></tr>
-                    <?php if ($code !== null): ?>
-                        <tr><th colspan="3">Rabat: <?= htmlspecialchars(describeDiscountCode($code)) ?></th><th>-<?= formatPrice($discount) ?></th></tr>
+                                <button type="submit" class="button--text">Fjern rabatkode</button>
+                            <?php endif; ?>
+                        </form>
+                    </div>
+                </aside>
+
+                <section class="checkout-main" aria-labelledby="levering">
+                    <h2 id="levering">Levering</h2>
+                    <?php if ($overStock): ?>
+                        <p class="banner banner--error">Der er ikke nok på lager af alle varer. <a href="/basket">Ret antallet i kurven</a> før du bestiller.</p>
+                    <?php elseif ($tooHeavy): ?>
+                        <p class="banner banner--error">Ordren vejer over 20 kg og kan ikke sendes. <a href="/basket">Del den op i flere ordrer</a>.</p>
+                    <?php else: ?>
+                        <form class="checkout-form form-stack" method="post" action="/checkout">
+                            <input type="hidden" name="csrfToken" value="<?= htmlspecialchars(csrfToken()) ?>">
+                            <input type="hidden" name="basketFingerprint" value="<?= htmlspecialchars(basketFingerprint($items, $code)) ?>">
+
+                            <p class="checkout-customer"><?= htmlspecialchars($customer['firstName'] . ' ' . $customer['lastName']) ?><br><?= htmlspecialchars($customer['email']) ?></p>
+
+                            <div class="field">
+                                <label for="addressLine">Adresse</label>
+                                <input type="text" id="addressLine" name="addressLine" autocomplete="street-address" maxlength="255" required value="<?= htmlspecialchars($address['addressLine']) ?>">
+                            </div>
+                            <div class="field">
+                                <label for="addressPostalCode">Postnummer</label>
+                                <input type="text" id="addressPostalCode" name="addressPostalCode" autocomplete="postal-code" inputmode="numeric" maxlength="20" required value="<?= htmlspecialchars($address['addressPostalCode']) ?>">
+                            </div>
+                            <div class="field">
+                                <label for="addressCity">By</label>
+                                <input type="text" id="addressCity" name="addressCity" autocomplete="address-level2" maxlength="100" required value="<?= htmlspecialchars($address['addressCity']) ?>">
+                            </div>
+
+                            <div>
+                                <label><input type="checkbox" name="saveAddress" value="1" <?= $saveAddress ? 'checked' : '' ?>> Gem adressen til næste gang</label>
+                                <label><input type="checkbox" name="acceptTerms" value="1" required> Jeg accepterer <a href="/legal/terms">handelsbetingelserne</a></label>
+                            </div>
+
+                            <p class="checkout-total"><span>Total</span> <span><?= formatPrice($total) ?></span></p>
+                            <button type="submit" class="button--large button--block">Bestil og betal</button>
+                        </form>
                     <?php endif; ?>
-                    <tr><th colspan="3">Fragt - GLS Pakkeshop (<?= htmlspecialchars(number_format($weight / 1000, 1, ',', '.')) ?> kg)</th><th><?= formatPrice($shipping) ?></th></tr>
-                    <tr><th colspan="3">Total</th><th><?= formatPrice($total) ?></th></tr>
-                </tfoot>
-            </table>
-            <p><a href="/basket">Ret kurven</a></p>
-
-            <form class="checkout-form" method="post" action="/checkout">
-                <input type="hidden" name="csrfToken" value="<?= htmlspecialchars(csrfToken()) ?>">
-                <?php if ($code === null): ?>
-                    <input type="hidden" name="action" value="applyCode">
-                    <label for="discountCode">Rabatkode</label>
-                    <input type="text" id="discountCode" name="discountCode" autocomplete="off" maxlength="100" required>
-                    <button type="submit">Brug rabatkode</button>
-                <?php else: ?>
-                    <input type="hidden" name="action" value="removeCode">
-                    <?php if ($code['discountType'] === 'product' && $discount <= 0): ?>
-                        <p>Rabatkoden gælder ikke for varerne i din kurv.</p>
-                    <?php endif; ?>
-                    <button type="submit">Fjern rabatkode</button>
-                <?php endif; ?>
-            </form>
-
-            <?php if ($overStock): ?>
-                <p><strong>Der er ikke nok på lager af alle varer. <a href="/basket">Ret antallet i kurven</a> før du bestiller.</strong></p>
-            <?php elseif ($tooHeavy): ?>
-                <p><strong>Ordren vejer over 20 kg og kan ikke sendes. <a href="/basket">Del den op i flere ordrer</a>.</strong></p>
-            <?php else: ?>
-                <h2>Levering</h2>
-                <form class="checkout-form" method="post" action="/checkout">
-                    <input type="hidden" name="csrfToken" value="<?= htmlspecialchars(csrfToken()) ?>">
-                    <input type="hidden" name="basketFingerprint" value="<?= htmlspecialchars(basketFingerprint($items, $code)) ?>">
-
-                    <p><?= htmlspecialchars($customer['firstName'] . ' ' . $customer['lastName']) ?><br><?= htmlspecialchars($customer['email']) ?></p>
-
-                    <label for="addressLine">Adresse</label>
-                    <input type="text" id="addressLine" name="addressLine" autocomplete="street-address" maxlength="255" required value="<?= htmlspecialchars($address['addressLine']) ?>">
-
-                    <label for="addressPostalCode">Postnummer</label>
-                    <input type="text" id="addressPostalCode" name="addressPostalCode" autocomplete="postal-code" inputmode="numeric" maxlength="20" required value="<?= htmlspecialchars($address['addressPostalCode']) ?>">
-
-                    <label for="addressCity">By</label>
-                    <input type="text" id="addressCity" name="addressCity" autocomplete="address-level2" maxlength="100" required value="<?= htmlspecialchars($address['addressCity']) ?>">
-
-                    <label><input type="checkbox" name="saveAddress" value="1" <?= $saveAddress ? 'checked' : '' ?>> Gem adressen til næste gang</label>
-                    <label><input type="checkbox" name="acceptTerms" value="1" required> Jeg accepterer <a href="/legal/terms">handelsbetingelserne</a></label>
-
-                    <button type="submit">Gå til betaling</button>
-                </form>
-            <?php endif; ?>
+                </section>
+            </div>
         <?php endif; ?>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>

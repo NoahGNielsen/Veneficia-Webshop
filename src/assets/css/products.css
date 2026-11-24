@@ -1,241 +1,237 @@
 @layer pages {
-    /* Old basket and checkout rules, replaced in phase 4 of the redesign */
-    .basket-page { overflow-x: auto; }
-    .basket-table { width: 100%; }
-    .basket-table form { display: flex; gap: 8px; margin: 0; }
-    .basket-table tfoot th { border-bottom: 0; }
-    .basket-table tfoot tr:last-child th { font-size: 1.1rem; }
-    .checkout-form { display: flex; flex-direction: column; gap: 6px; max-width: 420px; margin-top: 16px; }
-    .checkout-form button { align-self: flex-start; margin-top: 8px; }
+  /* Checkout-flow components (basket, checkout, order confirmation, the variant table), see MASTER.md.
+     .data-table: in a container under 600px every row is a card whose cells show their data-label, otherwise a normal
+     table. A container query, so a table in a narrow column (the checkout summary) stacks too. */
+  :where(body > main, .basket-lines, .summary, .card) {
+    container-type: inline-size;
+  }
 
-    /* Checkout-flow components (basket, checkout, order confirmation, the variant table), see MASTER.md.
-       .data-table: compact = every row is a card whose cells show their data-label; from 600px a normal table. */
-    .data-table {
-      width: 100%;
+  .data-table {
+    width: 100%;
+  }
+
+  .data-table tfoot .total-row > * {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  @container (max-width: 599.98px) {
+    .data-table,
+    .data-table tbody,
+    .data-table tfoot {
+      display: block;
     }
 
-    .data-table tfoot .total-row > * {
-      font-family: var(--font-serif);
-      font-size: 1.25rem;
-      font-weight: 600;
+    .data-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
     }
 
-    @media (max-width: 599.98px) {
-      .data-table,
-      .data-table tbody,
-      .data-table tfoot {
-        display: block;
-      }
-
-      .data-table thead {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip-path: inset(50%);
-      }
-
-      .data-table tbody tr,
-      .data-table tfoot {
-        display: block;
-        margin-bottom: var(--space-3);
-        padding: var(--space-3) var(--space-4);
-        border: 1px solid var(--color-outline-variant);
-        border-radius: var(--radius-lg);
-        background: var(--color-surface);
-      }
-
-      .data-table tr > * {
-        display: flex;
-        justify-content: space-between;
-        gap: var(--space-4);
-        padding: var(--space-1) 0;
-        border: 0;
-        text-align: right;
-      }
-
-      .data-table tbody tr > :first-child {
-        display: block;
-        padding-bottom: var(--space-2);
-        text-align: left;
-      }
-
-      .data-table [data-label]::before {
-        content: attr(data-label);
-        color: var(--color-on-surface-variant);
-        font-weight: 500;
-        text-align: left;
-      }
-
-      .data-table tfoot tr {
-        display: flex;
-        justify-content: space-between;
-        gap: var(--space-4);
-      }
-
-      .data-table tfoot tr > * {
-        display: block;
-      }
-
-      .data-table tfoot th {
-        text-align: left;
-      }
-
-      .data-table :is(td, th):empty {
-        display: none;
-      }
-    }
-
-    @media (min-width: 600px) {
-      .data-table {
-        background: var(--color-surface);
-      }
-
-      .data-table tfoot :is(th, td) {
-        border-bottom: 0;
-      }
-    }
-
-    /* ---- Step indicator: Kurv · Levering · Bekræftelse ---- */
-    .steps {
-      display: flex;
-      gap: var(--space-2);
-      margin: 0 0 var(--space-6);
-      padding: 0;
-      list-style: none;
-      counter-reset: step;
-    }
-
-    .steps li {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--space-2);
-      color: var(--color-on-surface-variant);
-      font-size: var(--font-size-label-medium);
-      font-weight: 500;
-      text-align: center;
-      counter-increment: step;
-    }
-
-    .steps li::before {
-      content: counter(step);
-      display: grid;
-      place-items: center;
-      width: 32px;
-      height: 32px;
-      border: 1px solid var(--color-outline);
-      border-radius: 50%;
+    .data-table tbody tr,
+    .data-table tfoot {
+      display: block;
+      margin-bottom: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--color-outline-variant);
+      border-radius: var(--radius-lg);
       background: var(--color-surface);
-      font-weight: 700;
     }
 
-    /* Steps before the current one are done */
-    .steps li:has(~ [aria-current="step"]) {
-      color: var(--color-on-surface);
-    }
-
-    .steps li:has(~ [aria-current="step"])::before {
-      border-color: var(--color-primary);
-      background: var(--color-primary-container);
-      color: var(--color-on-primary-container);
-    }
-
-    .steps [aria-current="step"] {
-      color: var(--color-on-surface);
-      font-weight: 700;
-    }
-
-    .steps [aria-current="step"]::before {
-      border-color: var(--color-primary);
-      background: var(--color-primary);
-      color: var(--color-on-primary);
-    }
-
-    @media (min-width: 600px) {
-      .steps li {
-        flex-direction: row;
-        text-align: left;
-      }
-
-      .steps li:not(:last-child)::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        margin-inline: var(--space-2);
-        background: var(--color-outline-variant);
-      }
-    }
-
-    /* ---- Breadcrumbs ---- */
-    .breadcrumbs ol {
+    .data-table tr > * {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0 var(--space-1);
-      margin: 0 0 var(--space-4);
-      padding: 0;
-      list-style: none;
-      font-size: var(--font-size-label-medium);
-      font-weight: 500;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-1) 0;
+      border: 0;
+      text-align: right;
     }
 
-    .breadcrumbs li {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-1);
+    .data-table tbody tr > :first-child {
+      display: block;
+      padding-bottom: var(--space-2);
+      text-align: left;
     }
 
-    .breadcrumbs li + li::before {
-      content: "";
-      width: 18px;
-      height: 18px;
-      background: var(--ctx-text-muted);
-      mask: var(--icon-chevron-right) center / contain no-repeat;
-    }
-
-    .breadcrumbs a {
-      display: inline-block;
-      padding-block: var(--space-1);
-      color: var(--ctx-text-muted);
-    }
-
-    .breadcrumbs [aria-current="page"] {
-      color: var(--ctx-text);
-      font-weight: 600;
-    }
-
-    /* ---- Pagination ---- */
-    .pagination {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-3) var(--space-4);
-      margin: var(--space-7) 0 0;
-    }
-
-    .pagination__current {
-      color: var(--ctx-text-muted);
-      font-size: var(--font-size-label-medium);
-      font-weight: 600;
-    }
-
-    /* ---- Empty state: icon in an arch, a short text, one action ---- */
-    .empty-state {
-      display: grid;
-      justify-items: center;
-      gap: var(--space-3);
-      max-width: 44ch;
-      margin: var(--space-7) auto;
-      text-align: center;
-    }
-
-    .empty-state p {
-      margin: 0 0 var(--space-2);
+    .data-table [data-label]::before {
+      content: attr(data-label);
       color: var(--color-on-surface-variant);
+      font-weight: 500;
+      text-align: left;
     }
+
+    .data-table tfoot tr {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+
+    .data-table tfoot tr > * {
+      display: block;
+    }
+
+    .data-table tfoot th {
+      text-align: left;
+    }
+
+    .data-table :is(td, th):empty {
+      display: none;
+    }
+  }
+
+  @container (min-width: 600px) {
+    .data-table {
+      background: var(--color-surface);
+    }
+
+    .data-table tfoot :is(th, td) {
+      border-bottom: 0;
+    }
+  }
+
+  /* ---- Step indicator: Kurv · Levering · Bekræftelse ---- */
+  .steps {
+    display: flex;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .steps li {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+    font-weight: 500;
+    text-align: center;
+    counter-increment: step;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-outline);
+    border-radius: 50%;
+    background: var(--color-surface);
+    font-weight: 700;
+  }
+
+  /* Steps before the current one are done */
+  .steps li:has(~ [aria-current="step"]) {
+    color: var(--color-on-surface);
+  }
+
+  .steps li:has(~ [aria-current="step"])::before {
+    border-color: var(--color-primary);
+    background: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  .steps [aria-current="step"] {
+    color: var(--color-on-surface);
+    font-weight: 700;
+  }
+
+  .steps [aria-current="step"]::before {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  @media (min-width: 600px) {
+    .steps li {
+      flex-direction: row;
+      text-align: left;
+    }
+
+    .steps li:not(:last-child)::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      margin-inline: var(--space-2);
+      background: var(--color-outline-variant);
+    }
+  }
+
+  /* ---- Breadcrumbs ---- */
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--space-1);
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    list-style: none;
+    font-size: var(--font-size-label-medium);
+    font-weight: 500;
+  }
+
+  .breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .breadcrumbs li + li::before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    background: var(--ctx-text-muted);
+    mask: var(--icon-chevron-right) center / contain no-repeat;
+  }
+
+  .breadcrumbs a {
+    display: inline-block;
+    padding-block: var(--space-1);
+    color: var(--ctx-text-muted);
+  }
+
+  .breadcrumbs [aria-current="page"] {
+    color: var(--ctx-text);
+    font-weight: 600;
+  }
+
+  /* ---- Pagination ---- */
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3) var(--space-4);
+    margin: var(--space-7) 0 0;
+  }
+
+  .pagination__current {
+    color: var(--ctx-text-muted);
+    font-size: var(--font-size-label-medium);
+    font-weight: 600;
+  }
+
+  /* ---- Empty state: icon in an arch, a short text, one action ---- */
+  .empty-state {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+    max-width: 44ch;
+    margin: var(--space-7) auto;
+    text-align: center;
+  }
+
+  .empty-state p {
+    margin: 0 0 var(--space-2);
+    color: var(--color-on-surface-variant);
+  }
 
   /* ---- Product list (products.php) ---- */
   .page-header {
@@ -398,5 +394,296 @@
 
   .product-tags {
     margin: 0;
+  }
+
+  /* ---- Basket, checkout and order confirmation. Expanded: the lines or the form left, the sticky summary right. ---- */
+  .checkout-layout {
+    display: grid;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  @media (min-width: 840px) {
+    .checkout-layout {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-7);
+    }
+
+    /* The checkout lists the order first (read it before you order), but shows the form on the left */
+    .checkout-page .summary {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .checkout-main {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .summary {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-5));
+    }
+  }
+
+  .summary {
+    padding: var(--space-5);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+  }
+
+  .summary > h2 {
+    margin: 0 0 var(--space-4);
+  }
+
+  .summary__total,
+  .checkout-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .summary__note {
+    margin-bottom: var(--space-5);
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .summary__continue {
+    display: block;
+    margin-top: var(--space-3);
+    padding-block: var(--space-2);
+    text-align: center;
+  }
+
+  /* Order lines inside the summary: rows split by a line instead of cards in a card */
+  .summary .data-table tbody tr,
+  .summary .data-table tfoot {
+    margin: 0;
+    padding: var(--space-3) 0;
+    border: 0;
+    border-bottom: 1px solid var(--color-outline-variant);
+    border-radius: 0;
+    background: none;
+  }
+
+  .summary .data-table tfoot {
+    border-bottom: 0;
+  }
+
+  .line-name {
+    font-weight: 600;
+  }
+
+  .line-variant {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .line-warning {
+    color: var(--color-error);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .qty-form {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .qty-form input {
+    width: 4.5rem;
+    min-height: 44px;
+    padding-block: var(--space-2);
+  }
+
+  .line-remove form {
+    margin: 0;
+  }
+
+  @container (max-width: 599.98px) {
+    .basket-table .line-remove {
+      justify-content: flex-end;
+    }
+  }
+
+  .checkout-main h2 {
+    margin-top: 0;
+  }
+
+  .checkout-form {
+    max-width: 480px;
+  }
+
+  .checkout-customer {
+    margin: 0;
+    color: var(--color-on-surface-variant);
+  }
+
+  .checkout-total {
+    margin: 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-outline-variant);
+  }
+
+  .error-summary {
+    outline-offset: 4px;
+  }
+
+  .discount {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-outline-variant);
+  }
+
+  .discount-form {
+    margin: 0;
+  }
+
+  .discount-form__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .discount-form__row input {
+    flex: 1 1 10rem;
+    min-width: 0;
+  }
+
+  /* "Magic dust": a short sparkle (about 600ms) on the banner right after a discount code is accepted */
+  .magic-dust {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .magic-dust::before,
+  .magic-dust::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 24px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    color: var(--color-primary);
+    background: currentColor;
+    box-shadow: 16px -10px 0 0 currentColor, 30px 6px 0 1px currentColor, 46px -14px 0 -1px currentColor,
+      62px 8px 0 0 currentColor, 80px -6px 0 1px currentColor, 98px 10px 0 -1px currentColor, 116px -12px 0 0 currentColor;
+    opacity: 0;
+    animation: magic-dust 600ms var(--ease-decelerate) both;
+  }
+
+  .magic-dust::after {
+    left: 34px;
+    color: var(--color-secondary-accent);
+    box-shadow: 18px 8px 0 1px currentColor, 36px -8px 0 0 currentColor, 54px 12px 0 -1px currentColor,
+      72px -12px 0 1px currentColor, 90px 4px 0 0 currentColor, 108px -4px 0 1px currentColor;
+    animation-delay: 80ms;
+  }
+
+  @keyframes magic-dust {
+    0% {
+      opacity: 0;
+      transform: translateY(8px) scale(.4);
+    }
+
+    30% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateY(-18px) scale(1.15);
+    }
+  }
+
+  /* Order confirmation: a calm, warm ending */
+  .confirmation-header {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-7);
+    text-align: center;
+  }
+
+  .confirmation-header h1 {
+    margin: var(--space-4) 0 0;
+  }
+
+  .confirmation-header p {
+    margin: 0;
+  }
+
+  .arch-icon--large {
+    width: 96px;
+  }
+
+  .arch-icon--large .icon {
+    margin-top: var(--space-4);
+  }
+
+  .confirmation-header .order-number {
+    display: grid;
+    gap: var(--space-1);
+    margin-top: var(--space-4);
+  }
+
+  .order-number strong {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-headline-medium);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .confirmation-card {
+    display: grid;
+    gap: var(--space-6);
+    max-width: 800px;
+    margin-inline: auto;
+  }
+
+  .confirmation-card h2 {
+    margin: 0 0 var(--space-3);
+  }
+
+  .confirmation-card p {
+    margin: 0;
+  }
+
+  .confirmation-actions {
+    margin-top: var(--space-6);
+    text-align: center;
+  }
+
+  /* Printed as a receipt: just the order */
+  @media print {
+    .navbar,
+    .footer,
+    .steps,
+    .confirmation-actions {
+      display: none;
+    }
+
+    body,
+    .card {
+      background: none;
+    }
+
+    .card {
+      border: 0;
+      box-shadow: none;
+    }
   }
 }
