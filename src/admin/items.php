@@ -23,7 +23,7 @@ $added = $addedId ? array_column($items, 'itemName', 'itemId')[$addedId] ?? null
     <main class="admin-page admin-list">
         <div class="admin-list-head">
             <h1>Varer</h1>
-            <a class="admin-button" href="/admin/item">Ny vare</a>
+            <a class="button" href="/admin/item">Ny vare</a>
         </div>
         <?php if ($added !== null): ?>
             <p class="admin-success" role="status"><?= htmlspecialchars($added) ?> er tilføjet.</p>

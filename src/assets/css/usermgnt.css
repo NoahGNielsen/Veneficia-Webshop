@@ -34,14 +34,15 @@
     }
   }
 
-  .auth-form h1 {
+  /* Admin forms on the same card use an h2 */
+  .auth-form :is(h1, h2) {
     margin: 0 0 var(--space-3);
     font-size: var(--font-size-headline-medium);
   }
 
   /* 8px from label to field, 20px from one field to the next */
   .auth-form > .field + .field,
-  .auth-form > input + label,
+  .auth-form > :is(input, select, textarea) + label,
   .auth-form > .field + .auth-checkbox {
     margin-top: var(--space-3);
   }

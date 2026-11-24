@@ -299,7 +299,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | Log ind / Opret | `userMgmt/*.php` → `usermgnt.css` | Wordmark-link + centreret kort (Lærred, radius 28, elevation 1) |
 | Fejlsider (10) | `statusCodesPages/*.php` → `statusCodePage.css` | Dansk, statuskode i Cinzel (Mosgrøn), venlig h1, "Til forsiden" + "Se produkterne". **Ingen navbar** (rammer databasen). |
 | Juridiske | `legal/*.php` → (kun mainStyle) | Side-skal: navbar, h1, "Teksten er på vej.", footer |
-| Admin | `admin/*.php` → `admin.css` | Let hånd: Mosgrøn admin-bar, nye komponenter og tokens, uændret layout |
+| Admin | `admin/*.php` → `admin.css` (+ `usermgnt.css` til formular-kortene) | Let hånd: mosgrøn admin-bar (`.on-secondary`) med outlined "Log ud". Tabeller på Lærred med Sand-kant, og hele rækken er klikbar. "Slet" (`button[name="delete"]`) er outlined i fejlfarven. `itemForm.js`' knapper er tonale. Formularerne i `.auth-form`/`.item-form` har 8px fra label til felt og 20px mellem felterne. Layout og adfærd er uændret. |
 
 ---
 
