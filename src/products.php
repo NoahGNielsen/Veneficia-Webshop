@@ -84,6 +84,19 @@ if ($products) {
 // The categories to browse into: the subcategories here, or the top level on /products
 $subcategories = array_filter($categories, fn($c) => $c['parent'] === $categoryId && $c['path'] !== null);
 
+// The category chips. Usually "Alle" (this page, marked as current) plus the categories above. A category without
+// subcategories shows its own level instead, with itself marked, so a neighbouring category is one tap away.
+$chipCategories = $subcategories;
+$chipAll = ['path' => $listPath, 'name' => $category === null ? 'Alle' : 'Alle i ' . $category['name'], 'current' => true];
+if (!$subcategories && $category !== null) {
+    $chipCategories = array_filter($categories, fn($c) => $c['parent'] === $category['parent'] && $c['path'] !== null);
+    $parent = $category['parent'] !== null ? ($categories[$category['parent']] ?? null) : null;
+    $chipAll = $parent !== null && $parent['path'] !== null
+        ? ['path' => $parent['path'], 'name' => 'Alle i ' . $parent['name'], 'current' => false]
+        : ['path' => '/products', 'name' => 'Alle', 'current' => false];
+}
+$navSection = 'products';
+
 // A page past the end (or an unknown tag) has nothing to show. An empty category is still a real page, just noindex.
 if (!$products && ($page > 1 || $tag !== '')) {
     http_response_code(404);
@@ -114,66 +127,103 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
     <main id="indhold" class="products-page">
-        <?php if ($category !== null): ?>
-            <p>
-                <a href="/products">Alle produkter</a>
-                <?php if ($category['parent'] !== null && ($categories[$category['parent']]['path'] ?? null) !== null): ?>
-                    · <a href="<?= htmlspecialchars($categories[$category['parent']]['path']) ?>"><?= htmlspecialchars($categories[$category['parent']]['name']) ?></a>
-                <?php endif; ?>
-            </p>
-        <?php endif; ?>
-        <h1><?= htmlspecialchars($heading) ?><?= $tag !== '' ? ' med tagget „' . htmlspecialchars($tag) . '“' : '' ?></h1>
-        <?php if ($tag !== ''): ?>
-            <p><a href="<?= htmlspecialchars($listPath) ?>">Vis alle <?= $category !== null ? 'i ' . htmlspecialchars($category['name']) : 'produkter' ?></a></p>
-        <?php endif; ?>
-        <?php if ($category !== null && $category['description'] !== '' && $page === 1): ?>
-            <p class="category-description"><?= nl2br(htmlspecialchars($category['description'])) ?></p>
-        <?php endif; ?>
-
-        <?php if ($subcategories): ?>
-            <nav class="category-list" aria-label="Kategorier">
-                <ul>
-                    <?php foreach ($subcategories as $sub): ?>
-                        <li><a href="<?= htmlspecialchars(productsUrl($tag, 1, $sub['path'])) ?>"><?= htmlspecialchars($sub['name']) ?></a></li>
-                    <?php endforeach; ?>
-                </ul>
+        <header class="page-header">
+            <nav class="breadcrumbs" aria-label="Brødkrumme">
+                <ol>
+                    <li><a href="/">Forside</a></li>
+                    <?php if ($category === null && $tag === ''): ?>
+                        <li><span aria-current="page">Produkter</span></li>
+                    <?php else: ?>
+                        <li><a href="/products">Produkter</a></li>
+                        <?php if ($category !== null && $category['parent'] !== null && ($categories[$category['parent']]['path'] ?? null) !== null): ?>
+                            <li><a href="<?= htmlspecialchars($categories[$category['parent']]['path']) ?>"><?= htmlspecialchars($categories[$category['parent']]['name']) ?></a></li>
+                        <?php endif; ?>
+                        <?php if ($category !== null && $tag === ''): ?>
+                            <li><span aria-current="page"><?= htmlspecialchars($category['name']) ?></span></li>
+                        <?php elseif ($category !== null): ?>
+                            <li><a href="<?= htmlspecialchars($listPath) ?>"><?= htmlspecialchars($category['name']) ?></a></li>
+                        <?php endif; ?>
+                        <?php if ($tag !== ''): ?>
+                            <li><span aria-current="page">Tagget „<?= htmlspecialchars($tag) ?>“</span></li>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </ol>
             </nav>
-        <?php endif; ?>
+            <h1><?= htmlspecialchars($heading) ?><?= $tag !== '' ? ' med tagget „' . htmlspecialchars($tag) . '“' : '' ?></h1>
+            <?php if ($category !== null && $category['description'] !== '' && $page === 1): ?>
+                <p class="category-description type-body-large"><?= nl2br(htmlspecialchars($category['description'])) ?></p>
+            <?php endif; ?>
+            <?php if ($tag !== ''): ?>
+                <p class="tag-filter">
+                    <span class="chip" aria-current="true"><span class="visually-hidden">Viser tagget </span><?= htmlspecialchars($tag) ?></span>
+                    <a href="<?= htmlspecialchars($listPath) ?>">Vis alle <?= $category !== null ? 'i ' . htmlspecialchars($category['name']) : 'produkter' ?></a>
+                </p>
+            <?php endif; ?>
+
+            <?php if ($chipCategories): ?>
+                <nav class="category-list" aria-label="Kategorier">
+                    <ul class="chip-set">
+                        <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $chipAll['path'])) ?>"<?= $chipAll['current'] ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($chipAll['name']) ?></a></li>
+                        <?php foreach ($chipCategories as $chipId => $chip): ?>
+                            <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $chip['path'])) ?>"<?= $chipId === $categoryId ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($chip['name']) ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
+            <?php endif; ?>
+        </header>
 
         <?php if (!$products): ?>
-            <p>Der er ingen produkter at vise.</p>
+            <div class="empty-state">
+                <span class="arch-icon"><?= uiIcon('category') ?></span>
+                <p class="type-title-large">Der er ingen produkter at vise</p>
+                <?php if ($category === null && $tag === '' && $page === 1): ?>
+                    <p>Kig forbi igen snart.</p>
+                    <a class="button" href="/">Til forsiden</a>
+                <?php else: ?>
+                    <p>Prøv en anden kategori, eller se alle produkterne.</p>
+                    <a class="button" href="/products">Se alle produkter</a>
+                <?php endif; ?>
+            </div>
         <?php else: ?>
             <ul class="product-grid">
                 <?php foreach ($products as $i => $product):
                     $id = (int)$product['itemId'];
                     $image = $images[$id] ?? null;
                     $samePrice = (float)$product['minPrice'] === (float)$product['maxPrice'];
+                    $productInStock = (int)$product['stock'] > 0;
                 ?>
                     <li class="product-card">
-                        <a href="<?= htmlspecialchars(productUrl($id, $product['itemName'], $product['categoryName'])) ?>">
-                            <?php if ($image !== null): ?>
+                        <?php if ($image !== null): ?>
+                            <div class="media-frame">
                                 <img src="<?= htmlspecialchars($image['fileUrl']) ?>" alt="<?= htmlspecialchars($image['altText'] ?: $product['itemName']) ?>"
                                      width="300" height="300" decoding="async" <?= $i < 4 ? 'fetchpriority="high"' : 'loading="lazy"' ?>>
-                            <?php else: ?>
-                                <span class="product-noimage">Intet billede</span>
+                            </div>
+                        <?php else: ?>
+                            <div class="media-frame media-frame--empty" aria-hidden="true"><?= uiIcon('diamond') ?><span class="media-frame__label">Intet billede</span></div>
+                        <?php endif; ?>
+                        <div class="product-card__body">
+                            <?php if ((string)$product['categoryName'] !== ''): ?>
+                                <p class="product-card__category type-overline"><?= htmlspecialchars($product['categoryName']) ?></p>
                             <?php endif; ?>
-                            <span class="product-name"><?= htmlspecialchars($product['itemName']) ?></span>
-                        </a>
-                        <span class="product-price"><?= $samePrice ? '' : 'Fra ' ?><?= formatPrice($product['minPrice']) ?></span>
-                        <span class="product-stock"><?= (int)$product['stock'] > 0 ? 'På lager' : 'Udsolgt' ?></span>
+                            <h2 class="product-card__name">
+                                <a class="product-card__link" href="<?= htmlspecialchars(productUrl($id, $product['itemName'], $product['categoryName'])) ?>"><?= htmlspecialchars($product['itemName']) ?></a>
+                            </h2>
+                            <p class="product-card__price"><?= $samePrice ? '' : 'Fra ' ?><?= formatPrice($product['minPrice']) ?></p>
+                            <p class="stock<?= $productInStock ? ' stock--in' : '' ?>"><?= $productInStock ? 'På lager' : 'Udsolgt' ?></p>
+                        </div>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
 
         <?php if ($page > 1 || $hasNext): ?>
-            <nav class="product-pages" aria-label="Sider">
+            <nav class="pagination product-pages" aria-label="Sider">
                 <?php if ($page > 1): ?>
-                    <a href="<?= htmlspecialchars(productsUrl($tag, $page - 1, $listPath)) ?>" rel="prev">Forrige side</a>
+                    <a class="button button--outlined" href="<?= htmlspecialchars(productsUrl($tag, $page - 1, $listPath)) ?>" rel="prev"><?= uiIcon('chevron-left', 'icon--20') ?>Forrige side</a>
                 <?php endif; ?>
-                <span>Side <?= $page ?></span>
+                <span class="pagination__current">Side <?= $page ?></span>
                 <?php if ($hasNext): ?>
-                    <a href="<?= htmlspecialchars(productsUrl($tag, $page + 1, $listPath)) ?>" rel="next">Næste side</a>
+                    <a class="button button--outlined" href="<?= htmlspecialchars(productsUrl($tag, $page + 1, $listPath)) ?>" rel="next">Næste side<?= uiIcon('chevron-right', 'icon--20') ?></a>
                 <?php endif; ?>
             </nav>
         <?php endif; ?>

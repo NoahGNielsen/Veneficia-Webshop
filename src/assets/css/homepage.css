@@ -1,30 +1,210 @@
+/* The homepage (index.php): full-width bands, each with a .container inside. */
 @layer pages {
-    /* Basic design, the real design comes later */
+  body > main.homepage {
+    max-width: none;
+    padding: 0;
+  }
+
+  /* ---- Hero: moss green, text left, the arch with the obelisk right (stacked on compact) ---- */
+  .hero {
+    padding-block: var(--space-7) var(--space-8);
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+
+  .hero__overline {
+    margin-bottom: var(--space-3);
+    color: var(--ctx-text-muted);
+  }
+
+  .hero h1 {
+    max-width: 15ch;
+    margin-bottom: var(--space-4);
+  }
+
+  .hero__lead {
+    max-width: 44ch;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .hero .moon-phases {
+    max-width: 420px;
+    margin-top: var(--space-7);
+  }
+
+  /* The arch sits on moss, so it gets a darker moss of its own and a fine lavender edge to keep its shape visible */
+  .hero__visual {
+    justify-self: center;
+    width: min(100%, 280px);
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-secondary-accent) 45%, transparent);
+    background:
+      radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--color-secondary-accent) 34%, transparent),
+        color-mix(in srgb, var(--color-primary) 22%, transparent) 40%, transparent 70%),
+      color-mix(in srgb, var(--color-on-background) 35%, var(--color-secondary));
+  }
+
+  .hero__visual img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 600px) {
+    .hero__actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (min-width: 840px) {
     .hero {
-        padding: 64px 32px;
-        border-radius: 16px;
-        background: color-mix(in srgb, var(--color-primary-container) 45%, var(--color-surface));
-        text-align: center;
+      padding-block: var(--space-8) var(--space-9);
     }
 
-    .hero p {
-        max-width: 60ch;
-        margin: 0 auto 24px;
-        color: var(--color-on-surface-variant);
-        font-size: 1.1rem;
+    .hero__inner {
+      grid-template-columns: 7fr 5fr;
+      gap: var(--space-8);
     }
 
-    .hero-button {
-        display: inline-block;
-        padding: 12px 24px;
-        border-radius: 8px;
-        background: var(--color-primary);
-        color: var(--color-on-primary);
-        font-weight: 700;
-        text-decoration: none;
+    .hero__visual {
+      width: min(100%, 400px);
     }
+  }
 
-    .hero-button:hover {
-        background: color-mix(in srgb, var(--color-primary) 85%, var(--color-on-surface));
+  /* ---- Sections ---- */
+  .home-section {
+    padding-block: var(--space-8);
+  }
+
+  .home-section h2 {
+    margin-top: 0;
+    margin-bottom: var(--space-6);
+  }
+
+  @media (min-width: 840px) {
+    .home-section {
+      padding-block: var(--space-9);
     }
+  }
+
+  /* ---- Category tiles: a canvas card with the icon in a small arch ---- */
+  .category-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 600px) {
+    .category-tiles {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+  }
+
+  @media (min-width: 840px) {
+    .category-tiles {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .category-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    height: 100%;
+    padding: var(--space-5) var(--space-3);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    text-align: center;
+    text-decoration: none;
+    transition: transform var(--duration-short) var(--ease-standard);
+  }
+
+  .category-tile::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    box-shadow: var(--elevation-2);
+    opacity: 0;
+    transition: opacity var(--duration-short) var(--ease-standard);
+    pointer-events: none;
+  }
+
+  .category-tile:hover::after {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .category-tile:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .category-tile__name {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-title-medium);
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---- How to shop: three short points ---- */
+  .home-section--how {
+    border-top: 1px solid var(--color-outline-variant);
+  }
+
+  .how-list {
+    display: grid;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 840px) {
+    .how-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-7);
+    }
+  }
+
+  .how-list h3 {
+    margin: var(--space-3) 0 var(--space-2);
+  }
+
+  .how-list p {
+    max-width: 36ch;
+    margin: 0;
+    color: var(--color-on-surface-variant);
+  }
+
+  .how-list__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-surface-variant);
+    color: var(--color-secondary);
+  }
 }

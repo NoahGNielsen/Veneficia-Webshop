@@ -89,6 +89,19 @@ $structuredData = [
     ],
 ];
 $structuredData = array_filter($structuredData, fn($v) => $v !== null);
+
+// For the page: the variant chosen from the start (the first one in stock), whether the basket message is good news,
+// and the category page that the breadcrumb and the sold-out box link to
+$defaultVariantId = null;
+foreach ($variants as $variant) {
+    if ((int)$variant['inventoryCount'] > 0) {
+        $defaultVariantId = (int)$variant['itemVariantId'];
+        break;
+    }
+}
+$basketMessageOk = $basketMessage !== null && str_ends_with($basketMessage, 'lagt i kurven.');
+$categoryPath = categoryPagePath((string)$item['categoryName']);
+$navSection = 'products';
 ?>
 <!DOCTYPE html>
 <html lang="da">
@@ -107,99 +120,139 @@ $structuredData = array_filter($structuredData, fn($v) => $v !== null);
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
     <main id="indhold" class="product-page">
-        <p>
-            <a href="/products">Alle produkter</a>
-            <?php if (($categoryPath = categoryPagePath((string)$item['categoryName'])) !== null): ?>
-                · <a href="<?= htmlspecialchars($categoryPath) ?>"><?= htmlspecialchars($item['categoryName']) ?></a>
-            <?php endif; ?>
-        </p>
-        <h1><?= htmlspecialchars($item['itemName']) ?></h1>
-        <p class="product-price">
-            <?= min($prices) === max($prices) ? formatPrice(min($prices)) : 'Fra ' . formatPrice(min($prices)) ?>
-            · <?= $inStock ? 'På lager' : 'Udsolgt' ?>
-        </p>
-
-        <?php if ($images): ?>
-            <div class="product-images">
-                <?php foreach ($images as $i => $image): ?>
-                    <img src="<?= htmlspecialchars($image['fileUrl']) ?>" alt="<?= htmlspecialchars($image['altText'] ?: $item['itemName']) ?>"
-                         width="400" height="400" decoding="async" <?= $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"' ?>>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($descriptionText !== ''): ?>
-            <h2>Beskrivelse</h2>
-            <p class="product-description"><?= nl2br(htmlspecialchars($descriptionText)) ?></p>
-        <?php endif; ?>
-
-        <h2><?= count($variants) > 1 ? 'Varianter' : 'Pris og lager' ?></h2>
-        <table class="product-variants">
-            <thead>
-                <tr>
-                    <?php if ($types): ?>
-                        <?php foreach ($types as $type): ?>
-                            <th><?= htmlspecialchars($type) ?></th>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <th>Variant</th>
-                    <?php endif; ?>
-                    <th>Pris</th>
-                    <th>Lager</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($variants as $variant): ?>
-                    <tr>
-                        <?php if ($types): ?>
-                            <?php foreach ($variant['values'] as $value): ?>
-                                <td><?= htmlspecialchars($value) ?></td>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <td><?= htmlspecialchars($variant['varriantName']) ?></td>
-                        <?php endif; ?>
-                        <td><?= formatPrice($variant['varriantPrice']) ?></td>
-                        <td><?= (int)$variant['inventoryCount'] > 0 ? 'På lager (' . (int)$variant['inventoryCount'] . ')' : 'Udsolgt' ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <?php if ($basketMessage !== null): ?>
-            <p role="status"><?= htmlspecialchars($basketMessage) ?> <a href="/basket">Gå til kurven</a></p>
-        <?php endif; ?>
-        <?php if ($inStock): ?>
-            <form class="product-add" method="post" action="/basket">
-                <?php // Guests without a session have no token yet; /basket checks the Origin header for them instead ?>
-                <input type="hidden" name="csrfToken" value="<?= htmlspecialchars($basketToken) ?>">
-                <input type="hidden" name="action" value="add">
-                <?php if (count($variants) > 1): ?>
-                    <label for="variantId">Variant</label>
-                    <select id="variantId" name="variantId" required>
-                        <?php foreach ($variants as $variant): ?>
-                            <option value="<?= (int)$variant['itemVariantId'] ?>" <?= (int)$variant['inventoryCount'] > 0 ? '' : 'disabled' ?>>
-                                <?= htmlspecialchars($types ? implode(' / ', $variant['values']) : $variant['varriantName']) ?>
-                                - <?= formatPrice($variant['varriantPrice']) ?><?= (int)$variant['inventoryCount'] > 0 ? '' : ' (udsolgt)' ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                <?php else: ?>
-                    <input type="hidden" name="variantId" value="<?= (int)$variants[0]['itemVariantId'] ?>">
+        <nav class="breadcrumbs" aria-label="Brødkrumme">
+            <ol>
+                <li><a href="/products">Alle produkter</a></li>
+                <?php if ($categoryPath !== null): ?>
+                    <li><a href="<?= htmlspecialchars($categoryPath) ?>"><?= htmlspecialchars($item['categoryName']) ?></a></li>
                 <?php endif; ?>
-                <label for="amount">Antal</label>
-                <input type="number" id="amount" name="amount" value="1" min="1" max="<?= BASKET_MAX_AMOUNT ?>" required>
-                <button type="submit">Læg i kurv</button>
-            </form>
-        <?php endif; ?>
+                <li><span aria-current="page"><?= htmlspecialchars($item['itemName']) ?></span></li>
+            </ol>
+        </nav>
 
-        <?php if ($tags): ?>
-            <h2>Tags</h2>
-            <ul class="product-tags">
-                <?php foreach ($tags as $tag): ?>
-                    <li><a href="<?= htmlspecialchars(productsUrl($tag)) ?>"><?= htmlspecialchars($tag) ?></a></li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
+        <div class="product-layout">
+            <?php if ($images): ?>
+                <ul class="product-gallery" aria-label="Billeder af <?= htmlspecialchars($item['itemName']) ?>"<?= count($images) > 1 ? ' tabindex="0"' : '' ?>>
+                    <?php foreach ($images as $i => $image): ?>
+                        <li class="media-frame">
+                            <img src="<?= htmlspecialchars($image['fileUrl']) ?>" alt="<?= htmlspecialchars($image['altText'] ?: $item['itemName']) ?>"
+                                 width="600" height="600" decoding="async" <?= $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"' ?>>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <div class="product-gallery">
+                    <div class="media-frame media-frame--empty" aria-hidden="true"><?= uiIcon('diamond') ?><span class="media-frame__label">Intet billede</span></div>
+                </div>
+            <?php endif; ?>
+
+            <div class="product-info">
+                <h1><?= htmlspecialchars($item['itemName']) ?></h1>
+                <p class="product-price"><?= min($prices) === max($prices) ? formatPrice(min($prices)) : 'Fra ' . formatPrice(min($prices)) ?></p>
+                <p class="stock<?= $inStock ? ' stock--in' : '' ?>"><?= $inStock ? 'På lager' : 'Udsolgt' ?></p>
+
+                <?php if ($basketMessage !== null): ?>
+                    <p class="banner <?= $basketMessageOk ? 'banner--success' : 'banner--error' ?>" role="status"><?= htmlspecialchars($basketMessage) ?> <a href="/basket">Gå til kurven</a></p>
+                <?php endif; ?>
+                <?php if ($inStock): ?>
+                    <form class="product-add" method="post" action="/basket">
+                        <?php // Guests without a session have no token yet; /basket checks the Origin header for them instead ?>
+                        <input type="hidden" name="csrfToken" value="<?= htmlspecialchars($basketToken) ?>">
+                        <input type="hidden" name="action" value="add">
+                        <?php if (count($variants) > 1): ?>
+                            <fieldset class="chip-fieldset">
+                                <legend>Vælg variant</legend>
+                                <div class="chip-set">
+                                    <?php foreach ($variants as $variant):
+                                        $variantInStock = (int)$variant['inventoryCount'] > 0;
+                                    ?>
+                                        <label class="chip">
+                                            <input type="radio" name="variantId" value="<?= (int)$variant['itemVariantId'] ?>" required<?= $variantInStock ? '' : ' disabled' ?><?= (int)$variant['itemVariantId'] === $defaultVariantId ? ' checked' : '' ?>>
+                                            <?= htmlspecialchars($types ? implode(' / ', $variant['values']) : $variant['varriantName']) ?>
+                                            · <?= formatPrice($variant['varriantPrice']) ?><?= $variantInStock ? '' : ' · udsolgt' ?>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </fieldset>
+                        <?php else: ?>
+                            <input type="hidden" name="variantId" value="<?= (int)$variants[0]['itemVariantId'] ?>">
+                        <?php endif; ?>
+                        <div class="field">
+                            <label for="amount">Antal</label>
+                            <input type="number" id="amount" name="amount" value="1" min="1" max="<?= BASKET_MAX_AMOUNT ?>" required inputmode="numeric">
+                        </div>
+                        <button type="submit" class="button--large button--block">Læg i kurv</button>
+                    </form>
+                <?php else: ?>
+                    <div class="product-soldout">
+                        <p class="type-title-large">Udsolgt lige nu</p>
+                        <p>Denne vare er ikke på lager. Kig efter noget lignende i <a href="<?= htmlspecialchars($categoryPath ?? '/products') ?>"><?= htmlspecialchars($categoryPath !== null ? $item['categoryName'] : 'alle produkter') ?></a>.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="product-details">
+            <?php if ($descriptionText !== ''): ?>
+                <section aria-labelledby="beskrivelse">
+                    <h2 id="beskrivelse">Beskrivelse</h2>
+                    <p class="product-description type-body-large"><?= nl2br(htmlspecialchars($descriptionText)) ?></p>
+                </section>
+            <?php endif; ?>
+
+            <section aria-labelledby="varianter">
+                <h2 id="varianter"><?= count($variants) > 1 ? 'Varianter' : 'Pris og lager' ?></h2>
+                <div class="table-scroll" role="region" aria-labelledby="varianter" tabindex="0">
+                    <table class="product-variants">
+                        <thead>
+                            <tr>
+                                <?php if ($types): ?>
+                                    <?php foreach ($types as $type): ?>
+                                        <th scope="col"><?= htmlspecialchars($type) ?></th>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <th scope="col">Variant</th>
+                                <?php endif; ?>
+                                <th scope="col" class="num">Pris</th>
+                                <th scope="col">Lager</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($variants as $variant): ?>
+                                <tr>
+                                    <?php if ($types): ?>
+                                        <?php foreach ($variant['values'] as $value): ?>
+                                            <td><?= htmlspecialchars($value) ?></td>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <td><?= htmlspecialchars($variant['varriantName']) ?></td>
+                                    <?php endif; ?>
+                                    <td class="num"><?= formatPrice($variant['varriantPrice']) ?></td>
+                                    <td>
+                                        <?php if ((int)$variant['inventoryCount'] > 0): ?>
+                                            <span class="stock stock--in">På lager (<?= (int)$variant['inventoryCount'] ?>)</span>
+                                        <?php else: ?>
+                                            <span class="stock">Udsolgt</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <?php if ($tags): ?>
+                <section aria-labelledby="tags">
+                    <h2 id="tags">Tags</h2>
+                    <ul class="chip-set product-tags">
+                        <?php foreach ($tags as $tag): ?>
+                            <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag)) ?>"><?= htmlspecialchars($tag) ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </section>
+            <?php endif; ?>
+        </div>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>

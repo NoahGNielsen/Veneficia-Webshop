@@ -234,7 +234,8 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 ### Ikoner
 - Ét sæt: **Material Symbols Rounded** (Apache-2.0, vægt 400). Kun de ikoner, vi bruger, i én sprite `src/assets/icons/icons.svg` (`<symbol id="…">` + `<svg><use href="/assets/icons/icons.svg#…"></svg>`). Licensen ligger ved siden af.
 - I PHP indsættes et ikon med `uiIcon('navn')` (defineret i `header.php`). Spriten får `?v=` til cache-busting.
-- Ikonerne i spriten: `menu`, `close`, `shopping-bag`, `chevron-left`, `chevron-right`, `keyboard-arrow-down`, `check`, `check-circle`, `error`, `info`, `delete`, `diamond` (krystaller og pladsholder), `local-shipping`, `menu-book`, `home`, `search`, `candle`, `psychiatry` (urter), `auto-stories` (bøger) og `wand-stars` (generisk kategori). Dertil kommer de egne symboler `crescent` og `moon-phases`.
+- Ikonerne i spriten (20 Material): `menu`, `close`, `shopping-bag`, `chevron-left`, `chevron-right`, `delete`, `diamond`, `local-shipping`, `menu-book`, `home`, `search`, `candle`, `psychiatry`, `auto-stories`, `wand-stars`, `experiment`, `star`, `wine-bar`, `local-fire-department` og `category`. Dertil kommer de egne symboler `crescent` og `moon-phases`.
+- **Kategori-ikoner** vælges ud fra kategoriens slug i `HOME_CATEGORY_ICONS` i `index.php`: krystaller og smykker → `diamond`, røgelse → `local-fire-department`, lys → `candle`, urter og eliksir-ingredienser → `psychiatry`, eliksirer → `experiment`, bøger → `auto-stories`, trylleformularer → `menu-book`, stave → `wand-stars`, rituelle genstande → `wine-bar`, religiøse og andre symboler → `star`, stjernetegn → `crescent`. Alt andet, også nye kategorier, får `category`. Kommer der en ny kategori, så tilføj dens slug.
 - Ikoner, som CSS selv tegner (chip-check, brødkrumme-chevron og banner-ikoner), er mask-tokens (`--icon-*`) i `:root`. De har ingen farve og arver `currentColor`. Select-pilen er den eneste med farve i (Oliven).
 - Størrelser: 20px (`.icon--20`, inline), 24px (standard), 40px (`.icon--40`).
 - `fill: currentColor`, så ikonet arver kontekstens farve.
@@ -274,7 +275,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | **Tabeller** | `.data-table`, `.table-scroll` | Compact: rækker bliver kort (grid, `data-label` + `::before`). Fra 600px: tabel, højrestillede tal, total i `tfoot` (Lora 600 1.25rem). | kurv, kasse, bekræftelse, varianter |
 | **Brødkrummer** | `nav.breadcrumbs > ol` | `aria-label="Brødkrumme"`, chevron-separatorer, sidste punkt `aria-current="page"` | produktliste, produktside |
 | **Paginering** | `.product-pages` | outlined-knapperne "Forrige side" og "Næste side" + "Side N" | produktliste |
-| **Kategorinavigation** | `.category-list` | Compact: én vandret række chips, `scroll-snap`, næste chip kigger frem, kanten fader ud (bevidst valg, så produkterne bliver højt oppe). Fra 600px: chips der ombrydes. | produktliste |
+| **Kategorinavigation** | `nav.category-list` > `ul.chip-set` > `a.chip` | Først chippen "Alle" (eller "Alle i X"), derefter kategorierne. En kategori uden underkategorier viser sine søskende med sig selv markeret (`aria-current`), så nabokategorien er ét tryk væk. Compact: én vandret række chips, `scroll-snap`, næste chip kigger frem, kanten fader ud (bevidst valg, så produkterne bliver højt oppe). Fra 600px: chips der ombrydes. | produktliste |
 | **Trinindikator** | `ol.steps` | Kurv · Levering · Bekræftelse, `aria-current="step"`, gennemførte trin med check | kurv, kasse, bekræftelse |
 | **Tom tilstand** | `.empty-state` | ikon i bue, kort tekst, én handling | tom kurv, ingen produkter |
 | **Købsboks** | `.product-add` | Lærred-kort, Sand-kant, radius 16. Varianter som radio-chips i `<fieldset>`, antal, "Læg i kurv" (filled `--large` `--block`). | produktside |
@@ -340,6 +341,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | `spring-physics` | M3's cubic-bezier-easing | Ren CSS uden JS. M3 easing er vores motion-system. |
 | Stack-råd (React, Tailwind osv.) | Springes over | Ingen af skillets stacks passer til ren PHP + vanilla CSS. |
 | *(prompten)* Hero-obelisken som inline SVG | `src/assets/images/obelisk.svg` vist med `<img alt="">` | En Blender-render kan senere erstatte den ved blot at skifte `src`, og filen caches. Den bruges også som demobillede i styleguiden. |
+| *(prompten)* Brødkrummen inde i produktsidens info-kolonne | Brødkrummen står over hele `.product-layout` | På mobil står galleriet først. En brødkrumme under billedet ville se forkert ud, og øverst er hvor folk leder efter den (Jakobs lov). |
 | *(prompten)* Al fælles komponent-CSS i `mainStyle.css` | Butiksflowets komponenter i `products.css`, kommende i `styleguide.css` | Så holdes `mainStyle.css` på ca. 40 kB, og besøgende henter ikke CSS, de ikke bruger. |
 
 *`search.py` kunne ikke køre (ingen Python på maskinen). Anbefalingerne ovenfor er hentet direkte fra skillets datafiler (`products.csv`, `ui-reasoning.csv`, `typography.csv`, `styles.csv`, `ux-guidelines.csv`, `landing.csv`).*
