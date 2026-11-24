@@ -6,18 +6,23 @@ if (!headers_sent()) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/header.php'; ?>
     <link rel="stylesheet" href="/assets/css/statusCodePage.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/statusCodePage.css') ?>">
-    <title>Locked - Veneficia</title>
+    <title>Låst - Veneficia</title>
     <meta name="robots" content="noindex">
 </head>
 <body>
     <main class="status-page">
-        <p class="status-code">423</p>
-        <h1>Locked</h1>
-        <p class="status-message">This resource is locked and can't be changed right now. Please try again later.</p>
+        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <p class="status-code"><span class="visually-hidden">Fejl </span>423</p>
+        <h1>Det er låst lige nu</h1>
+        <p class="status-message">Det, du prøver at ændre, er låst lige nu. Prøv igen senere.</p>
+        <div class="status-actions">
+            <a class="button" href="/">Til forsiden</a>
+            <a class="button button--outlined" href="/products">Se produkterne</a>
+        </div>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>

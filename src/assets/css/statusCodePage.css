@@ -1,16 +1,43 @@
+/* The error pages (assets/php/statusCodesPages/). Friendly and calm: the code large in Cinzel, a short text and the
+   way on. No top app bar, since it needs the database, which may be what's down. */
 @layer pages {
-    /* Functional only, the real design comes later */
-    .status-page {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 48px 16px;
-        text-align: center;
-    }
+  body > main.status-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 640px;
+    text-align: center;
+  }
 
-    .status-code {
-        margin: 0;
-        font-size: 4rem;
-        font-weight: 800;
-        color: var(--color-primary);
-    }
+  .status-page .brand {
+    margin-bottom: var(--space-6);
+  }
+
+  .status-code {
+    margin: 0;
+    color: var(--color-secondary);
+    font-family: var(--font-brand);
+    font-size: clamp(4.5rem, 3rem + 8vw, 7rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: .04em;
+  }
+
+  .status-page h1 {
+    margin: var(--space-4) 0 var(--space-3);
+  }
+
+  .status-message {
+    max-width: 44ch;
+    margin: 0 0 var(--space-6);
+    color: var(--color-on-surface-variant);
+  }
+
+  .status-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+  }
 }

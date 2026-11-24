@@ -5,18 +5,23 @@ if (!headers_sent()) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/header.php'; ?>
     <link rel="stylesheet" href="/assets/css/statusCodePage.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/statusCodePage.css') ?>">
-    <title>Page removed - Veneficia</title>
+    <title>Siden er fjernet - Veneficia</title>
     <meta name="robots" content="noindex">
 </head>
 <body>
     <main class="status-page">
-        <p class="status-code">410</p>
-        <h1>Page removed</h1>
-        <p class="status-message">This page has been permanently removed and won't be coming back.</p>
+        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <p class="status-code"><span class="visually-hidden">Fejl </span>410</p>
+        <h1>Siden er fjernet</h1>
+        <p class="status-message">Siden er fjernet for altid og kommer ikke tilbage.</p>
+        <div class="status-actions">
+            <a class="button" href="/">Til forsiden</a>
+            <a class="button button--outlined" href="/products">Se produkterne</a>
+        </div>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>

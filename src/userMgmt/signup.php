@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <main class="auth-page">
+        <a class="brand auth-brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
         <form class="auth-form" method="post" action="/userMgmt/signup<?= htmlspecialchars($nextQuery) ?>">
             <h1>Opret konto</h1>
             <?php if ($errors): ?>
@@ -86,20 +87,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
             <input type="hidden" name="csrfToken" value="<?= htmlspecialchars(csrfToken()) ?>">
 
-            <label for="firstName">Fornavn</label>
-            <input type="text" id="firstName" name="firstName" autocomplete="given-name" maxlength="100" required value="<?= htmlspecialchars($firstName) ?>">
+            <div class="field">
+                <label for="firstName">Fornavn</label>
+                <input type="text" id="firstName" name="firstName" autocomplete="given-name" maxlength="100" required value="<?= htmlspecialchars($firstName) ?>">
+            </div>
 
-            <label for="lastName">Efternavn</label>
-            <input type="text" id="lastName" name="lastName" autocomplete="family-name" maxlength="100" required value="<?= htmlspecialchars($lastName) ?>">
+            <div class="field">
+                <label for="lastName">Efternavn</label>
+                <input type="text" id="lastName" name="lastName" autocomplete="family-name" maxlength="100" required value="<?= htmlspecialchars($lastName) ?>">
+            </div>
 
-            <label for="email">E-mail</label>
-            <input type="email" id="email" name="email" autocomplete="email" maxlength="254" required value="<?= htmlspecialchars($email) ?>">
+            <div class="field">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" autocomplete="email" maxlength="254" required value="<?= htmlspecialchars($email) ?>">
+            </div>
 
-            <label for="password">Adgangskode</label>
-            <input type="password" id="password" name="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+            <div class="field">
+                <label for="password">Adgangskode</label>
+                <input type="password" id="password" name="password" autocomplete="new-password" minlength="8" maxlength="72" required aria-describedby="password-hint">
+                <p class="field-hint" id="password-hint">Mindst 8 tegn.</p>
+            </div>
 
-            <label for="passwordRepeat">Gentag adgangskode</label>
-            <input type="password" id="passwordRepeat" name="passwordRepeat" autocomplete="new-password" minlength="8" maxlength="72" required>
+            <div class="field">
+                <label for="passwordRepeat">Gentag adgangskode</label>
+                <input type="password" id="passwordRepeat" name="passwordRepeat" autocomplete="new-password" minlength="8" maxlength="72" required>
+            </div>
 
             <label class="auth-checkbox">
                 <input type="checkbox" name="newsLetterConsent" value="1" <?= $newsLetterConsent ? 'checked' : '' ?>> Ja tak, send mig nyhedsbrevet
@@ -111,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="checkbox" name="acceptTerms" value="1" required> Jeg accepterer <a href="/legal/terms">handelsbetingelserne</a> og <a href="/legal/privacy">privatlivspolitikken</a>
             </label>
 
-            <button type="submit">Opret konto</button>
+            <button type="submit" class="button--large button--block">Opret konto</button>
             <p class="auth-switch">Har du allerede en konto? <a href="/userMgmt/login<?= htmlspecialchars($nextQuery) ?>">Log ind</a></p>
         </form>
     </main>
