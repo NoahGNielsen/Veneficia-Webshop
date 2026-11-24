@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS VeneficiaOrdre (
     shippingPrice DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     shippingWeight DECIMAL(10,3) NOT NULL DEFAULT 0.000,
     PRIMARY KEY (ordreID),
+    KEY ix_VeneficiaOrdre_ordreStatus (ordreStatus),
     CONSTRAINT fk_VeneficiaOrdre_customer
         FOREIGN KEY (customerId) REFERENCES VeneficiaCustomers (VeneficiaCustomerId)
         ON DELETE RESTRICT,

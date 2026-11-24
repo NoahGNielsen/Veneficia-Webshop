@@ -4,6 +4,7 @@ $employee = requireEmployee();
 
 // One button per admin page. Add new pages here.
 $adminPages = [
+    ['href' => '/admin/orders', 'title' => 'Ordrer', 'description' => 'Se ordrer og skift deres status.'],
     ['href' => '/admin/items', 'title' => 'Varer', 'description' => 'Se, tilføj og ret varer med varianter og billeder.'],
     ['href' => '/admin/categories', 'title' => 'Kategorier', 'description' => 'Se, opret, ret og slet kategorier.'],
     ['href' => '/admin/discountCodes', 'title' => 'Rabatkoder', 'description' => 'Se, opret og slet rabatkoder.'],
