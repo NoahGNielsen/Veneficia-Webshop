@@ -114,10 +114,13 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 
 ### Typografi
 
-**Lora** (overskrifter, wordmark og produktnavne) + **Raleway** (brødtekst og UI). Det er skillets par "Wellness Calm" (calm, wellness, natural, organic). Serif + sans forbinder tradition (Wicca, Book of Shadows) med moderne læsbarhed.
+**Lora** (overskrifter og produktnavne) + **Raleway** (brødtekst og UI). Det er skillets par "Wellness Calm" (calm, wellness, natural, organic). Serif + sans forbinder tradition (Wicca, Book of Shadows) med moderne læsbarhed.
 
-- Begge er selv-hostet i `src/assets/fonts/` (woff2, latin + latin-ext, `font-display: swap`). Kun `raleway-latin.woff2` og `lora-latin.woff2` preloades.
-- Fallbacks: `--font-serif: "Lora", Georgia, serif` og `--font-sans: "Raleway", system-ui, sans-serif`.
+**Cinzel** (logoets font) bruges **kun som brand-font**: wordmarket "Veneficia" og de store statuskoder på fejlsiderne. Cinzel er en versal-font, der er tegnet efter romerske indskrifter. Den giver det højtidelige, "gamle" præg fra logoet, men den er svær at læse i længere tekst (små bogstaver bliver kapitæler). Derfor bruges den ikke til overskrifter, produktnavne eller brødtekst. Lora bærer den samme klassiske stemning i læsbar form.
+
+- Lora og Raleway er selv-hostet i `src/assets/fonts/` (woff2, latin + latin-ext, `font-display: swap`). Kun `raleway-latin.woff2` og `lora-latin.woff2` preloades.
+- Cinzel hentes som en **tekst-subset** fra Google Fonts' CSS2-API (`text=` med kun tegnene i "Veneficia" og cifrene 0–9). Den gemmes som `cinzel-wordmark.woff2` (få kB) + `OFL-Cinzel.txt`, med `font-display: swap` og **ingen preload**. Kommer der nye tegn i et brand-element, skal subsettet hentes igen.
+- Fallbacks: `--font-brand: "Cinzel", "Lora", Georgia, serif`, `--font-serif: "Lora", Georgia, serif` og `--font-sans: "Raleway", system-ui, sans-serif`.
 - `font-variant-numeric: lining-nums` på `body`. Raleways standardtal er gammeldags tal.
 - Raleway har ingen tabeltal, så tal i tabelkolonner højrestilles.
 - Brug ikke Raleway under vægt 400. Brug ikke kursiv Lora.
@@ -125,6 +128,7 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 
 | Rolle | Klasse | Font | Størrelse / linjehøjde | Brug |
 |---|---|---|---|---|
+| brand | `.wordmark` | Cinzel 600 | 1.375rem (navbar) til 2rem (log ind), +0.04em | wordmarket "Veneficia", statuskoder |
 | display | `.type-display` | Lora 600 | `clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem)` / 1.08 | forsidens h1 |
 | headline-large | `.type-headline-large` (h1) | Lora 600 | `clamp(1.875rem, 1.4rem + 1.8vw, 2.5rem)` / 1.15 | sidens h1 |
 | headline-medium | `.type-headline-medium` (h2) | Lora 600 | `clamp(1.5rem, 1.25rem + 1vw, 1.875rem)` / 1.2 | h2 |
@@ -252,7 +256,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 | Komponent | Klasse(r) | Spec | Bruges på |
 |---|---|---|---|
-| **Top app bar** | `.navbar.on-secondary` | Sticky, Mosgrøn, 64px. Skip-link "Spring til indhold" → `#indhold`. Wordmark "Veneficia" (Lora 600) + halvmåne. Expanded: Produkter · Log ind/Opret konto eller "Hej, navn"/Log ud · kurv-ikon med Lavendel-badge (`aria-label` "Kurv, 3 varer"). Compact: wordmark, kurv og menuknap → navigation drawer med **Popover API**. Menuikonet bliver et kryds via `:has(#menu:popover-open)`. Aktiv side: `aria-current="page"` + Lavendel indikator. | alle kundesider |
+| **Top app bar** | `.navbar.on-secondary` | Sticky, Mosgrøn, 64px. Skip-link "Spring til indhold" → `#indhold`. Wordmark "Veneficia" (Cinzel 600, `.wordmark`) + halvmåne. Expanded: Produkter · Log ind/Opret konto eller "Hej, navn"/Log ud · kurv-ikon med Lavendel-badge (`aria-label` "Kurv, 3 varer"). Compact: wordmark, kurv og menuknap → navigation drawer med **Popover API**. Menuikonet bliver et kryds via `:has(#menu:popover-open)`. Aktiv side: `aria-current="page"` + Lavendel indikator. | alle kundesider |
 | **Footer** | `.footer.on-secondary` | Månefase-skillelinje, wordmark + tagline, links (Produkter, Kurv, Handelsbetingelser, Privatlivspolitik), ©-år | alle sider |
 | **Knapper** | `.button` + `--tonal` `--outlined` `--text` + `--large` `--block` | Fuldt runde, min-højde 44px (48 med `--large`), label-large, state layers, fokusring 2px/2px offset (`--ctx-focus`), tryk `scale(.98)`, disabled. `<a class="button">` = `<button>`. `<button>` uden klasse = filled. Filled på mosgrøn = Lavendel med Nattegrøn tekst. | overalt |
 | **Links** | `a` | `--ctx-link`, altid understreget i brødtekst, `text-underline-offset: 3px`, tykkere ved hover. Nav-links uden understregning. | overalt |
@@ -287,7 +291,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | Kasse | `checkout.php` → `products.css` | Trin 2, fejlopsummering øverst, leveringsformular + `<aside>` med ordreoversigt og rabatkode. Knappen hedder **"Bestil og betal"** |
 | Ordrebekræftelse | `ordreConfimation.php` → `products.css` | Trin 3, bue med måne, "Tak for din ordre, navn!", ordrenummer i Lora, kort med levering + varer, "Shop videre". `@media print` |
 | Log ind / Opret | `userMgmt/*.php` → `usermgnt.css` | Wordmark-link + centreret kort (Lærred, radius 28, elevation 1) |
-| Fejlsider (10) | `statusCodesPages/*.php` → `statusCodePage.css` | Dansk, statuskode i Lora (Mosgrøn), venlig h1, "Til forsiden" + "Se produkterne". **Ingen navbar** (rammer databasen). |
+| Fejlsider (10) | `statusCodesPages/*.php` → `statusCodePage.css` | Dansk, statuskode i Cinzel (Mosgrøn), venlig h1, "Til forsiden" + "Se produkterne". **Ingen navbar** (rammer databasen). |
 | Juridiske | `legal/*.php` → (kun mainStyle) | Side-skal: navbar, h1, "Teksten er på vej.", footer |
 | Admin | `admin/*.php` → `admin.css` | Let hånd: Mosgrøn admin-bar, nye komponenter og tokens, uændret layout |
 
@@ -325,6 +329,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | `number-tabular` (tabeltal til priser) | `lining-nums` + højrestillede talkolonner | Raleway har ingen tabeltal. |
 | Ikoner: Phosphor/Heroicons (React-pakker) | Material Symbols Rounded som SVG-sprite | Matcher M3 og kræver hverken React, ikon-font eller CDN. |
 | Typografi-rækkens Google Fonts-`@import` | Selv-hostede woff2-filer | Ingen eksterne requests (sidehastighed og privatliv). |
+| Ét font-par (to familier) | Lora + Raleway + Cinzel som brand-font | Cinzel er logoets font, så wordmarket matcher logoet. Den er begrænset til en tekst-subset på få kB uden preload, så den koster næsten intet. |
 | E-handel effekt "Card hover lift (200ms) + Scale" | Lift `translateY(-2px)` + billede `scale(1.03)` på 150ms | Tilpasset M3's motion-tokens. |
 | `--motion`-dialens GSAP-snippets | Ren CSS | Ingen JS-biblioteker. |
 | `spring-physics` | M3's cubic-bezier-easing | Ren CSS uden JS. M3 easing er vores motion-system. |
@@ -346,6 +351,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 - Animation af andet end `transform` og `opacity`, og animation uden reduced-motion-fallback
 - Opdigtet indhold: anmeldelser, stjerner, kundetal, garantier, kontaktoplysninger og udokumenterede påstande
 - Fjernet fokusring uden erstatning, og placeholder som eneste label
+- Cinzel uden for brand-elementerne (wordmark og statuskoder), fx til overskrifter, knapper eller brødtekst
 
 ---
 
@@ -359,7 +365,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 - [ ] Intet formidles kun med farve.
 - [ ] Ingen vandret scroll ved 320px. Layoutet virker ved 360, 768, 1280 og 1440px og ved 200 % zoom.
 - [ ] `prefers-reduced-motion` slår animationerne fra.
-- [ ] Ingen eksterne requests, højst to fontfamilier og to preloads, CSS-budget overholdt, ingen ny JS.
+- [ ] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen ny JS.
 - [ ] Billeder har `width`/`height`.
 - [ ] Formularer har uændret `name`, `action`, `method` og CSRF, og al output er escaped.
 - [ ] Skillets Quick Reference §1–9 (i `SKILL.md`) er gennemgået.
