@@ -542,6 +542,11 @@
     cursor: not-allowed;
   }
 
+  ::placeholder {
+    color: var(--color-on-surface-variant);
+    opacity: 1;
+  }
+
   input[type="number"] {
     width: 5.5rem;
   }
@@ -607,14 +612,22 @@
     cursor: pointer;
   }
 
+  /* Not flex: the text and links inside must wrap as one paragraph */
   label:has(> input[type="checkbox"], > input[type="radio"]):not(.chip) {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
+    position: relative;
+    display: block;
     min-height: 44px;
+    padding: 11px 0 11px 32px;
     font-size: var(--font-size-body);
     font-weight: 400;
+    line-height: 1.4;
     cursor: pointer;
+  }
+
+  label:not(.chip) > :is(input[type="checkbox"], input[type="radio"]) {
+    position: absolute;
+    top: 12px;
+    left: 0;
   }
 
   /* ---- Chips: tags, categories and variant choices. Selected = Ametystskær + check. ---- */

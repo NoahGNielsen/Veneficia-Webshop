@@ -109,6 +109,10 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 | Nattegrøn på Lavendel / lavendel-hover `#C1ACD7` | 8,65 / 7,52 | ✓ knap og badge på mosgrøn |
 | Pergament på mosgrøn hover (8 % Pergament) `#4A5A3D` | 6,55 | ✓ nav-hover |
 | **Lavendel på mosgrøn hover `#4A5A3D`** | **4,13** | ✗ **hover-flader på mosgrøn har kun Pergament-tekst.** Aktiv tilstand vises med Lavendel på ren Mosgrøn plus en indikator. |
+| Ametyst-link på error-container / success-container | 6,17 / 6,11 | ✓ links i bannere |
+| Oliven placeholder på Lærred | 6,20 | ✓ `::placeholder` |
+| Sand "Intet billede" på billedrammens glød (værste sted) | 5,85 | ✓ |
+| Mosgrøn ikon på Sand | 6,30 | ✓ "Sådan handler du" |
 | **Ametyst på Mosgrøn** | **1,23** | ✗ aldrig |
 | **Oliven på Mosgrøn** | **1,44** | ✗ aldrig |
 
@@ -366,15 +370,17 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 ## Pre-Delivery Checklist
 
-- [ ] Kun tokens. Ingen rå hex uden for `:root` og ingen gamle variabelnavne.
-- [ ] Alle par af tekst og baggrund står i kontrasttabellen: tekst ≥ 4,5:1, UI og fokus ≥ 3:1.
-- [ ] Synlig fokus overalt, logisk tab-rækkefølge, skip-link og `lang="da"`.
-- [ ] Korrekt overskriftshierarki (én h1 pr. side).
-- [ ] Klikmål ≥ 24 × 24px, primære mål 44–48px.
-- [ ] Intet formidles kun med farve.
-- [ ] Ingen vandret scroll ved 320px. Layoutet virker ved 360, 768, 1280 og 1440px og ved 200 % zoom.
-- [ ] `prefers-reduced-motion` slår animationerne fra.
-- [ ] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen ny JS.
-- [ ] Billeder har `width`/`height`.
-- [ ] Formularer har uændret `name`, `action`, `method` og CSRF, og al output er escaped.
-- [ ] Skillets Quick Reference §1–9 (i `SKILL.md`) er gennemgået.
+Gennemgået 2026-11-24 i Fase 7. Siderne er testet som statiske mockups, der spejler PHP-skabelonernes output, fordi PHP ikke var installeret. De rigtige PHP-sider er ikke kørt i en browser.
+
+- [x] Kun tokens. Ingen rå hex uden for `:root` og ingen gamle variabelnavne.
+- [x] Alle par af tekst og baggrund står i kontrasttabellen: tekst ≥ 4,5:1, UI og fokus ≥ 3:1.
+- [x] Synlig fokus overalt, logisk tab-rækkefølge, skip-link og `lang="da"`.
+- [x] Korrekt overskriftshierarki (én h1 pr. side).
+- [x] Klikmål ≥ 24 × 24px, primære mål 44–48px.
+- [x] Intet formidles kun med farve.
+- [x] Ingen vandret scroll ved 320px. Layoutet virker ved 360, 768, 1280 og 1440px og ved 200 % zoom.
+- [x] `prefers-reduced-motion` slår animationerne fra.
+- [x] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen ny JS.
+- [x] Billeder har `width`/`height`.
+- [x] Formularer har uændret `name`, `action`, `method` og CSRF, og al output er escaped.
+- [x] Skillets Quick Reference §1–9 (i `SKILL.md`) er gennemgået.
