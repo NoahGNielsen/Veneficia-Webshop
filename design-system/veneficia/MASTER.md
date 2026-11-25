@@ -11,7 +11,7 @@
 **Kategori:** E-handel · wellness/spiritualitet (Wicca)
 **Designfilosofi:** Material Design 3, tilpasset med Material Theming (egen palet, typografi og former)
 **Stemning:** organisk, rolig og mystisk: bløde runde former, jordfarver, masser af luft og ét stærkt lilla accent
-**Stack:** PHP 8 + MySQL og ren CSS (`@layer`). Ingen frameworks, ingen CDN'er, ingen JS-biblioteker, ingen ikon-fonte.
+**Stack:** PHP 8 + MySQL og ren CSS (`@layer`). Ingen frameworks, ingen CDN'er, ingen JS-biblioteker, ingen ikon-fonte. JavaScript kun i små, egne stykker, hvor CSS ikke kan (se "Ændret efter designkritikken").
 **Design-dials** (svarer til skillets dials): Variance 3/10 (centreret/rolig) · Motion 3/10 (diskrete mikrointeraktioner) · Density 3/10 (luftig)
 
 ---
@@ -24,7 +24,7 @@
 | **Sabrina** (sekundær, WitchTok) | "Æstetisk pæn", diskret, stemningsfuld | Mosgrøn ramme, ametyst-glød, Lora-overskrifter, roligt tempo, ingen pop-ups |
 | Konkurrent Hekate.dk: "kantet og skarpt" | – | Runde, bløde former (shape-skala, fuldt runde knapper og chips, buen) |
 | Konkurrent Wicca.dk: alt på én lang side | – | Tydeligt hierarki, sticky top app bar, brødkrummer, kategorier som chips |
-| Problemanalysen | Jordlige farver, natur, tydelig produktinfo, årstider og månens cyklus | Jordpalet (60-30-10), billedregler for renders, månefase-skillelinje, købsboks |
+| Problemanalysen | Jordlige farver, natur, tydelig produktinfo, årstider og månens cyklus | Jordpalet (60-30-10), papirstruktur, billedregler for renders, **dagens månefase** i hero'en, faktaafsnit med fragtpriser, købsboks |
 
 ---
 
@@ -142,7 +142,6 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 | body | (standard) | Raleway 400 | 1rem / 1.6 | standard |
 | label-large | `.type-label-large` | Raleway 600 | 0.9375rem / 1.2, +0.01em | knapper og chips |
 | label-medium | `.type-label-medium` | Raleway 500 | 0.875rem / 1.4 | meta, brødkrummer, lagerstatus |
-| overline | `.type-overline` | Raleway 700 | 0.75rem / 1.3, versaler, +0.12em | "eyebrows" over overskrifter |
 
 ### Afstande (4/8-grid)
 
@@ -251,14 +250,14 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 - **Motiv:** mørkt, mystisk nærbillede af én krystal på mos, der lyser indefra. Hold motivet centreret med luft til kanten, for billedet beskæres med `object-fit: cover`.
 - **Visning:** altid kvadratisk med `aspect-ratio: 1`, `object-fit: cover` og `width`/`height` på `<img>` (ingen layout-hop). Det første billede på en side får `fetchpriority="high"`, resten `loading="lazy"`.
 - **Bagved:** mosgrøn flade med en svag lavendel glød (`.media-frame`), så mørke renders flyder sammen med kortet.
-- **Pladsholder** "Intet billede": samme glød og et lille ikon. Den skal se bevidst ud, ikke som en fejl.
+- **Pladsholder** for en vare uden billede: samme glød og **kategoriens ikon** (`categoryIcon()` i `assets/php/products.php`), ingen tekst. Den skal se bevidst ud, ikke som en fejl, og fortæller, hvad slags vare det er.
 - **Alt-tekst:** `altText` fra admin, ellers produktnavnet.
 
 ### Signaturelementer (den røde tråd)
 1. **Buen** (shape-arch): hero-visual, kategori-ikoner og ordrebekræftelsen.
-2. **Månefaser:** en dekorativ række af små faser (inline SVG, `aria-hidden`) som skillelinje i footeren og på forsiden. Den henviser til månens cyklus i Wicca.
+2. **Dagens månefase:** månens otte faser på række (`moon-0` til `moon-7` i spriten, `aria-hidden`) med **dagens fase fremhævet** og en linje som "Tiltagende måne i dag. Fuldmåne om 5 dage." Kun i forsidens hero. `index.php` regner fasen ud fra datoen (præcis inden for ca. en dag). Det er sitets ene dristige element og henviser til, at månens cyklus er central i Wicca.
 3. **Ametyst-glød:** en radial gradient i Lavendel og Ametyst på Mosgrøn bag hero-visualet og produktbillederne. Den er et ekko af krystallerne, der lyser indefra.
-4. **Papirstruktur** (valgfri): SVG-støj som data-URI på Pergament med opacitet ≤ 0,04. Kun hvis den ser ren ud og ikke sænker kontrasten mærkbart.
+4. **Papirstruktur:** SVG-støj (`--texture-paper`) på body'ens Pergament, højst ca. 3 % mørkere, så baggrunden læses som papir og ikke som flad creme. Kort og felter (Lærred) er glatte.
 
 ---
 
@@ -273,7 +272,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | **Tekstfelter** | `.field`, `input`, `select`, `textarea` | M3 outlined: label over feltet, 48px, Lærred, 1px Oliven, radius 8. Hover Nattegrøn kant. Fokus 2px Ametyst (via `box-shadow`, intet layout-skift). `:user-invalid` giver Fejl-kant + hjælpetekst. Påkrævet markeres via `:has(:required)`. `<select>` med egen pil. Antalsfelt ca. 5,5rem. | formularer |
 | **Checkbox/radio** | `.check` | `accent-color`, 20px, hele labelrækken er klikbar og ≥ 44px høj | kasse, log ind, opret |
 | **Chips** | `.chip` (+ `[aria-current]`, `:checked`) | 36px, fuldt runde, 1px Oliven. Assist/link: Lærred + Nattegrøn. Valgt/aktuel: Ametystskær + Ametyst + check-ikon. | tags, kategorier, varianter |
-| **Produktkort** | `ul.product-grid` > `li.product-card` > `.media-frame` (+ `--empty`), `.product-card__body` > `__category`, `__name` > `a.product-card__link`, `__price`, `.stock` | M3 outlined → elevated ved hover. Lærred, Sand-kant, radius 16. 1:1-billede i `.media-frame`, overline (kategori, kan mangle), navn i title-medium, pris Raleway 600, lagerstatus med prik + tekst. Hele kortet klikbart (`.product-card__link::after`), fokusring på kortet via `:has(.product-card__link:focus-visible)`. Skyggen ligger på `::before`, så kun dens opacity animeres. Hover: elevation 2, `translateY(-2px)`, billede `scale(1.03)`. | produktliste |
+| **Produktkort** | `ul.product-grid` > `li.product-card` > `.media-frame` (+ `--empty`), `.product-card__body` > `__category`, `__name` > `a.product-card__link`, `__price`, `.stock` | M3 outlined → elevated ved hover. Lærred, Sand-kant, radius 16. 1:1-billede i `.media-frame`, kategori (label-medium, kan mangle), navn i title-medium, pris Raleway 600, lagerstatus med prik + tekst. Hele kortet klikbart (`.product-card__link::after`), fokusring på kortet via `:has(.product-card__link:focus-visible)`. Skyggen ligger på `::before`, så kun dens opacity animeres. Hover: elevation 2, `translateY(-2px)`, billede `scale(1.03)`. Kategorien står som label-medium med almindelige bogstaver. | produktliste |
 | **Lagerstatus** | `.stock` + `--in` / `--out` | prik + tekst (label-medium). "På lager" Succes, "Udsolgt" rolig Oliven | kort, produktside |
 | **Bannere** | `.banner` + `--info` `--success` `--error`, `[role=status]`, `[role=alert]`, `.auth-error`, `.admin-success` | Radius 12, ikon + tekst, Nattegrøn brødtekst. Info: Ametystskær. Succes: success-container. Fejl: error-container + 4px venstrekant. | beskeder overalt |
 | **Tabeller** | `.data-table`, `.table-scroll` | Styres af en **container query**: Er tabellens container under 600px, bliver rækkerne til kort (`data-label` + `::before`). Ellers vises en tabel med højrestillede tal (`.num`) og total i `tfoot` (`.total-row`, Lora 600 1.25rem). Containerne er `main`, `.basket-lines`, `.summary` og `.card`, så tabellen i kassens smalle oversigt også stables. | kurv, kasse, bekræftelse, varianter |
@@ -283,7 +282,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | **Trinindikator** | `ol.steps` | Kurv · Levering · Bekræftelse, `aria-current="step"`, gennemførte trin med check | kurv, kasse, bekræftelse |
 | **Tom tilstand** | `.empty-state` | ikon i bue, kort tekst, én handling | tom kurv, ingen produkter |
 | **Købsboks** | `.product-add` | Lærred-kort, Sand-kant, radius 16. Varianter som radio-chips i `<fieldset>`, antal, "Læg i kurv" (filled `--large` `--block`). | produktside |
-| **Månefaser** | `.moon-phases` | dekorativ række, `aria-hidden` | footer, forside |
+| **Månefaser** | `.moon-phases` > `svg.moon-phases__phase` (+ `--today`) | otte faser, dagens 36px i Lavendel med glød, resten 20px dæmpede, `aria-hidden` (teksten ved siden af siger fasen) | forside (hero), styleguide |
 | **Dialog** | `dialog.dialog` | radius 28, elevation 3, scrim. *(kommende: mersalg ved kassen)* | styleguide |
 | **Søgefelt** | `.search-bar` | M3 search bar, fuldt rund, 56px. *(kommende, kræver backend)* | styleguide |
 | **Fri-fragt-bar** | `.free-shipping` | `<progress>` + tekst (goal-gradient). *(kommende)* | styleguide |
@@ -294,7 +293,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 | Side | Fil → CSS | Mønster |
 |---|---|---|
-| Forside | `index.php` → `homepage.css` | Hero (Mosgrøn, `.on-secondary`) med overline, display-h1, 1–2 linjer, primærknap "Se alle produkter" + outlined "Find en kategori", bue-visual med glød (SVG-obelisk, kan senere erstattes af `<img>`), månefaser → Kategorier (fliser med ikon i bue) → "Sådan handler du" (3 punkter) |
+| Forside | `index.php` → `homepage.css` | Hero (Mosgrøn, `.on-secondary`): display-h1, én linje, primærknap "Se alle produkter" + outlined "Find en kategori", dagens månefase, bue-visual med glød (SVG-obelisk, erstattes af en render ved at skifte `src`) → "Find en kategori" (enkel liste af links, ikon i lille bue, ingen kort) → "Godt at vide, før du handler" (`<dl>`: fragtpriser fra `SHIPPING_RATES`, beskrivelser, konto, rabatkode) |
 | Produktliste/kategori | `products.php` → `products.css` | Brødkrumme, h1, beskrivelse (body-large), kategori-chips, gitter 2/3/4, paginering, tom tilstand, tag-filter som valgt chip |
 | Produktside | `product.php` → `products.css` | `.product-layout`: galleri (7/12) + sticky info. Compact: vandret galleri, 88 % bredde. Info: brødkrumme, h1, pris, lager, købsboks. Nederst: Beskrivelse, Varianter (tabel), Tags |
 | Kurv | `basket.php` → `products.css` | Trin 1, varelinjer (`.basket-lines`) + sticky opsummeringskort (`.summary`) med "Gå til kassen" (filled `--block`) og "Fortsæt med at handle". "Opdater" er tonal, og "Fjern" er en text-knap med ikon. Begge har varens navn som skjult tekst for skærmlæsere. |
@@ -354,6 +353,11 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 ## Anti-Patterns (brug ikke)
 
+- Eyebrows og labels i VERSALER, meta-tekster bundet sammen med midterprikker ("A · B · C") og en label over hver overskrift
+- Feature-rækker med tre ikoner i cirkler og vage sætninger: skriv konkrete fakta i stedet
+- Hover-løft på alle kort: kun produktkortene løfter sig
+- Gentaget pynt: et signaturelement står ét sted, hvor det betyder noget
+
 - Rå hex uden for `:root` og gamle variabelnavne (`--text`, `--muted`, `--accent` …)
 - Ametyst eller Oliven på Mosgrøn, og Lavendel på en hover-flade på Mosgrøn
 - Ametyst brugt som pynt
@@ -368,6 +372,22 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 ---
 
+## Ændret efter designkritikken (2026-11-25)
+
+En gennemgang med `frontend-design`-skillet fandt steder, hvor designet lignede en standardskabelon. August besluttede derfor at gå ud over designpromptens låste valg:
+
+| Før | Nu | Hvorfor |
+|---|---|---|
+| Månefase-række som pynt i hero og footer | **Dagens rigtige månefase** i hero'en, ingen række i footeren | Ét signaturelement, der betyder noget og er specifikt for Wicca, frem for gentaget pynt |
+| Hero-overline "KRYSTALLER · RØGELSE · URTER · BØGER" | Fjernet | Gentog h1 og teksten. Versal-eyebrow med midterprikker er et kendt skabelon-træk |
+| Kategori i versaler på produktkort, "Lille · 49,00 kr." i chips | Almindelige bogstaver, navn **fed** og pris normal | Samme information uden skabelon-pynt |
+| "Sådan handler du": tre ikoner i cirkler | "Godt at vide": rigtige fragtpriser, konto og rabatkode | Konkrete fakta hjælper Henriette mere end ikoner |
+| 15 ens kort med hover-løft | Enkel liste af links med ikon i lille bue | Mindre visuel støj og ikke "SaaS-kort-kittet" |
+| Pladsholder: glødende diamant + "Intet billede" | Kategoriens ikon | Informerer i stedet for at gentage sig 48 gange |
+| Flad Pergament | Svag papirstruktur | Pergament læses som papir og ikke som generisk "AI-creme" |
+| Drawer med exit-animation | Lukker med det samme | Exit-overgangen på `display` fik drawer'en til at blinke, når vinduet krydsede 840px |
+| Ingen JavaScript | Ét lille inline-script i `products.php` | Scroller den aktive kategori-chip frem på mobil. Uden JS virker alt stadig, chippen er bare ikke i syne |
+
 ## Pre-Delivery Checklist
 
 Gennemgået 2026-11-24 i Fase 7. Siderne er testet som statiske mockups, der spejler PHP-skabelonernes output, fordi PHP ikke var installeret. De rigtige PHP-sider er ikke kørt i en browser.
@@ -380,7 +400,7 @@ Gennemgået 2026-11-24 i Fase 7. Siderne er testet som statiske mockups, der spe
 - [x] Intet formidles kun med farve.
 - [x] Ingen vandret scroll ved 320px. Layoutet virker ved 360, 768, 1280 og 1440px og ved 200 % zoom.
 - [x] `prefers-reduced-motion` slår animationerne fra.
-- [x] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen ny JS.
+- [x] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen JS-biblioteker (kun det lille chip-script i `products.php`).
 - [x] Billeder har `width`/`height`.
 - [x] Formularer har uændret `name`, `action`, `method` og CSRF, og al output er escaped.
 - [x] Skillets Quick Reference §1–9 (i `SKILL.md`) er gennemgået.

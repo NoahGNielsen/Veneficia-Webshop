@@ -7,6 +7,35 @@ function formatPrice(float|string $price): string
     return number_format((float)$price, 2, ',', '.') . ' kr.';
 }
 
+// GLS Pakkeshop prices in kr., by the order's total weight: max grams => price. Heavier orders can't be shipped.
+// The checkout charges these and the homepage lists them.
+const SHIPPING_RATES = [2000 => 45.00, 5000 => 62.00, 10000 => 83.00, 15000 => 127.00, 20000 => 154.00];
+const SHIPPING_MAX_GRAMS = 20000;
+
+// The icon (in assets/icons/icons.svg) for a category, by its name's slug: the homepage's category list and the
+// placeholder of a product without images. Add new categories here; anything unknown gets "category".
+const CATEGORY_ICONS = [
+    'krystaller' => 'diamond',
+    'smykker' => 'diamond',
+    'roegelse' => 'local-fire-department',
+    'lys' => 'candle',
+    'urter' => 'psychiatry',
+    'eliksirer' => 'experiment',
+    'eliksirer-ingredienser' => 'psychiatry',
+    'boeger' => 'auto-stories',
+    'trylleformularer' => 'menu-book',
+    'stave' => 'wand-stars',
+    'rituelle-genstande' => 'wine-bar',
+    'religioese-symboler' => 'star',
+    'andre-symboler' => 'star',
+    'stjernetegn' => 'crescent',
+];
+
+function categoryIcon(?string $categoryName): string
+{
+    return CATEGORY_ICONS[urlSlug((string)$categoryName)] ?? 'category';
+}
+
 // URL of the product list (or of a category's list, given its path from loadShopCategories()), optionally filtered by
 // tag and paged. Page 1 and no tag give the plain path.
 function productsUrl(?string $tag = null, int $page = 1, string $path = '/products'): string

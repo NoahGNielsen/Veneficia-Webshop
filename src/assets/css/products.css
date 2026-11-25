@@ -345,6 +345,11 @@
     white-space: normal;
   }
 
+  /* Variant chip: the name in bold, the price (or Udsolgt) in regular weight, no separator needed */
+  .chip__price {
+    font-weight: 400;
+  }
+
   .product-soldout > * {
     margin: 0 0 var(--space-2);
   }

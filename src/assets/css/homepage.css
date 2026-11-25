@@ -16,11 +16,6 @@
     align-items: center;
   }
 
-  .hero__overline {
-    margin-bottom: var(--space-3);
-    color: var(--ctx-text-muted);
-  }
-
   .hero h1 {
     max-width: 15ch;
     margin-bottom: var(--space-4);
@@ -37,9 +32,21 @@
     margin-top: var(--space-6);
   }
 
-  .hero .moon-phases {
-    max-width: 420px;
+  /* Today's moon: the one bold element on the page */
+  .moon-today {
     margin-top: var(--space-7);
+  }
+
+  .moon-today__text {
+    margin: var(--space-3) 0 0;
+    color: var(--ctx-text-muted);
+  }
+
+  .moon-today__text strong {
+    color: var(--ctx-text);
+    font-family: var(--font-serif);
+    font-size: var(--font-size-title-medium);
+    font-weight: 600;
   }
 
   /* The arch sits on moss, so it gets a darker moss of its own and a fine lavender edge to keep its shape visible */
@@ -99,112 +106,111 @@
     }
   }
 
-  /* ---- Category tiles: a canvas card with the icon in a small arch ---- */
-  .category-tiles {
+  /* ---- Categories: a plain list of links, each with its icon in a small arch ---- */
+  .category-links {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+    gap: 0 var(--space-6);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  @media (min-width: 600px) {
-    .category-tiles {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-5);
-    }
-  }
-
-  @media (min-width: 840px) {
-    .category-tiles {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
-  }
-
-  .category-tile {
-    position: relative;
+  .category-link {
     display: flex;
-    flex-direction: column;
     align-items: center;
     gap: var(--space-3);
-    height: 100%;
-    padding: var(--space-5) var(--space-3);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
-    color: var(--color-on-surface);
-    text-align: center;
-    text-decoration: none;
-    transition: transform var(--duration-short) var(--ease-standard);
-  }
-
-  .category-tile::after {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    box-shadow: var(--elevation-2);
-    opacity: 0;
-    transition: opacity var(--duration-short) var(--ease-standard);
-    pointer-events: none;
-  }
-
-  .category-tile:hover::after {
-    opacity: 1;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .category-tile:hover {
-      transform: translateY(-2px);
-    }
-  }
-
-  .category-tile__name {
+    min-height: 64px;
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--color-outline-variant);
+    color: var(--color-on-background);
     font-family: var(--font-serif);
     font-size: var(--font-size-title-medium);
     font-weight: 600;
-    line-height: 1.35;
-    overflow-wrap: anywhere;
+    text-decoration: none;
   }
 
-  /* ---- How to shop: three short points ---- */
-  .home-section--how {
+  .category-link:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .category-link__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--shape-arch);
+    background: var(--color-secondary);
+    color: var(--color-secondary-accent);
+  }
+
+  .category-link__icon .icon {
+    margin-top: 4px;
+  }
+
+  /* ---- Good to know: facts from the shop itself (shipping prices from the checkout's rates) ---- */
+  .home-facts {
     border-top: 1px solid var(--color-outline-variant);
   }
 
-  .how-list {
-    display: grid;
-    gap: var(--space-6);
+  .facts {
+    max-width: 880px;
     margin: 0;
+  }
+
+  .facts__row {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--color-outline-variant);
+  }
+
+  .facts__row:first-child {
+    padding-top: 0;
+  }
+
+  .facts dt {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-title-large);
+    font-weight: 600;
+  }
+
+  .facts dd {
+    margin: 0;
+  }
+
+  .facts dd p {
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  .shipping-list {
+    max-width: 320px;
+    margin: var(--space-3) 0 0;
     padding: 0;
     list-style: none;
   }
 
+  .shipping-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-1);
+  }
+
+  .shipping-list li span:last-child {
+    font-weight: 600;
+    text-align: right;
+  }
+
   @media (min-width: 840px) {
-    .how-list {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-7);
+    .facts__row {
+      grid-template-columns: 200px 1fr;
+      gap: var(--space-6);
     }
-  }
-
-  .how-list h3 {
-    margin: var(--space-3) 0 var(--space-2);
-  }
-
-  .how-list p {
-    max-width: 36ch;
-    margin: 0;
-    color: var(--color-on-surface-variant);
-  }
-
-  .how-list__icon {
-    display: inline-grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--color-surface-variant);
-    color: var(--color-secondary);
   }
 }

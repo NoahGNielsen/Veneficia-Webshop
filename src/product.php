@@ -142,7 +142,7 @@ $navSection = 'products';
                 </ul>
             <?php else: ?>
                 <div class="product-gallery">
-                    <div class="media-frame media-frame--empty" aria-hidden="true"><?= uiIcon('diamond') ?><span class="media-frame__label">Intet billede</span></div>
+                    <div class="media-frame media-frame--empty" aria-hidden="true"><?= uiIcon(categoryIcon($item['categoryName'])) ?></div>
                 </div>
             <?php endif; ?>
 
@@ -168,8 +168,8 @@ $navSection = 'products';
                                     ?>
                                         <label class="chip">
                                             <input type="radio" name="variantId" value="<?= (int)$variant['itemVariantId'] ?>" required<?= $variantInStock ? '' : ' disabled' ?><?= (int)$variant['itemVariantId'] === $defaultVariantId ? ' checked' : '' ?>>
-                                            <?= htmlspecialchars($types ? implode(' / ', $variant['values']) : $variant['varriantName']) ?>
-                                            · <?= formatPrice($variant['varriantPrice']) ?><?= $variantInStock ? '' : ' · udsolgt' ?>
+                                            <span class="chip__name"><?= htmlspecialchars($types ? implode(' / ', $variant['values']) : $variant['varriantName']) ?></span>
+                                            <span class="chip__price"><?= $variantInStock ? formatPrice($variant['varriantPrice']) : 'Udsolgt' ?></span>
                                         </label>
                                     <?php endforeach; ?>
                                 </div>

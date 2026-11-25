@@ -161,7 +161,7 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
             <?php endif; ?>
 
             <?php if ($chipCategories): ?>
-                <nav class="category-list" aria-label="Kategorier">
+                <nav class="category-list" id="kategorier" aria-label="Kategorier">
                     <ul class="chip-set">
                         <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $chipAll['path'])) ?>"<?= $chipAll['current'] ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($chipAll['name']) ?></a></li>
                         <?php foreach ($chipCategories as $chipId => $chip): ?>
@@ -169,6 +169,16 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
                         <?php endforeach; ?>
                     </ul>
                 </nav>
+                <script>
+                    // On a phone the chips scroll sideways; bring the current one into view (without moving the page)
+                    (() => {
+                        const list = document.querySelector('#kategorier .chip-set');
+                        const current = list && list.querySelector('[aria-current]');
+                        if (current && list.scrollWidth > list.clientWidth) {
+                            list.scrollLeft += current.getBoundingClientRect().left - list.getBoundingClientRect().left - 16;
+                        }
+                    })();
+                </script>
             <?php endif; ?>
         </header>
 
@@ -199,11 +209,12 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
                                      width="300" height="300" decoding="async" <?= $i < 4 ? 'fetchpriority="high"' : 'loading="lazy"' ?>>
                             </div>
                         <?php else: ?>
-                            <div class="media-frame media-frame--empty" aria-hidden="true"><?= uiIcon('diamond') ?><span class="media-frame__label">Intet billede</span></div>
+                            <?php // No image yet: the category's icon stands in (decoration, the name says what it is) ?>
+                            <div class="media-frame media-frame--empty" aria-hidden="true"><?= uiIcon(categoryIcon($product['categoryName'])) ?></div>
                         <?php endif; ?>
                         <div class="product-card__body">
                             <?php if ((string)$product['categoryName'] !== ''): ?>
-                                <p class="product-card__category type-overline"><?= htmlspecialchars($product['categoryName']) ?></p>
+                                <p class="product-card__category"><?= htmlspecialchars($product['categoryName']) ?></p>
                             <?php endif; ?>
                             <h2 class="product-card__name">
                                 <a class="product-card__link" href="<?= htmlspecialchars(productUrl($id, $product['itemName'], $product['categoryName'])) ?>"><?= htmlspecialchars($product['itemName']) ?></a>
