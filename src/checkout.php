@@ -8,9 +8,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/discounts.php';
 $customer = requireCustomer('/checkout');
 $customerId = (int)$customer['VeneficiaCustomerId'];
 
-// GLS Pakkeshop prices in kr., by the order's total weight: max grams => price. Heavier orders can't be shipped.
-const SHIPPING_RATES = [2000 => 45.00, 5000 => 62.00, 10000 => 83.00, 15000 => 127.00, 20000 => 154.00];
-const SHIPPING_MAX_GRAMS = 20000;
+// SHIPPING_RATES and SHIPPING_MAX_GRAMS (GLS Pakkeshop prices) live in assets/php/products.php, so the homepage shows
+// the same prices as the checkout charges.
 
 // Total weight of the basket in grams (variants without a weight count as 0)
 function basketWeight(array $items): int

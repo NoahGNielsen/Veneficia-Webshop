@@ -40,7 +40,6 @@
 </header>
 
 <main id="indhold" class="styleguide">
-    <p class="type-overline text-muted">Designsystem</p>
     <h1>Styleguide</h1>
     <p class="type-body-large">Veneficias designsystem: Material Design 3 med vores egen palet, typografi og former. Stemningen er organisk, rolig og mystisk. Reglerne står i <code>design-system/veneficia/MASTER.md</code>, og her ser du komponenterne i brug.</p>
     <nav aria-label="Indhold">
@@ -101,10 +100,8 @@
             <p class="text-muted">body · Raleway 400 · 1rem / 1.6</p>
             <p class="type-label-large">Læg i kurv</p>
             <p class="text-muted">label-large · knapper og chips · Raleway 600 · 0.9375rem</p>
-            <p class="type-label-medium">Alle produkter · På lager</p>
+            <p class="type-label-medium">På lager</p>
             <p class="text-muted">label-medium · meta og lagerstatus · Raleway 500 · 0.875rem</p>
-            <p class="type-overline">Krystaller · Røgelse</p>
-            <p class="text-muted">overline · Raleway 700 · 0.75rem, versaler, +0.12em</p>
         </div>
     </section>
 
@@ -212,9 +209,9 @@
         <fieldset class="chip-fieldset">
             <legend>Vælg variant</legend>
             <div class="chip-set">
-                <label class="chip"><input type="radio" name="sg-variant" value="1" checked>Lille · 49,00 kr.</label>
-                <label class="chip"><input type="radio" name="sg-variant" value="2">Mellem · 79,00 kr.</label>
-                <label class="chip"><input type="radio" name="sg-variant" value="3" disabled>Stor · udsolgt</label>
+                <label class="chip"><input type="radio" name="sg-variant" value="1" checked><span class="chip__name">Lille</span> <span class="chip__price">49,00 kr.</span></label>
+                <label class="chip"><input type="radio" name="sg-variant" value="2"><span class="chip__name">Mellem</span> <span class="chip__price">79,00 kr.</span></label>
+                <label class="chip"><input type="radio" name="sg-variant" value="3" disabled><span class="chip__name">Stor</span> <span class="chip__price">Udsolgt</span></label>
             </div>
         </fieldset>
     </section>
@@ -226,23 +223,23 @@
             <li class="product-card">
                 <div class="media-frame"><img src="/assets/images/obelisk.svg" alt="Stiliseret ametyst-obelisk på mos" width="300" height="300"></div>
                 <div class="product-card__body">
-                    <p class="product-card__category type-overline">Krystaller</p>
+                    <p class="product-card__category">Krystaller</p>
                     <h3 class="product-card__name"><a class="product-card__link" href="#kort">Ametyst-obelisk</a></h3>
                     <p class="product-card__price">Fra 149,00 kr.</p>
                     <p class="stock stock--in">På lager</p>
                 </div>
             </li>
             <li class="product-card">
-                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg><span class="media-frame__label">Intet billede</span></div>
+                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg></div>
                 <div class="product-card__body">
-                    <p class="product-card__category type-overline">Røgelse</p>
+                    <p class="product-card__category">Røgelse</p>
                     <h3 class="product-card__name"><a class="product-card__link" href="#kort">Røgelse, salvie</a></h3>
                     <p class="product-card__price">39,00 kr.</p>
                     <p class="stock">Udsolgt</p>
                 </div>
             </li>
             <li class="product-card">
-                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg><span class="media-frame__label">Intet billede</span></div>
+                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg></div>
                 <div class="product-card__body">
                     <h3 class="product-card__name"><a class="product-card__link" href="#kort">Produkt uden kategori med et langt navn, der ombrydes</a></h3>
                     <p class="product-card__price">129,00 kr.</p>
@@ -332,9 +329,9 @@
             <div class="arch arch--glow sg-arch"><img src="/assets/images/obelisk.svg" alt="" width="400" height="500"></div>
             <span class="arch-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg></span>
         </div>
-        <h3>Månefaser</h3>
-        <p>Dekorativ skillelinje i footeren og på forsiden. Den henviser til månens cyklus.</p>
-        <div class="moon-phases" aria-hidden="true"><svg viewBox="0 0 248 24" width="186" height="18" focusable="false"><use href="/assets/icons/icons.svg#moon-phases"></use></svg></div>
+        <h3>Dagens månefase</h3>
+        <p>Forsidens hero viser månens otte faser med dagens fase fremhævet, og en linje, der siger hvilken fase det er. Fasen regnes ud fra datoen i <code>index.php</code>. Månens cyklus er central i Wicca, så det er sitets signatur.</p>
+        <div class="sg-panel on-secondary"><div class="moon-phases" aria-hidden="true"><svg class="moon-phases__phase" viewBox="0 0 24 24" width="24" height="24" focusable="false"><use href="/assets/icons/icons.svg#moon-0"></use></svg><svg class="moon-phases__phase" viewBox="0 0 24 24" width="24" height="24" focusable="false"><use href="/assets/icons/icons.svg#moon-1"></use></svg><svg class="moon-phases__phase moon-phases__phase--today" viewBox="0 0 24 24" width="24" height="24" focusable="false"><use href="/assets/icons/icons.svg#moon-2"></use></svg><svg class="moon-phases__phase" viewBox="0 0 24 24" width="24" height="24" focusable="false"><use href="/assets/icons/icons.svg#moon-3"></use></svg><svg class="moon-phases__phase" viewBox="0 0 24 24" width="24" height="24" focusable="false"><use href="/assets/icons/icons.svg#moon-4"></use></svg><svg class="moon-phases__phase" viewBox="0 0 24 24" width="24" height="24" focusable="false"><use href="/assets/icons/icons.svg#moon-5"></use></svg><svg class="moon-phases__phase" viewBox="0 0 24 24" width="24" height="24" focusable="false"><use href="/assets/icons/icons.svg#moon-6"></use></svg><svg class="moon-phases__phase" viewBox="0 0 24 24" width="24" height="24" focusable="false"><use href="/assets/icons/icons.svg#moon-7"></use></svg></div><p style="margin: 12px 0 0">Første kvarter i dag. Fuldmåne om 4 dage.</p></div>
         <h3>Ikoner</h3>
         <p>Material Symbols Rounded (Apache-2.0) i én sprite, <code>/assets/icons/icons.svg</code>. Dekorative ikoner har <code>aria-hidden="true"</code>, og ikon-knapper har en dansk <code>aria-label</code>.</p>
         <ul class="sg-grid sg-icons">
@@ -397,7 +394,7 @@
                 </div>
             </li>
             <li class="product-card">
-                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#candle"></use></svg><span class="media-frame__label">Intet billede</span></div>
+                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#candle"></use></svg></div>
                 <div class="product-card__body">
                     <h4 class="product-card__name"><a class="product-card__link" href="#kommende">Røgelsesholder</a></h4>
                     <p class="product-card__price">59,00 kr.</p>
@@ -423,9 +420,6 @@
 
 <footer class="footer on-secondary">
     <div class="container">
-        <div class="moon-phases" aria-hidden="true">
-            <svg viewBox="0 0 248 24" width="186" height="18" focusable="false"><use href="/assets/icons/icons.svg#moon-phases"></use></svg>
-        </div>
         <div class="footer__grid">
             <div>
                 <a class="brand" href="/"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg>Veneficia</a>

@@ -1,11 +1,8 @@
 <?php
-// The footer on every page (error pages too, so it mustn't touch the database). The moon phases are decoration.
+// The footer on every page (error pages too, so it mustn't touch the database)
 ?>
 <footer class="footer on-secondary">
     <div class="container">
-        <div class="moon-phases" aria-hidden="true">
-            <svg viewBox="0 0 248 24" width="186" height="18" focusable="false"><use href="<?= htmlspecialchars(UI_ICON_SPRITE) ?>#moon-phases"></use></svg>
-        </div>
         <div class="footer__grid">
             <div>
                 <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
