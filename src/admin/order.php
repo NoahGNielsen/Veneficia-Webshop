@@ -68,10 +68,10 @@ $saved = isset($_GET['saved']) && !$errors;
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/adminBar.php'; ?>
-    <main class="admin-page admin-list">
+    <main id="indhold" class="admin-page admin-list">
         <div class="admin-list-head">
-            <h1>Ordre #<?= (int)$order['ordreID'] ?></h1>
-            <a href="/admin/orders">Alle ordrer</a>
+            <h1>Ordre #<?= (int)$order['ordreID'] ?> <span class="status status--<?= htmlspecialchars($order['ordreStatus']) ?>"><?= htmlspecialchars(orderStatusLabel($order['ordreStatus'])) ?></span></h1>
+            <a href="/admin/orders"><?= uiIcon('chevron-left', 'icon--20') ?>Alle ordrer</a>
         </div>
         <?php if ($saved): ?>
             <p class="admin-success" role="status">Status er gemt.</p>

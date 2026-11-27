@@ -1,127 +1,232 @@
-/* The admin pages (admin/): a light hand. The same layout and behaviour as before, on the design system's tokens and
-   components. The bar on top is moss green like the shop's top app bar (.on-secondary in adminBar.php). */
+/* The admin pages (admin/): the staff's tool, on the shop's design system. adminBar.php gives every page a moss
+   sidebar (the pages in three groups with icons, the current one as a lavender pill, a badge with the orders to pack,
+   who is logged in at the bottom), and the work happens on parchment beside it. admin/index.php is an overview built
+   as a bento grid that re-flows by its own width. Below 840px the sidebar is a drawer opened from a top bar. */
 @layer pages {
-  .admin-bar {
+  /* ---- Frame ---- */
+  .admin-topbar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
     align-items: center;
-    gap: var(--space-2) var(--space-4);
-    min-height: 56px;
-    padding: var(--space-2) var(--gutter);
+    justify-content: space-between;
+    gap: var(--space-2);
+    min-height: var(--header-height);
+    padding: 0 var(--space-2) 0 var(--gutter);
   }
 
-  .admin-bar a {
+  /* The shop's footer is for customers. The sidebar links to the shop instead. */
+  body:has(> .admin-nav) > .footer {
+    display: none;
+  }
+
+  /* Compact and medium: a drawer like the shop's menu */
+  .admin-nav {
+    position: fixed;
+    inset: 0 auto 0 0;
+    flex-direction: column;
+    width: min(300px, 86vw);
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: var(--space-3) var(--space-3) var(--space-4);
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    background: var(--color-secondary);
+    color: var(--ctx-text);
+    box-shadow: var(--elevation-3);
+  }
+
+  .admin-nav:popover-open {
+    display: flex;
+  }
+
+  .admin-nav::backdrop {
+    background: var(--scrim);
+  }
+
+  .admin-nav__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 56px;
+    padding-left: var(--space-2);
+  }
+
+  /* Sand on moss, 6.30:1 */
+  .admin-nav__tag {
+    padding: 2px var(--space-2);
+    border: 1px solid var(--ctx-outline);
+    border-radius: var(--radius-full);
+    color: var(--ctx-text-muted);
+    font-size: .75rem;
     font-weight: 600;
   }
 
-  .admin-bar form {
-    margin: 0;
+  .admin-nav__close {
+    margin-left: auto;
   }
 
-  .admin-bar button {
-    --button-bg: transparent;
-    --button-fg: var(--ctx-outlined);
-    --button-border: var(--ctx-outline);
+  /* The groups. Items are 44px pills like the shop's menu, 4px apart; a group label and more air between groups. */
+  .admin-menu {
+    margin-bottom: var(--space-5);
   }
 
+  .admin-menu__label {
+    margin: var(--space-5) 0 var(--space-1);
+    padding: 0 var(--space-4);
+    color: var(--ctx-text-muted);
+    font-size: var(--font-size-label-medium);
+    font-weight: 600;
+  }
+
+  .admin-menu__label:first-child {
+    margin-top: var(--space-3);
+  }
+
+  /* Always a column (the shop's .nav-list turns into a row from 840px) */
+  .admin-menu .nav-list {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-menu .nav-link {
+    min-height: 44px;
+    padding: 0 var(--space-4);
+  }
+
+  .admin-menu .badge {
+    margin-left: auto;
+  }
+
+  /* In the lavender pill the badge turns Nattegrøn with lavender figures (8.65:1) */
+  .admin-menu .nav-link[aria-current="page"] .badge {
+    background: var(--color-on-background);
+    color: var(--color-secondary-accent);
+  }
+
+  /* Who is logged in, at the bottom */
+  .admin-account {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: auto;
+    padding: var(--space-4) var(--space-2) 0;
+    border-top: 1px solid color-mix(in srgb, var(--color-on-secondary) 20%, transparent);
+  }
+
+  .admin-account__avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-secondary-accent);
+    color: var(--color-on-background);
+    font-family: var(--font-serif);
+    font-weight: 600;
+  }
+
+  .admin-account__who {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    font-size: var(--font-size-label-medium);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-account__muted {
+    color: var(--ctx-text-muted);
+  }
+
+  .admin-account form {
+    margin: 0 0 0 auto;
+  }
+
+  @media (max-width: 839.98px) and (prefers-reduced-motion: no-preference) {
+    .admin-nav:popover-open {
+      transition: transform var(--duration-medium) var(--ease-decelerate);
+    }
+
+    @starting-style {
+      .admin-nav:popover-open {
+        transform: translateX(-100%);
+      }
+    }
+  }
+
+  /* Expanded: the sidebar stays left of the page, as tall as the window */
+  @media (min-width: 840px) {
+    body:has(> .admin-nav) {
+      display: grid;
+      grid-template-columns: 272px minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .admin-topbar,
+    .admin-nav__close {
+      display: none;
+    }
+
+    .admin-nav {
+      position: sticky;
+      inset: 0 auto auto 0;
+      display: flex;
+      width: auto;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+
+  /* ---- Work area ---- */
   body > main.admin-page {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-7);
-    justify-content: center;
     align-items: flex-start;
-    padding: var(--space-7) var(--gutter) var(--space-8);
+    gap: var(--space-6);
+    max-width: calc(1240px + 2 * var(--gutter));
+    padding: var(--space-6) var(--gutter) var(--space-8);
+  }
+
+  @media (min-width: 840px) {
+    body > main.admin-page {
+      padding-top: var(--space-7);
+    }
   }
 
   .admin-page :is(h1, h2) {
     margin: 0 0 var(--space-2);
   }
 
-  body > main.admin-home {
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
+  .admin-page h1 {
+    font-size: var(--font-size-headline-medium);
   }
 
-  /* The admin home page's tiles */
-  .admin-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--space-4);
-    width: 100%;
-    max-width: 720px;
-  }
-
-  .admin-buttons .admin-button {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-    padding: var(--space-4);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
-    color: var(--color-on-surface);
-    text-decoration: none;
-  }
-
-  .admin-buttons .admin-button:hover {
-    border-color: var(--color-outline);
-  }
-
-  .admin-buttons .admin-button span {
-    color: var(--color-on-surface-variant);
-    font-size: var(--font-size-label-medium);
-  }
-
-  /* Tables */
-  .admin-table {
-    min-width: 280px;
-    border: 1px solid var(--color-outline-variant);
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    background: var(--color-surface);
-  }
-
-  /* On small screens a wide table scrolls inside itself instead of the page */
-  .admin-page > * {
+  /* A list next to its form card (categories, discount codes, employees) */
+  body > main.admin-page:not(.admin-list, .admin-home) > section {
+    flex: 1 1 440px;
     min-width: 0;
-    max-width: 100%;
   }
 
-  @media (max-width: 839.98px) {
-    .admin-table {
-      display: block;
-      max-width: 100%;
-      overflow-x: auto;
-    }
+  body > main.admin-page:not(.admin-list, .admin-home) > .auth-form {
+    flex: 0 1 400px;
   }
 
-  .admin-table tr:last-child > td {
-    border-bottom: 0;
-  }
-
-  .admin-table td form {
-    margin: 0;
-  }
-
-  /* A destructive action stands out in the error colour */
-  .admin-page button[name="delete"] {
-    --button-bg: transparent;
-    --button-fg: var(--color-error);
-    --button-border: var(--color-error);
-    min-height: 36px;
-    padding: 6px var(--space-4);
-  }
-
-  /* Lists: the link covers the whole row, so a click anywhere opens the item */
-  body > main.admin-list {
+  /* Lists, the order page and the overview: one column */
+  body > main:is(.admin-list, .admin-home) {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
     gap: var(--space-4);
+  }
+
+  .admin-page > * {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .admin-list-head {
@@ -132,14 +237,107 @@
     gap: var(--space-3) var(--space-4);
   }
 
-  form.admin-list-head {
-    justify-content: flex-start;
+  .admin-list-head h1 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    margin: 0;
   }
 
-  .admin-list .admin-table {
+  .admin-list-head > a:not(.button) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  /* The order list's search (the status chips sit under it) */
+  .admin-search {
+    display: flex;
+    flex: 1 1 280px;
+    gap: var(--space-2);
+    max-width: 440px;
+  }
+
+  .admin-search input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-list .chip-set {
+    margin: 0;
+  }
+
+  .chip__count {
+    font-weight: 400;
+  }
+
+  .admin-filter-note {
+    margin: 0;
+  }
+
+  .admin-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* ---- Tables: a card with a parchment head, row lines in Sand, figures right-aligned ---- */
+  .admin-table {
     width: 100%;
+    min-width: 280px;
+    border: 1px solid var(--color-outline-variant);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-surface);
   }
 
+  .admin-table :is(th, td) {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-outline-variant);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .admin-table th {
+    background: var(--color-background);
+    font-size: var(--font-size-label-medium);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .admin-table .num {
+    text-align: right;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .admin-table tr:last-child > td {
+    border-bottom: 0;
+  }
+
+  .admin-table td form {
+    margin: 0;
+  }
+
+  /* On small screens a wide table scrolls inside itself instead of the page */
+  @media (max-width: 839.98px) {
+    .admin-table {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    /* Each row stays one line (dates and amounts don't break); the table scrolls sideways */
+    .admin-table :is(th, td) {
+      white-space: nowrap;
+    }
+  }
+
+  /* The link covers the whole row, so a click anywhere opens it (Fitts) */
   .admin-row {
     position: relative;
   }
@@ -154,7 +352,411 @@
     background: var(--color-primary-container);
   }
 
-  /* The item form (admin/item, with itemForm.js): 8px from label to field, more between the groups */
+  /* A destructive action stands out in the error colour */
+  .admin-page button[name="delete"] {
+    --button-bg: transparent;
+    --button-fg: var(--color-error);
+    --button-border: var(--color-error);
+    min-height: 36px;
+    padding: 6px var(--space-4);
+  }
+
+  /* ---- Order status: the word in a pill with a dot, so it never rests on colour alone.
+     Betalt (to be packed) is the one in the action colour. ---- */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 24px;
+    padding: 2px var(--space-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-variant);
+    color: var(--color-on-background);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-label-medium);
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .status::before {
+    content: "";
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status--paid {
+    background: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  .status--shipped {
+    background: var(--color-success-container);
+    color: var(--color-success);
+  }
+
+  .status--delivered {
+    border-color: var(--color-outline);
+    background: transparent;
+    color: var(--color-on-surface-variant);
+  }
+
+  .status--soldout {
+    background: var(--color-error-container);
+    color: var(--color-error);
+  }
+
+  /* ---- The overview ---- */
+  .admin-home {
+    container: admin-home / inline-size;
+  }
+
+  .admin-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  .admin-head h1 {
+    margin: 0;
+  }
+
+  .admin-head__date {
+    margin: 0 0 var(--space-1);
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-large);
+  }
+
+  .admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  /* Bento grid by its own width: the key numbers two by two and the panels under them, then two columns from
+     560px and four from 960px */
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "pack orders"
+      "sales items"
+      "chart chart"
+      "recent recent"
+      "flow flow"
+      "stock stock";
+    gap: var(--space-3);
+  }
+
+  @container admin-home (min-width: 560px) {
+    .dashboard {
+      gap: var(--space-4);
+      grid-template-areas:
+        "pack orders"
+        "sales items"
+        "chart chart"
+        "recent recent"
+        "flow stock";
+    }
+  }
+
+  @container admin-home (min-width: 960px) {
+    .dashboard {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-areas:
+        "pack orders sales items"
+        "chart chart recent recent"
+        "flow flow stock stock";
+    }
+  }
+
+  .stat--pack { grid-area: pack; }
+  .stat--orders { grid-area: orders; }
+  .stat--sales { grid-area: sales; }
+  .stat--items { grid-area: items; }
+  .panel--chart { grid-area: chart; }
+  .panel--recent { grid-area: recent; }
+  .panel--flow { grid-area: flow; }
+  .panel--stock { grid-area: stock; }
+
+  .stat,
+  .panel {
+    min-width: 0;
+    padding: var(--space-5);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+  }
+
+  /* Key numbers: label, the number large in Lora, a note under it */
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    text-decoration: none;
+  }
+
+  @container admin-home (max-width: 559px) {
+    .dashboard .stat {
+      padding: var(--space-4);
+    }
+
+    .dashboard .stat__value {
+      font-size: var(--font-size-title-large);
+    }
+  }
+
+  a.stat:hover {
+    border-color: var(--color-outline);
+  }
+
+  .stat__label {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-large);
+    font-weight: 600;
+  }
+
+  .stat__value {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-headline-medium);
+    font-weight: 600;
+    line-height: 1.15;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .stat__note {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+  }
+
+  /* The one number that needs doing something stands out (Von Restorff) */
+  .stat--attention {
+    border-color: var(--color-primary);
+    background: var(--color-primary-container);
+  }
+
+  .panel h2 {
+    margin: 0;
+    font-size: var(--font-size-title-large);
+  }
+
+  .panel__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+
+  .panel__note {
+    margin: var(--space-1) 0 var(--space-4);
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .panel__head + .panel__note {
+    margin-top: 0;
+  }
+
+  /* Orders per day: one series in Mosgrøn (8.96:1 on Lærred), 4px rounded tops on the baseline, 4px apart. Today
+     and the busiest day carry their number, the rest show it on hover (the whole column is the target). The visually
+     hidden text in each bar is the table view for screen readers. */
+  /* The chart fills its panel, which is as tall as the newest orders next to it */
+  .panel--chart {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bar-chart {
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    gap: 4px;
+    min-height: 200px;
+    margin: 0;
+    padding: var(--space-5) 0 0;
+    list-style: none;
+  }
+
+  .bar-chart__day {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    border-radius: var(--radius-xs);
+  }
+
+  .bar-chart__day:hover {
+    background: color-mix(in srgb, var(--color-secondary) 6%, transparent);
+  }
+
+  .bar-chart__bar {
+    position: relative;
+    align-self: end;
+    height: max(2px, calc(var(--value) / var(--max) * 100%));
+    border-radius: 4px 4px 0 0;
+    background: var(--color-secondary);
+  }
+
+  .bar-chart__tip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-bottom: var(--space-1);
+    color: var(--color-on-surface);
+    font-size: .75rem;
+    font-weight: 700;
+    font-variant-numeric: lining-nums tabular-nums;
+    opacity: 0;
+    transform: translateX(-50%);
+  }
+
+  :is(.bar-chart__day:hover, .bar-chart__day--today, .bar-chart__day--max) .bar-chart__tip {
+    opacity: 1;
+  }
+
+  .bar-chart__date {
+    padding-top: 6px;
+    border-top: 1px solid var(--color-outline-variant);
+    color: var(--color-on-surface-variant);
+    font-size: .75rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .bar-chart__day--today .bar-chart__date {
+    color: var(--color-on-surface);
+    font-weight: 700;
+    text-align: right;
+  }
+
+  /* Narrow: every other date, so they don't run together */
+  @container admin-home (max-width: 479px) {
+    .bar-chart__day:nth-child(odd):not(.bar-chart__day--today) .bar-chart__date {
+      color: transparent;
+    }
+  }
+
+  /* The newest orders: the whole row opens the order */
+  .recent-orders,
+  .stock-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .recent-order {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "id who total"
+      "id when status";
+    align-items: center;
+    gap: 2px var(--space-3);
+    margin-inline: calc(-1 * var(--space-2));
+    padding: var(--space-3) var(--space-2);
+    border-top: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-sm);
+  }
+
+  .recent-order:first-child {
+    border-top: 0;
+  }
+
+  .recent-order:hover {
+    background: var(--color-primary-container);
+  }
+
+  .recent-order__link {
+    grid-area: id;
+    align-self: start;
+    font-weight: 700;
+  }
+
+  .recent-order__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .recent-order__who {
+    grid-area: who;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .recent-order__when {
+    grid-area: when;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .recent-order__total {
+    grid-area: total;
+    font-weight: 600;
+    text-align: right;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .recent-order .status {
+    grid-area: status;
+    justify-self: end;
+  }
+
+  /* The order flow: Betalt → Pakket → Afsendt → Leveret, each a way into the filtered list */
+  .order-flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+    gap: var(--space-2);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .order-flow__step {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    height: 100%;
+    padding: var(--space-3);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    color: var(--color-on-background);
+    text-decoration: none;
+  }
+
+  .order-flow__step:hover {
+    border-color: var(--color-outline);
+  }
+
+  .order-flow__count {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-headline-medium);
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .stock-list li {
+    padding: var(--space-2) 0;
+    border-top: 1px solid var(--color-outline-variant);
+  }
+
+  .stock-list li:first-child {
+    border-top: 0;
+  }
+
+  /* ---- The item form (admin/item, with itemForm.js): 8px from label to field, more between the groups ---- */
   .item-form {
     display: flex;
     flex-direction: column;
@@ -185,6 +787,7 @@
     padding: var(--space-4);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--radius-md);
+    background: var(--color-surface);
   }
 
   .item-form legend {

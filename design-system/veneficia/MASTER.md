@@ -201,6 +201,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 - Exit-animationer varer ca. 70 % af entry-animationen.
 - Animer kun `transform` og `opacity`.
+- **Sideskift:** mellem vores egne sider glider den aktuelle sides pille i menuen (`.nav-link`/`.cart-link[aria-current]`, `view-transition-name: nav-current`) til sin nye plads på 250ms. Selve siden skifter med det samme (`::view-transition-*(root)` uden animation). Det er cross-document view transitions, så browsere uden dem skifter bare side.
 - **Alt slås fra ved `prefers-reduced-motion: reduce`.**
 
 ### Z-index
@@ -231,7 +232,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 - Side-CSS (`homepage.css`, `products.css`, `usermgnt.css`, `statusCodePage.css`, `admin.css`) ligger i `@layer pages`.
 - **Al CSS ligger i et lag.** CSS uden lag vinder ellers over alt.
 - Hold specificiteten lav med `:where()`, og brug klassenavne i kebab-case.
-- Budget: `mainStyle.css` < ca. 40 kB, hver side-CSS < ca. 15 kB (uminificeret).
+- Budget: `mainStyle.css` < ca. 42 kB, hver side-CSS < ca. 15 kB (uminificeret). `admin.css` må fylde ca. 20 kB, fordi kun personalet henter den.
 
 ---
 
@@ -240,13 +241,28 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 ### Ikoner
 - Ét sæt: **Material Symbols Rounded** (Apache-2.0, vægt 400). Kun de ikoner, vi bruger, i én sprite `src/assets/icons/icons.svg` (`<symbol id="…">` + `<svg><use href="/assets/icons/icons.svg#…"></svg>`). Licensen ligger ved siden af.
 - I PHP indsættes et ikon med `uiIcon('navn')` (defineret i `header.php`). Spriten får `?v=` til cache-busting.
-- Ikonerne i spriten (20 Material): `menu`, `close`, `shopping-bag`, `chevron-left`, `chevron-right`, `delete`, `diamond`, `local-shipping`, `menu-book`, `home`, `search`, `candle`, `psychiatry`, `auto-stories`, `wand-stars`, `experiment`, `star`, `wine-bar`, `local-fire-department` og `category`. Dertil kommer de egne symboler `crescent` og `moon-phases`.
+- Ikonerne i spriten (30 Material): `menu`, `close`, `shopping-bag`, `chevron-left`, `chevron-right`, `delete`, `diamond`, `local-shipping`, `menu-book`, `home`, `search`, `candle`, `psychiatry`, `auto-stories`, `wand-stars`, `experiment`, `star`, `wine-bar`, `local-fire-department` og `category`. Til admin: `space-dashboard`, `receipt-long`, `inventory-2`, `sell`, `account-tree`, `group`, `key`, `logout`, `storefront` og `add`. Dertil kommer de egne symboler `crescent`, `moon-0` til `moon-7` og `logo` (logoets mærke).
 - **Kategori-ikoner** vælges ud fra kategoriens slug i `HOME_CATEGORY_ICONS` i `index.php`: krystaller og smykker → `diamond`, røgelse → `local-fire-department`, lys → `candle`, urter og eliksir-ingredienser → `psychiatry`, eliksirer → `experiment`, bøger → `auto-stories`, trylleformularer → `menu-book`, stave → `wand-stars`, rituelle genstande → `wine-bar`, religiøse og andre symboler → `star`, stjernetegn → `crescent`. Alt andet, også nye kategorier, får `category`. Kommer der en ny kategori, så tilføj dens slug.
 - Ikoner, som CSS selv tegner (chip-check, brødkrumme-chevron og banner-ikoner), er mask-tokens (`--icon-*`) i `:root`. De har ingen farve og arver `currentColor`. Select-pilen er den eneste med farve i (Oliven).
 - Størrelser: 20px (`.icon--20`, inline), 24px (standard), 40px (`.icon--40`).
 - `fill: currentColor`, så ikonet arver kontekstens farve.
 - Dekorative ikoner får `aria-hidden="true"`. Ikon-knapper får en dansk `aria-label`.
 - Ingen emoji som ikoner.
+
+### Logo
+Logoet er Augusts tegning: et pentagram med månens faser i en ramme af to firkanter, over ordet VENEFICIA i Cinzel. Farven er Nattegrøn (`#1F2619`), samme farve som i paletten.
+
+| Fil | Indhold | Bruges |
+|---|---|---|
+| `icons.svg#logo` | mærket, `currentColor` | `uiIcon('logo')` i `.brand` (top app bar, menu og footer) ved siden af wordmarket "Veneficia" i Cinzel |
+| `assets/images/logo.svg` | mærket og ordet, Nattegrøn | `<img alt="Veneficia">` over kortet på log ind og opret konto (128px bred) og på fejlsiderne (112px) |
+| `assets/images/favicon.svg` | mærket, kvadratisk | favicon. Nattegrøn, og Pergament når fanelinjen er mørk |
+| `appIcon192/512.png`, `appIconMaskable192/512.png`, `appleTouchIcon.png` | mærket i Pergament på Mosgrøn | manifestets ikoner og iOS. Mærket fylder 76 % (any), 66 % (maskable, hele mærket inden for den midterste cirkel på 80 %) og 70 % (iOS) |
+
+- **SVG'erne er tracet** fra logoets PNG (alfa-kanten ved 50 %, forenklet med højst 0,8px afvigelse på 2000px-tegningen). De afviger under 5 % fra originalen målt pixel for pixel, og de er skarpe i alle størrelser. PNG-ikonerne er skaleret direkte ned fra originalens pixels.
+- **Farver:** Nattegrøn på lys bund og Pergament på Mosgrøn. Ingen andre farver, skygger eller effekter.
+- **Mindste størrelse:** 32px for mærket. Under det forsvinder rammens tynde streger (favicon'et er undtaget).
+- **Månen** (`crescent`) er ikke længere logoet. Den bruges kun til stjernetegn og ordrebekræftelsen.
 
 ### Produktbilleder (regler til Blender-renders)
 - **Format:** 1:1, eksportér 1200 × 1200 px som **WebP**, højst ca. **200 kB** pr. billede.
@@ -279,8 +295,8 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 | Komponent | Klasse(r) | Spec | Bruges på |
 |---|---|---|---|
-| **Top app bar** | `header.navbar.on-secondary` > `.navbar__inner.container`: `.skip-link`, `.brand`, `nav#menu.nav-drawer[popover]` > `.nav-list` > `.nav-link`, `.cart-link` + `.badge`, `.menu-button` | Sticky, Mosgrøn, 64px, svag skygge ved scroll. Skip-link "Spring til indhold" → `#indhold`. Wordmark "Veneficia" (Cinzel 600, `.brand`) + halvmåne. Expanded: Produkter · Log ind/Opret konto eller "Hej, navn"/Log ud · kurv-ikon med Lavendel-badge (`aria-label` "Kurv, 3 varer"). Compact: wordmark, kurv og menuknap → navigation drawer med **Popover API**. Menuikonet bliver et kryds via `:has(#menu:popover-open)`. Aktiv side: `aria-current="page"` + Lavendel indikator. | alle kundesider |
-| **Footer** | `.footer.on-secondary` > `.container`: `.moon-phases`, `.footer__grid`, `.footer__links`, `.footer__copy` | Månefase-skillelinje, wordmark + tagline, links (Produkter, Kurv, Handelsbetingelser, Privatlivspolitik), ©-år | alle sider |
+| **Top app bar** | `header.navbar.on-secondary` > `.navbar__inner.container`: `.skip-link`, `.brand`, `nav#menu.nav-drawer[popover]` > `.nav-list` > `.nav-link`, `.cart-link` + `.badge`, `.menu-button` | Sticky, Mosgrøn, 64px, svag skygge ved scroll. Skip-link "Spring til indhold" → `#indhold`. Logoets mærke (40px) + wordmark "Veneficia" (Cinzel 600, `.brand`). Expanded: Produkter · Log ind/Opret konto eller "Hej, navn"/Log ud · kurv-ikon med Lavendel-badge (`aria-label` "Kurv, 3 varer"). Compact: wordmark, kurv og menuknap → navigation drawer med **Popover API**. Menuikonet bliver et kryds via `:has(#menu:popover-open)`. Aktiv side: `aria-current="page"` + Lavendel indikator. | alle kundesider |
+| **Footer** | `.footer.on-secondary` > `.container`: `.footer__grid`, `.footer__links`, `.footer__copy` | Logoets mærke + wordmark, tagline, links (Produkter, Kurv, Handelsbetingelser, Privatlivspolitik), ©-år | alle sider |
 | **Knapper** | `.button` + `--tonal` `--outlined` `--text` + `--large` `--block` | Fuldt runde, min-højde 44px (48 med `--large`), label-large, state layers, fokusring 2px/2px offset (`--ctx-focus`), tryk `scale(.98)`, disabled. `<a class="button">` = `<button>`. `<button>` uden klasse = filled. Filled på mosgrøn = Lavendel med Nattegrøn tekst. | overalt |
 | **Links** | `a` | `--ctx-link`, altid understreget i brødtekst, `text-underline-offset: 3px`, tykkere ved hover. Nav-links uden understregning. | overalt |
 | **Tekstfelter** | `.field`, `input`, `select`, `textarea` | M3 outlined: label over feltet, 48px, Lærred, 1px Oliven, radius 8. Hover Nattegrøn kant. Fokus 2px Ametyst (via `box-shadow`, intet layout-skift). `:user-invalid` giver Fejl-kant + hjælpetekst. Påkrævet markeres via `:has(:required)`. `<select>` med egen pil. Antalsfelt ca. 5,5rem. | formularer |
@@ -298,6 +314,12 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | **Købsboks** | `.product-add` | Lærred-kort, Sand-kant, radius 16. Varianter som radio-chips i `<fieldset>`, antal, "Læg i kurv" (filled `--large` `--block`). | produktside |
 | **Månefaser** | `.moon-phases` > `svg.moon-phases__phase` (+ `--today`) | otte faser, dagens 36px i Lavendel med glød, resten 20px dæmpede, `aria-hidden` (teksten ved siden af siger fasen) | forside (hero), styleguide |
 | **Dialog** | `dialog.dialog` | radius 28, elevation 3, scrim. *(kommende: mersalg ved kassen)* | styleguide |
+| **Sendt-knap** | `button[aria-busy="true"]` | Scriptet i `header.php` sætter `aria-busy` på knappen, der sendte formularen. Den får en snurrende ring efter teksten (stille ved reduced motion), og formularen kan ikke sendes to gange. Frigives efter 10 s og ved tilbage-knappen | alle formularer |
+| **Admin-sidebjælke** | `adminBar.php`: `.admin-topbar` + `nav#admin-menu.admin-nav[popover]` > `.admin-nav__head`, `.admin-menu` (`.admin-menu__label` + `.nav-list` > `.nav-link`), `.admin-account` | Mosgrøn, 272px, sticky i fuld højde fra 840px. Under 840px en skuffe fra en topbar (Popover API). Tre grupper: Butik (Overblik, Ordrer, Varer, Kategorier, Rabatkoder), Site (Sitemap, Se butikken), Konto (Medarbejdere, Skift adgangskode). Punkter 44px, 4px imellem, ikon + tekst. Aktiv: lavendel pille. Ordrer har et badge med betalte ordrer. Nederst: initial, brugernavn og "Log ud" | alle admin-sider |
+| **Ordrestatus** | `.status` + `--paid` `--packed` `--shipped` `--delivered` `--soldout` | Ordet i en pille med en prik. Betalt: Ametystskær/Ametyst (den eneste i handlingsfarven, for den skal pakkes). Pakket: Sand/Nattegrøn. Afsendt: success-container/Succes. Leveret: Oliven-kant og -tekst. Udsolgt: error-container/Fejl | admin |
+| **Nøgletal** | `.stat` (+ `--attention`) > `__label` `__value` `__note` | Lærred-kort, label, tallet i Lora headline-large, en note (fx "12 % flere end de 30 dage før"). Det ene tal, der kræver handling, får Ametyst-kant og Ametystskær | admin-overblik |
+| **Panel** | `.panel` > `h2`, `.panel__head`, `.panel__note` | Lærred-kort med titel og evt. link til hele listen | admin-overblik |
+| **Søjlediagram** | `ol.bar-chart[style="--max"]` > `.bar-chart__day[style="--value"]` | 14 dage, én serie i Mosgrøn, 4px runde toppe, 4px mellemrum. I dag og den travleste dag har tallet på, resten ved hover. Skjult tekst pr. søjle er tabelvisningen | admin-overblik |
 | **Søgefelt** | `.search-bar` | M3 search bar, fuldt rund, 56px. *(kommende, kræver backend)* | styleguide |
 | **Fri-fragt-bar** | `.free-shipping` | `<progress>` + tekst (goal-gradient). *(kommende)* | styleguide |
 
@@ -313,10 +335,10 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | Kurv | `basket.php` → `products.css` | Trin 1, varelinjer (`.basket-lines`) + sticky opsummeringskort (`.summary`) med "Gå til kassen" (filled `--block`) og "Fortsæt med at handle". "Opdater" er tonal, og "Fjern" er en text-knap med ikon. Begge har varens navn som skjult tekst for skærmlæsere. |
 | Kasse | `checkout.php` → `products.css` | Trin 2. Fejlopsummeringen står øverst (`role="alert"`, `tabindex="-1"`, `autofocus`). `<aside class="summary">` med ordreoversigt og rabatkode står først i DOM'en, så ordren læses før man bestiller (og står først på mobil). Fra 840px står leveringsformularen til venstre og oversigten til højre. Totalen gentages lige over knappen **"Bestil og betal"**. En godkendt rabatkode giver et succesbanner med "magisk støv" (`.magic-dust`, 600ms, kun opacity og transform). |
 | Ordrebekræftelse | `ordreConfimation.php` → `products.css` | Trin 3, bue med måne, "Tak for din ordre, navn!", ordrenummer i Lora, kort med levering + varer, "Shop videre". `@media print` |
-| Log ind / Opret | `userMgmt/*.php` → `usermgnt.css` | Wordmark-link + centreret kort (Lærred, radius 28, elevation 1) |
-| Fejlsider (10) | `statusCodesPages/*.php` → `statusCodePage.css` | Dansk, statuskode i Cinzel (Mosgrøn), venlig h1, "Til forsiden" + "Se produkterne". **Ingen navbar** (rammer databasen). |
+| Log ind / Opret | `userMgmt/*.php` → `usermgnt.css` | Hele logoet som link + centreret kort (Lærred, radius 28, elevation 1) |
+| Fejlsider (10) | `statusCodesPages/*.php` → `statusCodePage.css` | Dansk, hele logoet øverst som link til forsiden, statuskode i Cinzel (Mosgrøn), venlig h1, "Til forsiden" + "Se produkterne". **Ingen navbar** (rammer databasen). |
 | Juridiske | `legal/*.php` → (kun mainStyle) | Side-skal: navbar, h1, "Teksten er på vej.", footer |
-| Admin | `admin/*.php` → `admin.css` (+ `usermgnt.css` til formular-kortene) | Let hånd: mosgrøn admin-bar (`.on-secondary`) med outlined "Log ud". Tabeller på Lærred med Sand-kant, og hele rækken er klikbar. "Slet" (`button[name="delete"]`) er outlined i fejlfarven. `itemForm.js`' knapper er tonale. Formularerne i `.auth-form`/`.item-form` har 8px fra label til felt og 20px mellem felterne. Layout og adfærd er uændret. |
+| Admin | `admin/*.php` → `admin.css` (+ `usermgnt.css` til formular-kortene) | Sidebjælke til venstre (se Component Specs), arbejdsfladen på Pergament ved siden af, butikkens footer er skjult. **Overblik** (`admin/index.php`): dato og hilsen efter tid på dagen ("God eftermiddag, august"), hurtige handlinger (filled "Pak ordrer (n)" når der er betalte ordrer, ellers "Ny vare"), og et bento-gitter (`grid-template-areas`, 1/2/4 kolonner efter sin egen bredde med container queries): fire nøgletal (venter på pakning, ordrer og salg de sidste 30 dage mod de 30 før, varer med antal udsolgte varianter), ordrer pr. dag i 14 dage, de fem nyeste ordrer, ordrernes vej (antal pr. status) og udsolgte varianter. Alle tal linker til siden, hvor de håndteres. **Ordrer:** søgefelt i toppen og status som chips med antal (ét klik i stedet for en select og en knap), status som pille i tabellen. Tabeller på Lærred med Pergament-hoved og Sand-linjer, tal højrestillet, og hele rækken er klikbar. "Slet" (`button[name="delete"]`) er outlined i fejlfarven. `itemForm.js`' knapper er tonale. Formularerne i `.auth-form`/`.item-form` har 8px fra label til felt og 20px mellem felterne. Layout og adfærd er uændret. |
 
 ---
 
@@ -326,15 +348,15 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 |---|---|
 | **Jakobs lov** | Logo til venstre og kurv med antal øverst til højre (navbar), brødkrummer, produktgitter, kurv → kasse → bekræftelse |
 | **Hicks lov / choice overload** | Én primær (ametyst) handling pr. skærm. Varianter som synlige radio-chips. Kategorier som chips, kun topniveau |
-| **Fitts' lov** | Primærknapper ≥ 48px og fuld bredde på mobil (`--block`). Hele produktkortet er klikbart. Alle klikmål ≥ 24 × 24px, helst 44–48 |
+| **Fitts' lov** | Primærknapper ≥ 48px og fuld bredde på mobil (`--block`). Hele produktkortet, hver tabelrække og hver ordre på admin-overblikket er klikbar. Alle klikmål ≥ 24 × 24px, helst 44–48 |
 | **Millers lov / chunking** | Produktsiden er delt i køb, beskrivelse, varianter og tags. Navigationen har højst 5–7 punkter |
-| **Von Restorff** | Kun primærhandlinger er Ametyst |
+| **Von Restorff** | Kun primærhandlinger er Ametyst. I admin er det kun det tal og den status, der kræver handling (betalte ordrer) |
 | **Serial position** | "Produkter" står først i navigationen og kurven sidst |
 | **Goal-gradient** | Trinindikatoren Kurv → Levering → Bekræftelse. Fri-fragt-baren ligger klar i styleguiden |
 | **Zeigarnik** | Badge med antal på kurv-ikonet |
 | **Peak-end** | Rolig og varm ordrebekræftelse (bue, måne, tak, tydeligt ordrenummer). Venlige fejlsider med vej videre |
 | **Aesthetic-usability** | Gennemført palet, typografi og former på alle sider |
-| **Doherty-tærsklen** | State layers giver feedback inden for 150ms. Ingen tunge assets og ingen ny JS |
+| **Doherty-tærsklen** | State layers giver feedback inden for 150ms. En sendt formulars knap viser en snurrende ring med det samme og kan ikke sendes igen. Ingen tunge assets |
 | **Tesler / Postel** | Systemet regner fragt, rabat og lager ud. Felterne beholder `inputmode` og `autocomplete` |
 | **Gestalt** | Nærhed (spacing-skalaen), lighed (samme funktion = samme stil), fælles område (kort og købsboks), figur–grund (Lærred-kort på Pergament i mosgrøn ramme), Prägnanz (enkle former) |
 | **Kognitiv belastning** | Formularer i én kolonne med labels over felterne. Fejl ved feltet og i en opsummering øverst |
@@ -415,6 +437,20 @@ August lavede renderet i Blender og sendte det med et forslag til en hero (`hero
 | Uendelig zoom (22 s) og tekst, der toner ind | Udeladt | WCAG 2.2.2 (bevægelse over 5 s kræver en pauseknap) og LCP |
 | `<link rel="preload">` til billedet | `fetchpriority="high"` på `<img>` | Billedet står tidligt i HTML'en, så browseren finder det med det samme |
 
+## Ændret efter TikTok-gennemgangen (2026-11-27)
+
+August sendte syv opslag om UI. Her er pointerne, og hvor de er brugt. Det meste fra de generelle opslag var allerede på plads.
+
+| Opslag | Pointe | Her |
+|---|---|---|
+| Sidebar (ux_dose) | Logo øverst, grupper med label, aktiv- og hover-tilstand, status-badge, konto nederst, ensartede 40–44px punkter, højst to niveauer | Admin-sidebjælken |
+| 8 navigationsmenuer (ahmadkhancodes) | Tydelig aktiv og hover-tilstand, ikon + tekst, sidebjælke der bliver til en skuffe på mobil | Admin-sidebjælken. Butikkens navbar havde det i forvejen. Mega-menu, bento-menu og "luksus"-stilen er ikke brugt: shoppen har få punkter, og stilen ligger fast |
+| 5 UX-love (ux_snacks) | Fitts, Hick, nærhed, Von Restorff, Doherty | Fitts, Hick, nærhed og Von Restorff var på plads (se UX-love). **Nyt:** Doherty med sendt-knappen, statuschips i admin (Hick) og hele rækker som klikmål i admin (Fitts) |
+| Kedeligt design (uiuxmanuel) | Hierarki, kontrast, én skrifttype i flere vægte, luft, brud på mønsteret, noget at se på | Var på plads efter designkritikken og hero-renderet. Admin-overblikket har tydeligt hierarki (store tal i Lora, små labels) |
+| Navigationsfaner (devdevil.ui) | Den aktive markering glider mellem punkterne | Sideskift med view transitions (se Motion) |
+| Bento-gitter (davidm_ai) | `grid-template-areas`, der skifter med bredden | Admin-overblikket, med container queries, fordi sidebjælken ændrer pladsen |
+| Admin-dashboard (paulcodes4) | Sidebjælke med grupper og badges, hilsen, hurtige handlinger, nøgletal med udvikling, graf, liste over nyeste ordrer | Hele det nye admin. Uden glas-effekt, mørk tilstand og løft ved hover: det strider mod stilen og anti-mønstrene |
+
 ## Pre-Delivery Checklist
 
 Gennemgået 2026-11-24 i Fase 7. Siderne er testet som statiske mockups, der spejler PHP-skabelonernes output, fordi PHP ikke var installeret. De rigtige PHP-sider er ikke kørt i en browser.
@@ -427,7 +463,7 @@ Gennemgået 2026-11-24 i Fase 7. Siderne er testet som statiske mockups, der spe
 - [x] Intet formidles kun med farve.
 - [x] Ingen vandret scroll ved 320px. Layoutet virker ved 360, 768, 1280 og 1440px og ved 200 % zoom.
 - [x] `prefers-reduced-motion` slår animationerne fra.
-- [x] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen JS-biblioteker (kun det lille chip-script i `products.php`).
+- [x] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen JS-biblioteker (kun det lille chip-script i `products.php` og formular-scriptet i `header.php`).
 - [x] Billeder har `width`/`height`.
 - [x] Formularer har uændret `name`, `action`, `method` og CSRF, og al output er escaped.
 - [x] Skillets Quick Reference §1–9 (i `SKILL.md`) er gennemgået.

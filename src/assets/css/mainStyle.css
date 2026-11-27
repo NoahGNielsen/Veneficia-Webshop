@@ -215,6 +215,26 @@
     html {
       scroll-behavior: smooth;
     }
+
+    /* Between our own pages the current page's pill in the menu glides to its new place, so you see where you went
+       (cross-document view transitions; other browsers just change page). The page itself changes at once. */
+    @view-transition {
+      navigation: auto;
+    }
+  }
+
+  :where(.nav-link, .cart-link)[aria-current="page"] {
+    view-transition-name: nav-current;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
+  ::view-transition-group(nav-current) {
+    animation-duration: var(--duration-medium);
+    animation-timing-function: var(--ease-standard);
   }
 
   body {
@@ -456,6 +476,28 @@
   .button--tonal {
     --button-bg: var(--color-primary-container);
     --button-fg: var(--color-on-primary-container);
+  }
+
+  /* A sent form's button (the script in header.php): a spinner after the text at once, and no second send */
+  :where(button, .button)[aria-busy="true"] {
+    cursor: progress;
+  }
+
+  :where(button, .button)[aria-busy="true"]::after {
+    content: "";
+    flex: none;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 700ms linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(1turn);
+    }
   }
 
   .button--outlined {
@@ -1097,10 +1139,11 @@
     min-height: var(--header-height);
   }
 
+  /* The logo's mark and the wordmark, in the context's text colour (Pergament on Mosgrøn) like the logo itself */
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-3);
     min-height: 48px;
     color: var(--ctx-text);
     font-family: var(--font-brand);
@@ -1110,10 +1153,10 @@
     text-decoration: none;
   }
 
+  /* 40px: below about 32px the mark's thin frame lines disappear */
   .brand .icon {
-    width: 22px;
-    height: 22px;
-    color: var(--ctx-link);
+    width: 40px;
+    height: 40px;
   }
 
   .navbar .brand {

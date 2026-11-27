@@ -10,8 +10,13 @@
     text-align: center;
   }
 
-  .status-page .brand {
+  /* The full logo (mark and word) leads back to the shop */
+  .status-brand {
     margin-bottom: var(--space-6);
+  }
+
+  .status-brand img {
+    display: block;
   }
 
   .status-code {

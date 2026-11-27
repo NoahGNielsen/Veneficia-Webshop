@@ -14,7 +14,7 @@ if (!headers_sent()) {
 </head>
 <body>
     <main class="status-page">
-        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <a class="status-brand" href="/"><img src="<?= htmlspecialchars($headerVersion('/assets/images/logo.svg')) ?>" alt="Veneficia" width="112" height="142"></a>
         <p class="status-code"><span class="visually-hidden">Fejl </span>404</p>
         <h1>Vi kan ikke finde siden</h1>
         <p class="status-message">Siden findes ikke, eller den er blevet flyttet.</p>

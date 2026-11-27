@@ -49,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <main class="auth-page">
+        <a class="auth-brand" href="/"><img src="<?= htmlspecialchars($headerVersion('/assets/images/logo.svg')) ?>" alt="Veneficia" width="128" height="162"></a>
         <form class="auth-form" method="post" action="/admin/login">
             <h1>Medarbejderlogin</h1>
             <?php if ($error !== ''): ?>

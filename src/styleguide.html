@@ -12,6 +12,7 @@
     <link rel="preload" href="/assets/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/assets/css/mainStyle.css">
     <link rel="stylesheet" href="/assets/css/products.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
     <link rel="stylesheet" href="/assets/css/styleguide.css">
     <title>Styleguide - Veneficia</title>
 </head>
@@ -19,10 +20,10 @@
 <header class="navbar on-secondary">
     <a class="skip-link" href="#indhold">Spring til indhold</a>
     <div class="navbar__inner container">
-        <a class="brand" href="/"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg>Veneficia</a>
+        <a class="brand" href="/"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#logo"></use></svg>Veneficia</a>
         <nav id="menu" class="nav-drawer" popover aria-label="Hovedmenu">
             <div class="nav-drawer__header">
-                <span class="brand"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg>Veneficia</span>
+                <span class="brand"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#logo"></use></svg>Veneficia</span>
                 <button type="button" class="icon-button" popovertarget="menu" popovertargetaction="hide" aria-label="Luk menu"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#close"></use></svg></button>
             </div>
             <ul class="nav-list">
@@ -55,6 +56,7 @@
             <li><a class="chip" href="#navigation">Navigation</a></li>
             <li><a class="chip" href="#signaturer">Signaturer og ikoner</a></li>
             <li><a class="chip" href="#billeder">Billeder</a></li>
+            <li><a class="chip" href="#admin">Admin</a></li>
             <li><a class="chip" href="#kommende">Kommende</a></li>
         </ul>
     </nav>
@@ -124,6 +126,7 @@
             <button type="button" class="demo-focus">Fokus</button>
             <button type="button" class="demo-pressed">Tryk</button>
             <button type="button" disabled>Disabled</button>
+            <button type="button" aria-busy="true">Sendt</button>
         </div>
         <div class="sg-row">
             <button type="button" class="button--outlined">Normal</button>
@@ -323,6 +326,13 @@
 
     <section id="signaturer" aria-labelledby="signaturer-titel">
         <h2 id="signaturer-titel">Signaturer og ikoner</h2>
+        <h3>Logoet</h3>
+        <p>Logoets mærke (<code>uiIcon('logo')</code>, 40px) står ved wordmarket i top app bar, menu og footer, i kontekstens tekstfarve. Log ind, opret konto og fejlsiderne viser hele logoet med ordet (<code>/assets/images/logo.svg</code>, <code>alt="Veneficia"</code>). Kun Nattegrøn på lys bund og Pergament på Mosgrøn. Mindst 32px.</p>
+        <div class="sg-row">
+            <img src="/assets/images/logo.svg" alt="Veneficia" width="112" height="142">
+            <span class="sg-panel on-secondary brand"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#logo"></use></svg>Veneficia</span>
+            <span class="brand"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#logo"></use></svg>Veneficia</span>
+        </div>
         <h3>Buen</h3>
         <p>Signaturformen omkring et ikon (<code>.arch-icon</code>). Bruges sparsomt: kategori-ikonerne, tomme tilstande og ordrebekræftelsen. Altid på en 4:5-boks.</p>
         <div class="sg-row">
@@ -354,7 +364,7 @@
             <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#wine-bar"></use></svg><figcaption>wine-bar (rituelle genstande)</figcaption></figure></li>
             <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#local-fire-department"></use></svg><figcaption>local-fire-department (røgelse)</figcaption></figure></li>
             <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#category"></use></svg><figcaption>category (generisk kategori)</figcaption></figure></li>
-            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg><figcaption>crescent (egen: wordmark, stjernetegn)</figcaption></figure></li>
+            <li><figure><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg><figcaption>crescent (egen: stjernetegn, ordrebekræftelse)</figcaption></figure></li>
         </ul>
     </section>
 
@@ -367,6 +377,42 @@
             <li>Alle <code>&lt;img&gt;</code> har <code>width</code> og <code>height</code>. Det første billede får <code>fetchpriority="high"</code>, resten <code>loading="lazy"</code>.</li>
             <li>Alt-teksten er billedets beskrivelse fra admin, ellers produktnavnet.</li>
         </ul>
+    </section>
+
+    <section id="admin" aria-labelledby="admin-titel">
+        <h2 id="admin-titel">Admin</h2>
+        <p>Admin-siderne (<code>admin.css</code>) bruger de samme tokens. Sidebjælken i Mosgrøn har siderne i tre grupper med ikoner, den aktuelle side som lavendel pille og et badge med ordrer, der venter på at blive pakket. Under 840px er den en skuffe fra en topbar. Overblikket er et bento-gitter med 1, 2 eller 4 kolonner efter sin egen bredde (container queries).</p>
+        <h3>Sidebjælke</h3>
+        <div class="sg-panel on-secondary sg-admin-menu">
+            <div class="admin-menu">
+                <p class="admin-menu__label" id="sg-butik">Butik</p>
+                <ul class="nav-list" aria-labelledby="sg-butik"><li><a class="nav-link" href="#admin" aria-current="page"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#space-dashboard"></use></svg>Overblik</a></li><li><a class="nav-link" href="#admin"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#receipt-long"></use></svg>Ordrer<span class="badge">3<span class="visually-hidden"> venter på at blive pakket</span></span></a></li><li><a class="nav-link" href="#admin"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#inventory-2"></use></svg>Varer</a></li><li><a class="nav-link" href="#admin"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#category"></use></svg>Kategorier</a></li><li><a class="nav-link" href="#admin"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#sell"></use></svg>Rabatkoder</a></li></ul>
+            </div>
+            <div class="admin-account">
+                <span class="admin-account__avatar" aria-hidden="true">A</span>
+                <span class="admin-account__who"><span class="admin-account__muted">Logget ind som</span> <strong>august</strong></span>
+                <button type="button" class="icon-button" aria-label="Log ud"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#logout"></use></svg></button>
+            </div>
+        </div>
+        <h3>Ordrestatus</h3>
+        <p>Ordet i en pille med en prik, så status aldrig kun er en farve. "Betalt" (skal pakkes) er den eneste i handlingsfarven.</p>
+        <div class="sg-row">
+            <span class="status status--paid">Betalt</span>
+            <span class="status status--packed">Pakket</span>
+            <span class="status status--shipped">Afsendt</span>
+            <span class="status status--delivered">Leveret</span>
+            <span class="status status--soldout">Udsolgt</span>
+        </div>
+        <h3>Nøgletal</h3>
+        <div class="sg-grid">
+            <a class="stat stat--attention" href="#admin"><span class="stat__label">Venter på pakning</span><span class="stat__value">3</span><span class="stat__note">Betalte ordrer</span></a>
+            <a class="stat" href="#admin"><span class="stat__label">Ordrer, 30 dage</span><span class="stat__value">42</span><span class="stat__note">12 % flere end de 30 dage før</span></a>
+        </div>
+        <h3>Søjlediagram</h3>
+        <p>Én serie i Mosgrøn, 4px runde toppe på grundlinjen. I dag og den travleste dag har tallet på; resten viser det ved hover. Skjult tekst i hver søjle er tabelvisningen for skærmlæsere.</p>
+        <section class="panel sg-chart" aria-label="Eksempel: ordrer pr. dag">
+            <ol class="bar-chart" style="--max: 5"><li class="bar-chart__day" style="--value: 0"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">0</span></span><span class="bar-chart__date" aria-hidden="true">14</span><span class="visually-hidden">14. november: 0 ordrer</span></li><li class="bar-chart__day" style="--value: 2"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">2</span></span><span class="bar-chart__date" aria-hidden="true">15</span><span class="visually-hidden">15. november: 2 ordrer</span></li><li class="bar-chart__day" style="--value: 1"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">1</span></span><span class="bar-chart__date" aria-hidden="true">16</span><span class="visually-hidden">16. november: 1 ordrer</span></li><li class="bar-chart__day" style="--value: 0"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">0</span></span><span class="bar-chart__date" aria-hidden="true">17</span><span class="visually-hidden">17. november: 0 ordrer</span></li><li class="bar-chart__day" style="--value: 3"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">3</span></span><span class="bar-chart__date" aria-hidden="true">18</span><span class="visually-hidden">18. november: 3 ordrer</span></li><li class="bar-chart__day" style="--value: 1"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">1</span></span><span class="bar-chart__date" aria-hidden="true">19</span><span class="visually-hidden">19. november: 1 ordrer</span></li><li class="bar-chart__day" style="--value: 4"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">4</span></span><span class="bar-chart__date" aria-hidden="true">20</span><span class="visually-hidden">20. november: 4 ordrer</span></li><li class="bar-chart__day" style="--value: 2"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">2</span></span><span class="bar-chart__date" aria-hidden="true">21</span><span class="visually-hidden">21. november: 2 ordrer</span></li><li class="bar-chart__day" style="--value: 0"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">0</span></span><span class="bar-chart__date" aria-hidden="true">22</span><span class="visually-hidden">22. november: 0 ordrer</span></li><li class="bar-chart__day" style="--value: 1"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">1</span></span><span class="bar-chart__date" aria-hidden="true">23</span><span class="visually-hidden">23. november: 1 ordrer</span></li><li class="bar-chart__day bar-chart__day--max" style="--value: 5"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">5</span></span><span class="bar-chart__date" aria-hidden="true">24</span><span class="visually-hidden">24. november: 5 ordrer</span></li><li class="bar-chart__day" style="--value: 2"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">2</span></span><span class="bar-chart__date" aria-hidden="true">25</span><span class="visually-hidden">25. november: 2 ordrer</span></li><li class="bar-chart__day" style="--value: 1"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">1</span></span><span class="bar-chart__date" aria-hidden="true">26</span><span class="visually-hidden">26. november: 1 ordrer</span></li><li class="bar-chart__day bar-chart__day--today" style="--value: 3"><span class="bar-chart__bar" aria-hidden="true"><span class="bar-chart__tip">3</span></span><span class="bar-chart__date" aria-hidden="true">I dag</span><span class="visually-hidden">27. november: 3 ordrer</span></li></ol>
+        </section>
     </section>
 
     <section id="kommende" aria-labelledby="kommende-titel">
@@ -421,7 +467,7 @@
     <div class="container">
         <div class="footer__grid">
             <div>
-                <a class="brand" href="/"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#crescent"></use></svg>Veneficia</a>
+                <a class="brand" href="/"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#logo"></use></svg>Veneficia</a>
                 <p class="footer__tagline">Krystaller, røgelse, urter og bøger til din praksis.</p>
             </div>
             <nav aria-label="Sidefod">

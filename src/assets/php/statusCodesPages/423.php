@@ -15,7 +15,7 @@ if (!headers_sent()) {
 </head>
 <body>
     <main class="status-page">
-        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <a class="status-brand" href="/"><img src="<?= htmlspecialchars($headerVersion('/assets/images/logo.svg')) ?>" alt="Veneficia" width="112" height="142"></a>
         <p class="status-code"><span class="visually-hidden">Fejl </span>423</p>
         <h1>Det er låst lige nu</h1>
         <p class="status-message">Det, du prøver at ændre, er låst lige nu. Prøv igen senere.</p>

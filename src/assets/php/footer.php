@@ -5,7 +5,7 @@
     <div class="container">
         <div class="footer__grid">
             <div>
-                <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+                <a class="brand" href="/"><?= uiIcon('logo') ?>Veneficia</a>
                 <p class="footer__tagline">Krystaller, røgelse, urter og bøger til din praksis.</p>
             </div>
             <nav aria-label="Sidefod">
