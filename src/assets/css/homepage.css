@@ -5,15 +5,43 @@
     padding: 0;
   }
 
-  /* ---- Hero: moss green, text left, the arch with the obelisk right (stacked on compact) ---- */
+  /* ---- Hero: the Blender render of the amethyst tower on Nattegrøn. Below 840px the render sits on top and fades
+     into the band, with the text under it; from 840px it fills the band behind the text, shaded on the left. ---- */
   .hero {
-    padding-block: var(--space-7) var(--space-8);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-bottom: var(--space-8);
+    background-color: var(--color-inverse-surface);
   }
 
+  .hero__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    max-height: 75svh;
+  }
+
+  .hero__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* The crystal (two thirds across the render) in the middle of the 4:5 crop, with both candles beside it */
+    object-position: 80% 50%;
+  }
+
+  .hero__media::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 40%;
+    background: linear-gradient(transparent, var(--color-inverse-surface));
+  }
+
+  /* The text starts on the faded part of the render */
   .hero__inner {
-    display: grid;
-    gap: var(--space-7);
-    align-items: center;
+    position: relative;
+    margin-top: calc(-1 * var(--space-8));
   }
 
   .hero h1 {
@@ -49,26 +77,16 @@
     font-weight: 600;
   }
 
-  /* The arch sits on moss, so it gets a darker moss of its own and a fine lavender edge to keep its shape visible */
-  .hero__visual {
-    justify-self: center;
-    width: min(100%, 280px);
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--color-secondary-accent) 45%, transparent);
-    background:
-      radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--color-secondary-accent) 34%, transparent),
-        color-mix(in srgb, var(--color-primary) 22%, transparent) 40%, transparent 70%),
-      color-mix(in srgb, var(--color-on-background) 35%, var(--color-secondary));
-  }
-
-  .hero__visual img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
   @media (min-width: 600px) {
+    /* The whole render, uncropped */
+    .hero__media {
+      aspect-ratio: 16 / 9;
+    }
+
+    .hero__media img {
+      object-position: 50% 50%;
+    }
+
     .hero__actions {
       flex-direction: row;
       flex-wrap: wrap;
@@ -76,17 +94,41 @@
   }
 
   @media (min-width: 840px) {
+    /* As tall as the 16:9 render, but never taller than the screen under the top app bar, less a strip so the
+       next section shows. Taller text makes it taller, and the render is cropped at the sides. */
     .hero {
-      padding-block: var(--space-8) var(--space-9);
+      display: grid;
+      align-items: center;
+      min-height: min(56.25vw, calc(100svh - var(--header-height) - var(--space-8)));
+      padding-block: var(--space-8);
+    }
+
+    .hero__media {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      aspect-ratio: auto;
+      max-height: none;
+    }
+
+    /* Nattegrøn shading behind the text column (which ends before 50 %), clear from about 66 %, so the crystal
+       and the right-hand candle stay untouched */
+    .hero__media::after {
+      inset: 0;
+      height: auto;
+      background: linear-gradient(90deg,
+        color-mix(in srgb, var(--color-inverse-surface) 90%, transparent),
+        color-mix(in srgb, var(--color-inverse-surface) 78%, transparent) 30%,
+        color-mix(in srgb, var(--color-inverse-surface) 55%, transparent) 48%,
+        transparent 66%);
     }
 
     .hero__inner {
-      grid-template-columns: 7fr 5fr;
-      gap: var(--space-8);
+      margin-top: 0;
     }
 
-    .hero__visual {
-      width: min(100%, 400px);
+    .hero__text {
+      max-width: min(36rem, 48%);
     }
   }
 

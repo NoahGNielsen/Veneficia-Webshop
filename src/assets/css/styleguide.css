@@ -165,17 +165,6 @@
     font-size: var(--font-size-label-medium);
   }
 
-  .sg-arch {
-    width: min(240px, 60%);
-  }
-
-  .sg-arch img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
   .sg-scrim {
     display: grid;
     place-items: center;
