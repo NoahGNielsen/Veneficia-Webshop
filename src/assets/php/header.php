@@ -65,31 +65,7 @@ if (http_response_code() === 200) {
 <link rel="preload" href="/assets/fonts/raleway-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/lora-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= $headerVersion('/assets/css/mainStyle.css') ?>">
-<script>
-// A sent form shows it at once (Doherty threshold): its button gets aria-busy, which mainStyle.css turns into a
-// spinner, and a second click doesn't send it again. A cancelled confirm() or itemForm.js's own checks stop the event
-// first, so they never get here. The back button (bfcache) and a server that hasn't answered in 10 s free it again.
-document.addEventListener('submit', (event) => {
-    const form = event.target;
-    if (event.defaultPrevented || form.method === 'dialog') return;
-    if (form.dataset.sending) {
-        event.preventDefault();
-        return;
-    }
-    form.dataset.sending = '1';
-    const button = event.submitter;
-    if (button) button.setAttribute('aria-busy', 'true');
-    setTimeout(() => {
-        delete form.dataset.sending;
-        if (button) button.removeAttribute('aria-busy');
-    }, 10000);
-});
-addEventListener('pageshow', (event) => {
-    if (!event.persisted) return;
-    document.querySelectorAll('form[data-sending]').forEach((form) => delete form.dataset.sending);
-    document.querySelectorAll('[aria-busy="true"]').forEach((button) => button.removeAttribute('aria-busy'));
-});
-</script>
+<script src="<?= $headerVersion('/assets/js/site.js') ?>" defer></script>
 <link rel="terms-of-service" href="https://veneficia.noahgajnielsen.dk/legal/terms">
 <link rel="privacy-policy" href="https://veneficia.noahgajnielsen.dk/legal/privacy">
 

@@ -236,4 +236,25 @@
   .sg-chart {
     max-width: 560px;
   }
+
+  /* The buy bar shown in place instead of fixed at the bottom */
+  .buy-bar.sg-static {
+    position: static;
+    display: flex;
+    max-width: 420px;
+    margin-block: var(--space-4);
+  }
+
+  .sg-search-demo {
+    min-height: 200px;
+    max-width: 480px;
+  }
+
+  .sg-search-demo .list-search {
+    display: flex;
+  }
+
+  .sg-narrow {
+    max-width: 360px;
+  }
 }

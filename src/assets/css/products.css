@@ -92,6 +92,56 @@
     }
   }
 
+  /* The checkout's order summary in a narrow column: one short line per product (name and variant left, the line's
+     total and the amount right) instead of a card with three rows each */
+  @container (max-width: 599.98px) {
+    .order-table tbody tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0 var(--space-3);
+      margin: 0;
+      padding: var(--space-3) 0;
+      border: 0;
+      border-bottom: 1px solid var(--color-outline-variant);
+      border-radius: 0;
+      background: none;
+    }
+
+    .order-table tbody tr > :first-child {
+      grid-row: 1 / span 2;
+      padding: 0;
+    }
+
+    .order-table tbody td[data-label="Pris"] {
+      display: none;
+    }
+
+    .order-table tbody td[data-label="I alt"] {
+      grid-column: 2;
+      grid-row: 1;
+      padding: 0;
+      font-weight: 600;
+    }
+
+    .order-table tbody td[data-label="I alt"]::before {
+      content: none;
+    }
+
+    .order-table tbody td[data-label="Antal"] {
+      grid-column: 2;
+      grid-row: 2;
+      justify-content: flex-end;
+      gap: var(--space-1);
+      padding: 0;
+      color: var(--color-on-surface-variant);
+      font-size: var(--font-size-label-medium);
+    }
+
+    .order-table tfoot {
+      margin-top: var(--space-3);
+    }
+  }
+
   /* ---- Step indicator: Kurv · Levering · Bekræftelse ---- */
   .steps {
     display: flex;
@@ -278,6 +328,44 @@
     }
   }
 
+  /* ---- The list's search, stock filter and sort (products.php). The search shows on phones, and in a category on
+     every size (the top app bar searches the whole shop from 840px). ---- */
+  .list-search {
+    display: flex;
+    gap: var(--space-1);
+    max-width: 480px;
+    margin: 0 0 var(--space-3);
+  }
+
+  .list-search input {
+    flex: 1;
+    min-width: 0;
+    border-radius: var(--radius-full);
+  }
+
+  @media (min-width: 840px) {
+    .list-search:not(.list-search--category) {
+      display: none;
+    }
+  }
+
+  .list-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-outline-variant);
+  }
+
+  .list-sort .chip-set {
+    margin: 0;
+  }
+
+  .products-page .page-header {
+    margin-bottom: var(--space-6);
+  }
+
   /* ---- Product page (product.php). Expanded: gallery left (7/12), sticky info right. ---- */
   .product-layout {
     display: grid;
@@ -348,6 +436,101 @@
   /* Variant chip: the name in bold, the price (or Udsolgt) in regular weight, no separator needed */
   .chip__price {
     font-weight: 400;
+  }
+
+  /* Delivery right under the button */
+  .buy-facts {
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+    list-style: none;
+  }
+
+  .buy-facts li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .buy-facts .icon {
+    flex: none;
+    margin-top: 2px;
+    color: var(--color-secondary);
+  }
+
+  /* Phones: the price and the button at the bottom while the real button is out of sight (Fitts). assets/js/site.js removes [hidden]; from 840px the buy box is sticky beside the pictures instead. */
+  .buy-bar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: var(--z-sticky);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--gutter) max(var(--space-3), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--color-outline-variant);
+    background: var(--color-surface);
+    box-shadow: var(--elevation-3);
+  }
+
+  .buy-bar[hidden] {
+    display: none;
+  }
+
+  .buy-bar__info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .buy-bar__name {
+    overflow: hidden;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .buy-bar__price {
+    font-size: var(--font-size-title-medium);
+    font-weight: 700;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  /* Room under the page for the bar, so it never covers the footer's last line */
+  body:has(.buy-bar:not([hidden])) {
+    padding-bottom: 80px;
+  }
+
+  @media (min-width: 840px) {
+    .buy-bar {
+      display: none;
+    }
+
+    body:has(.buy-bar:not([hidden])) {
+      padding-bottom: 0;
+    }
+  }
+
+  /* More products (the product page's "Mere fra ..." and the empty basket's suggestions) */
+  .related {
+    margin-top: var(--space-8);
+  }
+
+  .related__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .related__head h2 {
+    margin: 0;
   }
 
   .product-soldout > * {

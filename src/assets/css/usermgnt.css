@@ -14,6 +14,14 @@
     display: block;
   }
 
+  /* Phones: a smaller logo, so the form starts in the first screen */
+  @media (max-width: 599.98px) {
+    .auth-brand img {
+      width: 88px;
+      height: auto;
+    }
+  }
+
   /* M3 form card: canvas, radius 28, elevation 1 */
   .auth-form {
     display: flex;
@@ -42,7 +50,7 @@
 
   /* 8px from label to field, 20px from one field to the next */
   .auth-form > .field + .field,
-  .auth-form > :is(input, select, textarea) + label,
+  .auth-form > :is(input, select, textarea, .password-field) + label,
   .auth-form > .field + .auth-checkbox {
     margin-top: var(--space-3);
   }

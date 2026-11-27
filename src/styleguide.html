@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/assets/css/products.css">
     <link rel="stylesheet" href="/assets/css/admin.css">
     <link rel="stylesheet" href="/assets/css/styleguide.css">
+    <script src="/assets/js/site.js" defer></script>
     <title>Styleguide - Veneficia</title>
 </head>
 <body>
@@ -26,10 +27,25 @@
                 <span class="brand"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#logo"></use></svg>Veneficia</span>
                 <button type="button" class="icon-button" popovertarget="menu" popovertargetaction="hide" aria-label="Luk menu"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#close"></use></svg></button>
             </div>
+            <form class="nav-search" method="get" action="/products" role="search">
+                <label for="nav-q" class="visually-hidden">Søg i butikken</label>
+                <input type="search" id="nav-q" name="q" maxlength="100" placeholder="Søg i butikken" value="">
+                <button type="submit" class="icon-button" aria-label="Søg"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#search"></use></svg></button>
+            </form>
             <ul class="nav-list">
                 <li><a class="nav-link" href="/products" aria-current="page">Produkter</a></li>
                 <li><a class="nav-link" href="/userMgmt/login">Log ind</a></li>
-                <li><a class="nav-link" href="/userMgmt/signup">Opret konto</a></li>
+            </ul>
+            <p class="nav-drawer__label" id="nav-kategorier">Kategorier</p>
+            <ul class="nav-list nav-categories" aria-labelledby="nav-kategorier">
+                <li><a class="nav-link" href="/andre-symboler"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#star"></use></svg>Andre Symboler</a></li>
+                <li><a class="nav-link" href="/boeger"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#auto-stories"></use></svg>Bøger</a></li>
+                <li><a class="nav-link" href="/eliksirer"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#experiment"></use></svg>Eliksirer</a></li>
+                <li><a class="nav-link" href="/krystaller"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg>Krystaller</a></li>
+                <li><a class="nav-link" href="/lys"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#candle"></use></svg>Lys</a></li>
+                <li><a class="nav-link" href="/roegelse"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#local-fire-department"></use></svg>Røgelse</a></li>
+                <li><a class="nav-link" href="/urter"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#psychiatry"></use></svg>Urter</a></li>
+                <li><a class="nav-link" href="/andet"><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#category"></use></svg>Andet</a></li>
             </ul>
         </nav>
         <a class="cart-link" href="/basket" aria-label="Kurv, 3 varer">
@@ -57,6 +73,7 @@
             <li><a class="chip" href="#signaturer">Signaturer og ikoner</a></li>
             <li><a class="chip" href="#billeder">Billeder</a></li>
             <li><a class="chip" href="#admin">Admin</a></li>
+            <li><a class="chip" href="#listevaerktoejer">Søgning</a></li>
             <li><a class="chip" href="#kommende">Kommende</a></li>
         </ul>
     </nav>
@@ -198,6 +215,15 @@
         </form>
     </section>
 
+    <section id="adgangskode" aria-labelledby="adgangskode-titel">
+        <h2 id="adgangskode-titel">Adgangskodefelt</h2>
+        <p><code>assets/js/site.js</code> lægger en "Vis"/"Skjul"-knap ind i hvert adgangskodefelt.</p>
+        <div class="field sg-narrow">
+            <label for="sg-password">Adgangskode</label>
+            <input type="password" id="sg-password" name="sgpassword" autocomplete="off" value="hemmelig">
+        </div>
+    </section>
+
     <section id="chips" aria-labelledby="chips-titel">
         <h2 id="chips-titel">Chips</h2>
         <h3>Kategorier og tags (link-chips)</h3>
@@ -219,30 +245,61 @@
         </fieldset>
     </section>
 
+    <section id="listevaerktoejer" aria-labelledby="liste-titel">
+        <h2 id="liste-titel">Søgning og liste-værktøjer</h2>
+        <p>Søgefeltet sidder i navbaren (i skuffen på mobil) og på produktlisten. Mens man skriver, viser det op til seks varer (<code>/searchSuggestions</code>). "Kun på lager" og sorteringen er links, ét tryk hver.</p>
+        <div class="sg-search-demo">
+            <form class="list-search" method="get" action="#listevaerktoejer" role="search">
+                <label for="sg-q" class="visually-hidden">Søg i produkterne</label>
+                <input type="search" id="sg-q" name="sgq" maxlength="100" placeholder="Søg i produkterne" value="ame">
+                <button type="button" class="icon-button" aria-label="Søg"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#search"></use></svg></button>
+                <ul class="search-suggestions"><li><a href="#listevaerktoejer"><span class="search-suggestions__name">Ametyst-obelisk</span><span class="search-suggestions__meta">Krystaller, Fra 89,95 kr.</span></a></li><li><a href="#listevaerktoejer"><span class="search-suggestions__name">Ametyst</span><span class="search-suggestions__meta">Krystaller, Fra 89,95 kr.</span></a></li></ul>
+            </form>
+        </div>
+        <div class="list-tools">
+            <a class="chip" href="#listevaerktoejer" aria-current="true">Kun på lager</a>
+            <nav class="list-sort" aria-label="Sortering (eksempel)"><ul class="chip-set"><li><a class="chip" href="#listevaerktoejer" aria-current="true">Anbefalet</a></li><li><a class="chip" href="#listevaerktoejer">Nyeste</a></li><li><a class="chip" href="#listevaerktoejer">Billigst først</a></li><li><a class="chip" href="#listevaerktoejer">Dyrest først</a></li></ul></nav>
+        </div>
+        <h3>Købsfakta og købsbjælke</h3>
+        <p>Under "Læg i kurv" står levering og fragten for den valgte variant. På mobil ligger bjælken fast i bunden, mens den rigtige knap ikke er synlig (her vist på sin plads).</p>
+        <ul class="buy-facts"><li><svg class="icon icon--20" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#local-shipping"></use></svg><span>Sendes med GLS til en Pakkeshop. Fragt 45 kr., efter ordrens samlede vægt.</span></li></ul>
+        <div class="buy-bar sg-static"><p class="buy-bar__info"><span class="buy-bar__name">Ametyst-obelisk</span> <span class="buy-bar__price">89,95 kr.</span></p><button type="button">Læg i kurv</button></div>
+        <p>Årets hjul står på <a href="/#aarets-hjul">forsiden</a>.</p>
+    </section>
+
     <section id="kort" aria-labelledby="kort-titel">
         <h2 id="kort-titel">Produktkort</h2>
-        <p>Hele kortet er klikbart, og fokusringen ligger om hele kortet. Billedet er 1:1 på en mosgrøn flade med ametyst-glød.</p>
+        <p>Samme kort overalt (<code>productCard()</code> i <code>assets/php/products.php</code>). Hele kortet er klikbart. Billedet er 1:1 på en mosgrøn flade med ametyst-glød. Uden billede bliver kortet kompakt med kategoriens ikon i en lille bue. Udsolgte billeder mister farven.</p>
         <ul class="product-grid">
             <li class="product-card">
                 <div class="media-frame"><img src="/assets/images/obelisk.svg" alt="Stiliseret ametyst-obelisk på mos" width="300" height="300"></div>
                 <div class="product-card__body">
                     <p class="product-card__category">Krystaller</p>
                     <h3 class="product-card__name"><a class="product-card__link" href="#kort">Ametyst-obelisk</a></h3>
-                    <p class="product-card__price">Fra 149,00 kr.</p>
+                    <p class="product-card__price">Fra 149 kr.</p>
                     <p class="stock stock--in">På lager</p>
                 </div>
             </li>
-            <li class="product-card">
-                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg></div>
+            <li class="product-card product-card--soldout">
+                <div class="media-frame"><img src="/assets/images/obelisk.svg" alt="Stiliseret ametyst-obelisk, udsolgt" width="300" height="300"></div>
                 <div class="product-card__body">
-                    <p class="product-card__category">Røgelse</p>
-                    <h3 class="product-card__name"><a class="product-card__link" href="#kort">Røgelse, salvie</a></h3>
-                    <p class="product-card__price">39,00 kr.</p>
+                    <p class="product-card__category">Krystaller</p>
+                    <h3 class="product-card__name"><a class="product-card__link" href="#kort">Ametyst-obelisk, stor</a></h3>
+                    <p class="product-card__price">249 kr.</p>
                     <p class="stock">Udsolgt</p>
                 </div>
             </li>
-            <li class="product-card">
-                <div class="media-frame media-frame--empty"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#diamond"></use></svg></div>
+            <li class="product-card product-card--compact product-card--soldout">
+                <span class="arch-icon product-card__icon" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#local-fire-department"></use></svg></span>
+                <div class="product-card__body">
+                    <p class="product-card__category">Røgelse</p>
+                    <h3 class="product-card__name"><a class="product-card__link" href="#kort">Røgelse, salvie</a></h3>
+                    <p class="product-card__price">39 kr.</p>
+                    <p class="stock">Udsolgt</p>
+                </div>
+            </li>
+            <li class="product-card product-card--compact">
+                <span class="arch-icon product-card__icon" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="/assets/icons/icons.svg#category"></use></svg></span>
                 <div class="product-card__body">
                     <h3 class="product-card__name"><a class="product-card__link" href="#kort">Produkt uden kategori med et langt navn, der ombrydes</a></h3>
                     <p class="product-card__price">129,00 kr.</p>

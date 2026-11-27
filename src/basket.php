@@ -89,6 +89,21 @@ $messageOk = $message !== null && str_ends_with($message, 'lagt i kurven.');
                 <p>Find noget, der passer til din praksis.</p>
                 <a class="button" href="/products">Se produkterne</a>
             </div>
+            <?php // Not a dead end: the first products in the list's recommended order (in stock and with a picture first) ?>
+            <?php $basketSuggestions = loadProductCards(getDb(), [], [], PRODUCT_SORTS[PRODUCT_SORT_DEFAULT][1], 4); ?>
+            <?php if ($basketSuggestions): ?>
+                <section class="related" aria-labelledby="forslag">
+                    <div class="related__head">
+                        <h2 id="forslag">Fra butikken</h2>
+                        <a href="/products">Se alle</a>
+                    </div>
+                    <ul class="product-grid product-grid--row">
+                        <?php foreach ($basketSuggestions as $i => $product): ?>
+                            <?= productCard($product, $i, 'h3', 0) ?>
+                        <?php endforeach; ?>
+                    </ul>
+                </section>
+            <?php endif; ?>
         <?php else: ?>
             <div class="checkout-layout">
                 <div class="basket-lines">
