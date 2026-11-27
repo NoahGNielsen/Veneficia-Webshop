@@ -29,7 +29,7 @@ $builtAt = is_file($file) ? date('d-m-Y H:i', filemtime($file)) : null;
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/adminBar.php'; ?>
-    <main class="admin-page">
+    <main id="indhold" class="admin-page">
         <h1>Produkt-sitemap</h1>
         <?php if ($error !== ''): ?>
             <p class="auth-error" role="alert"><?= htmlspecialchars($error) ?></p>

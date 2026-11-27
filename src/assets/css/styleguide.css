@@ -228,4 +228,12 @@
   .demo-error .field-error {
     display: block;
   }
+
+  .sg-admin-menu {
+    max-width: 300px;
+  }
+
+  .sg-chart {
+    max-width: 560px;
+  }
 }

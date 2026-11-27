@@ -157,7 +157,7 @@ $codes = $db->query(
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/adminBar.php'; ?>
-    <main class="admin-page">
+    <main id="indhold" class="admin-page">
         <section>
             <h1>Rabatkoder</h1>
             <?php if (!$codes): ?>

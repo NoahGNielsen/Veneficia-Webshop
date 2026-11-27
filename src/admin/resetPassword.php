@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/adminBar.php'; ?>
-    <main class="admin-page">
+    <main id="indhold" class="admin-page">
         <form class="auth-form" method="post" action="/admin/resetPassword">
             <h1>Skift adgangskode</h1>
             <?php if ($changed): ?>

@@ -49,7 +49,7 @@ $employees = getDb()->query('SELECT employeeID, employeeUsername FROM VeneficiaE
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/adminBar.php'; ?>
-    <main class="admin-page">
+    <main id="indhold" class="admin-page">
         <section>
             <h1>Medarbejdere</h1>
             <table class="admin-table">

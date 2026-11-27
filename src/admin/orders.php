@@ -85,30 +85,38 @@ if ($orders) {
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/adminBar.php'; ?>
-    <main class="admin-page admin-list">
-        <h1>Ordrer</h1>
-        <form class="admin-list-head" method="get" action="/admin/orders">
-            <label for="status">Status</label>
-            <select id="status" name="status">
-                <option value="">Alle (<?= (int)array_sum($statusCounts) ?>)</option>
+    <main id="indhold" class="admin-page admin-list">
+        <div class="admin-list-head">
+            <h1>Ordrer</h1>
+            <?php // The search keeps the chosen status; the status chips keep the search ?>
+            <form class="admin-search" method="get" action="/admin/orders" role="search">
+                <?php if ($status !== ''): ?>
+                    <input type="hidden" name="status" value="<?= htmlspecialchars($status) ?>">
+                <?php endif; ?>
+                <label for="q" class="visually-hidden">Søg i ordrer</label>
+                <input type="search" id="q" name="q" maxlength="254" placeholder="Ordrenummer eller email" value="<?= htmlspecialchars($search) ?>">
+                <button type="submit" class="button--tonal"><?= uiIcon('search', 'icon--20') ?>Søg</button>
+            </form>
+        </div>
+        <?php // One click per status instead of a select and a button (Hick); the count shows where the work is ?>
+        <nav aria-label="Status">
+            <ul class="chip-set">
+                <li><a class="chip" href="<?= htmlspecialchars(ordersUrl('', $search)) ?>"<?= $status === '' ? ' aria-current="page"' : '' ?>>Alle <span class="chip__count"><?= (int)array_sum($statusCounts) ?></span></a></li>
                 <?php foreach (ORDER_STATUSES as $value => $label): ?>
-                    <option value="<?= htmlspecialchars($value) ?>" <?= $status === $value ? 'selected' : '' ?>><?= htmlspecialchars($label) ?> (<?= (int)($statusCounts[$value] ?? 0) ?>)</option>
+                    <li><a class="chip" href="<?= htmlspecialchars(ordersUrl($value, $search)) ?>"<?= $status === $value ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($label) ?> <span class="chip__count"><?= (int)($statusCounts[$value] ?? 0) ?></span></a></li>
                 <?php endforeach; ?>
-            </select>
-            <label for="q">Søg</label>
-            <input type="search" id="q" name="q" maxlength="254" placeholder="Ordrenummer eller email" value="<?= htmlspecialchars($search) ?>">
-            <button type="submit">Vis</button>
-            <?php if ($status !== '' || $search !== ''): ?>
-                <a href="/admin/orders">Nulstil</a>
-            <?php endif; ?>
-        </form>
+            </ul>
+        </nav>
+        <?php if ($search !== ''): ?>
+            <p class="admin-filter-note">Søgning: <strong><?= htmlspecialchars($search) ?></strong> <a href="<?= htmlspecialchars(ordersUrl($status, '')) ?>">Ryd søgningen</a></p>
+        <?php endif; ?>
 
         <?php if (!$orders): ?>
             <p>Der er ingen ordrer<?= $status !== '' || $search !== '' ? ' der passer til filteret' : ' endnu' ?>.</p>
         <?php else: ?>
             <table class="admin-table">
                 <thead>
-                    <tr><th>Ordre</th><th>Bestilt</th><th>Kunde</th><th>Varer</th><th>Total</th><th>Status</th></tr>
+                    <tr><th>Ordre</th><th>Bestilt</th><th>Kunde</th><th class="num">Varer</th><th class="num">Total</th><th>Status</th></tr>
                 </thead>
                 <tbody>
                     <?php foreach ($orders as $order): ?>
@@ -120,22 +128,22 @@ if ($orders) {
                         <tr class="admin-row">
                             <td><a href="/admin/order?id=<?= $id ?>">#<?= $id ?></a></td>
                             <td><?= htmlspecialchars(date('d-m-Y H:i', strtotime($order['ordredAt']))) ?></td>
-                            <td><?= htmlspecialchars($order['firstName'] . ' ' . $order['lastName']) ?><br><?= htmlspecialchars($order['email']) ?></td>
-                            <td><?= (int)$line['itemCount'] ?></td>
-                            <td><?= formatPrice($orderTotal) ?></td>
-                            <td><?= htmlspecialchars(orderStatusLabel($order['ordreStatus'])) ?></td>
+                            <td><?= htmlspecialchars($order['firstName'] . ' ' . $order['lastName']) ?><br><span class="text-muted"><?= htmlspecialchars($order['email']) ?></span></td>
+                            <td class="num"><?= (int)$line['itemCount'] ?></td>
+                            <td class="num"><?= formatPrice($orderTotal) ?></td>
+                            <td><span class="status status--<?= htmlspecialchars($order['ordreStatus']) ?>"><?= htmlspecialchars(orderStatusLabel($order['ordreStatus'])) ?></span></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
             <?php if ($pages > 1): ?>
-                <nav>
+                <nav class="admin-pagination" aria-label="Sider">
                     <?php if ($page > 1): ?>
-                        <a href="<?= htmlspecialchars(ordersUrl($status, $search, $page - 1)) ?>">Forrige</a>
+                        <a class="button button--outlined" href="<?= htmlspecialchars(ordersUrl($status, $search, $page - 1)) ?>"><?= uiIcon('chevron-left', 'icon--20') ?>Forrige</a>
                     <?php endif; ?>
-                    Side <?= $page ?> af <?= $pages ?>
+                    <span>Side <?= $page ?> af <?= $pages ?></span>
                     <?php if ($page < $pages): ?>
-                        <a href="<?= htmlspecialchars(ordersUrl($status, $search, $page + 1)) ?>">Næste</a>
+                        <a class="button button--outlined" href="<?= htmlspecialchars(ordersUrl($status, $search, $page + 1)) ?>">Næste<?= uiIcon('chevron-right', 'icon--20') ?></a>
                     <?php endif; ?>
                 </nav>
             <?php endif; ?>

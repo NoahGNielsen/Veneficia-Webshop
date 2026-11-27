@@ -425,7 +425,7 @@ $heading = $itemId === null ? 'Ny vare' : 'Ret vare';
 </head>
 <body>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/adminBar.php'; ?>
-    <main class="admin-page">
+    <main id="indhold" class="admin-page">
         <form class="item-form" method="post" action="/admin/item<?= $itemId === null ? '' : '?id=' . $itemId ?>" enctype="multipart/form-data">
             <a href="/admin/items">Alle varer</a>
             <h1><?= $heading ?></h1>
