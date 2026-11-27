@@ -12,8 +12,8 @@
 // (mainStyle.css's --palette-moss), so the phone's browser bar blends into the navbar; background_color in
 // manifest.json is --color-background (parchment). Update them together with mainStyle.css.
 //
-// The ?v= on each file is its last change, so browsers fetch it again after an update. A file that doesn't exist yet
-// (the icons, until they're made) gets no ?v= instead of a warning.
+// The ?v= on each file is its last change, so browsers fetch it again after an update. A file that doesn't exist gets
+// no ?v= instead of a warning. The favicon and the app icons are the logo's mark (MASTER.md, "Logo").
 //
 // The canonical URL is the page's clean path without the query string, so /userMgmt/login?return=%2F counts as
 // /userMgmt/login, and /index as /. Error pages (anything that isn't a 200) are noindex, so they get none. A page whose

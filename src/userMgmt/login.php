@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <main class="auth-page">
-        <a class="brand auth-brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <a class="auth-brand" href="/"><img src="<?= htmlspecialchars($headerVersion('/assets/images/logo.svg')) ?>" alt="Veneficia" width="128" height="162"></a>
         <form class="auth-form" method="post" action="/userMgmt/login<?= htmlspecialchars($nextQuery) ?>">
             <h1>Log ind</h1>
             <?php if ($error !== ''): ?>

@@ -1,5 +1,5 @@
 /* Log in and sign up (userMgmt/), and the admin pages that use the same form card (admin/login, resetPassword, ...).
-   No top app bar here, so the wordmark above the card leads back to the shop. The admin forms put label and input
+   No top app bar here, so the logo above the card leads back to the shop. The admin forms put label and input
    straight after each other, ours wrap each pair in a .field; both get the same spacing. */
 @layer pages {
   .auth-page {
@@ -10,8 +10,8 @@
     padding-block: var(--space-7) var(--space-8);
   }
 
-  .auth-brand {
-    font-size: 1.75rem;
+  .auth-brand img {
+    display: block;
   }
 
   /* M3 form card: canvas, radius 28, elevation 1 */

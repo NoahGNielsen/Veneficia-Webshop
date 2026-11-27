@@ -14,7 +14,7 @@ if (!headers_sent()) {
 </head>
 <body>
     <main class="status-page">
-        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <a class="status-brand" href="/"><img src="<?= htmlspecialchars($headerVersion('/assets/images/logo.svg')) ?>" alt="Veneficia" width="112" height="142"></a>
         <p class="status-code"><span class="visually-hidden">Fejl </span>410</p>
         <h1>Siden er fjernet</h1>
         <p class="status-message">Siden er fjernet for altid og kommer ikke tilbage.</p>

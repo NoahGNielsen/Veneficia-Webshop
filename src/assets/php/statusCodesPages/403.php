@@ -14,7 +14,7 @@ if (!headers_sent()) {
 </head>
 <body>
     <main class="status-page">
-        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <a class="status-brand" href="/"><img src="<?= htmlspecialchars($headerVersion('/assets/images/logo.svg')) ?>" alt="Veneficia" width="112" height="142"></a>
         <p class="status-code"><span class="visually-hidden">Fejl </span>403</p>
         <h1>Du har ikke adgang til denne side</h1>
         <p class="status-message">Enten er du ikke logget ind, eller også har din konto ikke adgang til siden.</p>

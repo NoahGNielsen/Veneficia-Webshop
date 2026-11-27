@@ -27,10 +27,10 @@ $navBasketLabel = 'Kurv' . match (true) {
 <header class="navbar on-secondary">
     <a class="skip-link" href="#indhold">Spring til indhold</a>
     <div class="navbar__inner container">
-        <a class="brand" href="/"><?= uiIcon('crescent') ?>Veneficia</a>
+        <a class="brand" href="/"><?= uiIcon('logo') ?>Veneficia</a>
         <nav id="menu" class="nav-drawer" popover aria-label="Hovedmenu">
             <div class="nav-drawer__header">
-                <span class="brand"><?= uiIcon('crescent') ?>Veneficia</span>
+                <span class="brand"><?= uiIcon('logo') ?>Veneficia</span>
                 <button type="button" class="icon-button" popovertarget="menu" popovertargetaction="hide" aria-label="Luk menu"><?= uiIcon('close') ?></button>
             </div>
             <ul class="nav-list">

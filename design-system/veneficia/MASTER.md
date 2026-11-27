@@ -240,13 +240,28 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 ### Ikoner
 - Ét sæt: **Material Symbols Rounded** (Apache-2.0, vægt 400). Kun de ikoner, vi bruger, i én sprite `src/assets/icons/icons.svg` (`<symbol id="…">` + `<svg><use href="/assets/icons/icons.svg#…"></svg>`). Licensen ligger ved siden af.
 - I PHP indsættes et ikon med `uiIcon('navn')` (defineret i `header.php`). Spriten får `?v=` til cache-busting.
-- Ikonerne i spriten (20 Material): `menu`, `close`, `shopping-bag`, `chevron-left`, `chevron-right`, `delete`, `diamond`, `local-shipping`, `menu-book`, `home`, `search`, `candle`, `psychiatry`, `auto-stories`, `wand-stars`, `experiment`, `star`, `wine-bar`, `local-fire-department` og `category`. Dertil kommer de egne symboler `crescent` og `moon-phases`.
+- Ikonerne i spriten (20 Material): `menu`, `close`, `shopping-bag`, `chevron-left`, `chevron-right`, `delete`, `diamond`, `local-shipping`, `menu-book`, `home`, `search`, `candle`, `psychiatry`, `auto-stories`, `wand-stars`, `experiment`, `star`, `wine-bar`, `local-fire-department` og `category`. Dertil kommer de egne symboler `crescent`, `moon-0` til `moon-7` og `logo` (logoets mærke).
 - **Kategori-ikoner** vælges ud fra kategoriens slug i `HOME_CATEGORY_ICONS` i `index.php`: krystaller og smykker → `diamond`, røgelse → `local-fire-department`, lys → `candle`, urter og eliksir-ingredienser → `psychiatry`, eliksirer → `experiment`, bøger → `auto-stories`, trylleformularer → `menu-book`, stave → `wand-stars`, rituelle genstande → `wine-bar`, religiøse og andre symboler → `star`, stjernetegn → `crescent`. Alt andet, også nye kategorier, får `category`. Kommer der en ny kategori, så tilføj dens slug.
 - Ikoner, som CSS selv tegner (chip-check, brødkrumme-chevron og banner-ikoner), er mask-tokens (`--icon-*`) i `:root`. De har ingen farve og arver `currentColor`. Select-pilen er den eneste med farve i (Oliven).
 - Størrelser: 20px (`.icon--20`, inline), 24px (standard), 40px (`.icon--40`).
 - `fill: currentColor`, så ikonet arver kontekstens farve.
 - Dekorative ikoner får `aria-hidden="true"`. Ikon-knapper får en dansk `aria-label`.
 - Ingen emoji som ikoner.
+
+### Logo
+Logoet er Augusts tegning: et pentagram med månens faser i en ramme af to firkanter, over ordet VENEFICIA i Cinzel. Farven er Nattegrøn (`#1F2619`), samme farve som i paletten.
+
+| Fil | Indhold | Bruges |
+|---|---|---|
+| `icons.svg#logo` | mærket, `currentColor` | `uiIcon('logo')` i `.brand` (top app bar, menu og footer) ved siden af wordmarket "Veneficia" i Cinzel |
+| `assets/images/logo.svg` | mærket og ordet, Nattegrøn | `<img alt="Veneficia">` over kortet på log ind og opret konto (128px bred) og på fejlsiderne (112px) |
+| `assets/images/favicon.svg` | mærket, kvadratisk | favicon. Nattegrøn, og Pergament når fanelinjen er mørk |
+| `appIcon192/512.png`, `appIconMaskable192/512.png`, `appleTouchIcon.png` | mærket i Pergament på Mosgrøn | manifestets ikoner og iOS. Mærket fylder 76 % (any), 66 % (maskable, hele mærket inden for den midterste cirkel på 80 %) og 70 % (iOS) |
+
+- **SVG'erne er tracet** fra logoets PNG (alfa-kanten ved 50 %, forenklet med højst 0,8px afvigelse på 2000px-tegningen). De afviger under 5 % fra originalen målt pixel for pixel, og de er skarpe i alle størrelser. PNG-ikonerne er skaleret direkte ned fra originalens pixels.
+- **Farver:** Nattegrøn på lys bund og Pergament på Mosgrøn. Ingen andre farver, skygger eller effekter.
+- **Mindste størrelse:** 32px for mærket. Under det forsvinder rammens tynde streger (favicon'et er undtaget).
+- **Månen** (`crescent`) er ikke længere logoet. Den bruges kun til stjernetegn og ordrebekræftelsen.
 
 ### Produktbilleder (regler til Blender-renders)
 - **Format:** 1:1, eksportér 1200 × 1200 px som **WebP**, højst ca. **200 kB** pr. billede.
@@ -313,8 +328,8 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | Kurv | `basket.php` → `products.css` | Trin 1, varelinjer (`.basket-lines`) + sticky opsummeringskort (`.summary`) med "Gå til kassen" (filled `--block`) og "Fortsæt med at handle". "Opdater" er tonal, og "Fjern" er en text-knap med ikon. Begge har varens navn som skjult tekst for skærmlæsere. |
 | Kasse | `checkout.php` → `products.css` | Trin 2. Fejlopsummeringen står øverst (`role="alert"`, `tabindex="-1"`, `autofocus`). `<aside class="summary">` med ordreoversigt og rabatkode står først i DOM'en, så ordren læses før man bestiller (og står først på mobil). Fra 840px står leveringsformularen til venstre og oversigten til højre. Totalen gentages lige over knappen **"Bestil og betal"**. En godkendt rabatkode giver et succesbanner med "magisk støv" (`.magic-dust`, 600ms, kun opacity og transform). |
 | Ordrebekræftelse | `ordreConfimation.php` → `products.css` | Trin 3, bue med måne, "Tak for din ordre, navn!", ordrenummer i Lora, kort med levering + varer, "Shop videre". `@media print` |
-| Log ind / Opret | `userMgmt/*.php` → `usermgnt.css` | Wordmark-link + centreret kort (Lærred, radius 28, elevation 1) |
-| Fejlsider (10) | `statusCodesPages/*.php` → `statusCodePage.css` | Dansk, statuskode i Cinzel (Mosgrøn), venlig h1, "Til forsiden" + "Se produkterne". **Ingen navbar** (rammer databasen). |
+| Log ind / Opret | `userMgmt/*.php` → `usermgnt.css` | Hele logoet som link + centreret kort (Lærred, radius 28, elevation 1) |
+| Fejlsider (10) | `statusCodesPages/*.php` → `statusCodePage.css` | Dansk, hele logoet øverst som link til forsiden, statuskode i Cinzel (Mosgrøn), venlig h1, "Til forsiden" + "Se produkterne". **Ingen navbar** (rammer databasen). |
 | Juridiske | `legal/*.php` → (kun mainStyle) | Side-skal: navbar, h1, "Teksten er på vej.", footer |
 | Admin | `admin/*.php` → `admin.css` (+ `usermgnt.css` til formular-kortene) | Let hånd: mosgrøn admin-bar (`.on-secondary`) med outlined "Log ud". Tabeller på Lærred med Sand-kant, og hele rækken er klikbar. "Slet" (`button[name="delete"]`) er outlined i fejlfarven. `itemForm.js`' knapper er tonale. Formularerne i `.auth-form`/`.item-form` har 8px fra label til felt og 20px mellem felterne. Layout og adfærd er uændret. |
 
