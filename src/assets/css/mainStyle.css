@@ -122,12 +122,12 @@
     --font-brand: "Cinzel", "Lora", Georgia, serif;
     --font-serif: "Lora", Georgia, serif;
     --font-sans: "Raleway", system-ui, sans-serif;
-    --font-size-display: clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem);
-    --font-size-headline-large: clamp(1.875rem, 1.4rem + 1.8vw, 2.5rem);
-    --font-size-headline-medium: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
-    --font-size-title-large: 1.25rem;
-    --font-size-title-medium: 1.0625rem;
-    --font-size-body-large: 1.0625rem;
+    --font-size-display: clamp(2.5rem, 1.6rem + 3.6vw, 4rem);
+    --font-size-headline-large: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+    --font-size-headline-medium: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+    --font-size-title-large: 1.375rem;
+    --font-size-title-medium: 1.125rem;
+    --font-size-body-large: 1.125rem;
     --font-size-body: 1rem;
     --font-size-label-large: .9375rem;
     --font-size-label-medium: .875rem;
@@ -247,7 +247,7 @@
     color: var(--ctx-text);
     font-family: var(--font-sans);
     font-size: var(--font-size-body);
-    font-weight: 400;
+    font-weight: 450;
     line-height: 1.6;
     /* Raleway's default figures are old-style (3, 4, 5, 7 and 9 hang below the line) */
     font-variant-numeric: lining-nums;
@@ -478,7 +478,7 @@
     --button-fg: var(--color-on-primary-container);
   }
 
-  /* A sent form's button (the script in header.php): a spinner after the text at once, and no second send */
+  /* A sent form's button (assets/js/site.js): a spinner after the text at once, and no second send */
   :where(button, .button)[aria-busy="true"] {
     cursor: progress;
   }
@@ -617,7 +617,7 @@
   }
 
   /* Required fields get an asterisk (hidden from screen readers, which announce "required" themselves) */
-  :is(.field:has(:required) > label, label:has(+ :is(input, select, textarea):required))::after {
+  :is(.field:has(:required) > label, label:has(+ :is(input, select, textarea):required), label:has(+ .password-field > :required))::after {
     content: " *";
     content: " *" / "";
     color: var(--color-error);
@@ -872,10 +872,12 @@
     font-weight: 500;
   }
 
+  /* The card's own colour, also on a moss band (headings otherwise take the context's text colour) */
   .product-card__name {
     margin: 0;
+    color: inherit;
     font-family: var(--font-serif);
-    font-size: var(--font-size-title-medium);
+    font-size: var(--font-size-body);
     font-weight: 600;
     line-height: 1.35;
     overflow-wrap: anywhere;
@@ -906,7 +908,26 @@
   .product-card__price {
     margin-top: auto;
     padding-top: var(--space-2);
-    font-weight: 600;
+    font-size: var(--font-size-title-medium);
+    font-weight: 700;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  /* No picture yet: the category's icon in a small arch at the top instead of a square placeholder, so a list of
+     them stays short and calm (productCard() in assets/php/products.php) */
+  .product-card__icon {
+    width: 40px;
+    margin: var(--space-4) var(--space-4) 0;
+  }
+
+  .product-card__icon .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Sold out: the picture loses its colour (the text keeps its contrast and says "Udsolgt") */
+  .product-card--soldout .media-frame img {
+    filter: saturate(.35);
   }
 
   .product-card:hover::before {
@@ -1333,6 +1354,136 @@
     }
   }
 
+  /* ---- Search in the top app bar (in the drawer on phones) ---- */
+  .nav-search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
+  }
+
+  .nav-search input {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    border-color: transparent;
+    border-radius: var(--radius-full);
+  }
+
+  /* Suggestions under a search field while typing (assets/js/site.js) */
+  form[role="search"] {
+    position: relative;
+  }
+
+  .search-suggestions {
+    position: absolute;
+    top: calc(100% + var(--space-1));
+    left: 0;
+    z-index: var(--z-overlay);
+    width: max(100%, 320px);
+    max-width: calc(100vw - 2 * var(--gutter));
+    margin: 0;
+    padding: var(--space-1) 0;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    box-shadow: var(--elevation-3);
+    list-style: none;
+  }
+
+  .search-suggestions[hidden] {
+    display: none;
+  }
+
+  .search-suggestions a {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2) var(--space-4);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .search-suggestions a:hover {
+    background: var(--color-primary-container);
+  }
+
+  .search-suggestions a:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+    background: var(--color-primary-container);
+  }
+
+  .search-suggestions__name {
+    font-weight: 600;
+  }
+
+  .search-suggestions__meta {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-label-medium);
+  }
+
+  /* The drawer's categories (phones), under a label like the admin's groups */
+  .nav-drawer__label {
+    margin: var(--space-5) 0 var(--space-1);
+    padding: 0 var(--space-5);
+    color: var(--ctx-text-muted);
+    font-size: var(--font-size-label-medium);
+    font-weight: 600;
+  }
+
+  .nav-categories .nav-link {
+    min-height: 44px;
+    font-weight: 500;
+  }
+
+  .nav-categories .icon {
+    color: var(--ctx-link);
+  }
+
+  @media (min-width: 840px) {
+    .nav-search {
+      margin: 0 var(--space-3) 0 0;
+    }
+
+    .nav-search input {
+      width: clamp(160px, 18vw, 260px);
+      min-height: 40px;
+      padding-block: var(--space-2);
+    }
+
+    .nav-drawer__label,
+    .nav-categories {
+      display: none;
+    }
+  }
+
+  /* ---- Password fields: a "Vis"/"Skjul" text button inside the field (added by assets/js/site.js) ---- */
+  .password-field {
+    position: relative;
+    display: block;
+  }
+
+  .password-field input {
+    width: 100%;
+    padding-right: 72px;
+  }
+
+  .password-toggle {
+    --button-bg: transparent;
+    --button-fg: var(--color-primary);
+    position: absolute;
+    top: 50%;
+    right: var(--space-1);
+    min-height: 40px;
+    padding: 0 var(--space-3);
+    transform: translateY(-50%);
+  }
+
+  .password-toggle:active {
+    transform: translateY(-50%) scale(.98);
+  }
+
   /* ---- Footer ---- */
   .footer {
     padding: var(--space-6) 0 var(--space-7);
@@ -1369,12 +1520,21 @@
     color: var(--ctx-text-muted);
   }
 
+  /* The business's contact details (footer.php), one per line */
+  .footer__contact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    font-style: normal;
+  }
+
   @media (min-width: 840px) {
     .footer__grid {
       grid-template-columns: 1fr auto;
       align-items: center;
     }
 
+    .footer__contact,
     .footer__copy {
       grid-column: 1 / -1;
     }

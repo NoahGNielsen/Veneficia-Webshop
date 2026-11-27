@@ -1,5 +1,7 @@
 <?php
-// One product: /category/product-name-5 (see productUrl()). Shows its images, description, tags and every variant with price and stock.
+// One product: /category/product-name-5 (see productUrl()). Shows its images, the buy box (variants as chips; price,
+// stock and shipping follow the chosen one), description, tags and more products from the same category. On phones a
+// bar with the price and "Læg i kurv" stays at the bottom while the real button is out of sight.
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/products.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/basket.php';
@@ -21,7 +23,7 @@ if ($itemId) {
 if ($item) {
     // Default variant first, the rest in the order they were added
     $stmt = $db->prepare(
-        'SELECT itemVariantId, varriantType, varriantName, varriantPrice, inventoryCount FROM VeneficiaItemVariants
+        'SELECT itemVariantId, varriantType, varriantName, varriantPrice, inventoryCount, varriantWeight FROM VeneficiaItemVariants
          WHERE itemId = ? ORDER BY itemVariantId = ? DESC, itemVariantId'
     );
     $stmt->execute([$itemId, (int)$item['itemDefaultVariant']]);
@@ -102,6 +104,47 @@ foreach ($variants as $variant) {
 $basketMessageOk = $basketMessage !== null && str_ends_with($basketMessage, 'lagt i kurven.');
 $categoryPath = categoryPagePath((string)$item['categoryName']);
 $navSection = 'products';
+
+// What the buy box says about a variant: its price, its stock (honest scarcity: the real count when 5 or fewer are
+// left) and what one unit costs to ship. The chips carry the same as data-* for the script at the bottom.
+function variantStockText(int $count): string
+{
+    return match (true) {
+        $count <= 0 => 'Udsolgt',
+        $count <= 5 => 'Kun ' . $count . ' på lager',
+        default => 'På lager',
+    };
+}
+function variantShippingText(?int $grams): string
+{
+    $price = shippingPriceFor($grams);
+    return $price === null ? 'fra ' . formatPriceShort(min(SHIPPING_RATES)) : formatPriceShort($price);
+}
+$shownVariant = $variants[0];
+foreach ($variants as $variant) {
+    if ((int)$variant['itemVariantId'] === $defaultVariantId) {
+        $shownVariant = $variant;
+    }
+}
+$variantData = fn(array $variant): string => ' data-price="' . htmlspecialchars(formatPriceShort($variant['varriantPrice'])) . '"'
+    . ' data-stock="' . htmlspecialchars(variantStockText((int)$variant['inventoryCount'])) . '"'
+    . ' data-in-stock="' . ((int)$variant['inventoryCount'] > 0 ? '1' : '0') . '"'
+    . ' data-shipping="' . htmlspecialchars(variantShippingText($variant['varriantWeight'] === null ? null : (int)$variant['varriantWeight'])) . '"';
+// The price at the top: the chosen variant's when one is in stock, otherwise the lowest
+$shownPrice = $defaultVariantId !== null || min($prices) === max($prices)
+    ? formatPriceShort($shownVariant['varriantPrice'])
+    : 'Fra ' . formatPriceShort(min($prices));
+
+// More from the same category (in stock and with a picture first), or from the whole shop when it has no category
+$relatedCategoryId = (int)($options['categories'][0] ?? 0);
+$relatedParams = [$itemId];
+$relatedWhere = ['i.itemId <> ?'];
+if ($relatedCategoryId > 0 && $categoryPath !== null) {
+    $relatedWhere[] = 'pc.categoryId = ?';
+    $relatedParams[] = $relatedCategoryId;
+}
+$related = loadProductCards($db, $relatedWhere, $relatedParams, PRODUCT_SORTS[PRODUCT_SORT_DEFAULT][1], 4);
+$relatedHeading = count($relatedWhere) > 1 ? 'Mere fra ' . $item['categoryName'] : 'Andre varer';
 ?>
 <!DOCTYPE html>
 <html lang="da">
@@ -122,7 +165,8 @@ $navSection = 'products';
     <main id="indhold" class="product-page">
         <nav class="breadcrumbs" aria-label="Brødkrumme">
             <ol>
-                <li><a href="/products">Alle produkter</a></li>
+                <li><a href="/">Forside</a></li>
+                <li><a href="/products">Produkter</a></li>
                 <?php if ($categoryPath !== null): ?>
                     <li><a href="<?= htmlspecialchars($categoryPath) ?>"><?= htmlspecialchars($item['categoryName']) ?></a></li>
                 <?php endif; ?>
@@ -148,14 +192,14 @@ $navSection = 'products';
 
             <div class="product-info">
                 <h1><?= htmlspecialchars($item['itemName']) ?></h1>
-                <p class="product-price"><?= min($prices) === max($prices) ? formatPrice(min($prices)) : 'Fra ' . formatPrice(min($prices)) ?></p>
-                <p class="stock<?= $inStock ? ' stock--in' : '' ?>"><?= $inStock ? 'På lager' : 'Udsolgt' ?></p>
+                <p class="product-price" data-variant-price><?= htmlspecialchars($shownPrice) ?></p>
+                <p class="stock<?= $inStock ? ' stock--in' : '' ?>" data-variant-stock><?= htmlspecialchars($inStock ? variantStockText((int)$shownVariant['inventoryCount']) : 'Udsolgt') ?></p>
 
                 <?php if ($basketMessage !== null): ?>
                     <p class="banner <?= $basketMessageOk ? 'banner--success' : 'banner--error' ?>" role="status"><?= htmlspecialchars($basketMessage) ?> <a href="/basket">Gå til kurven</a></p>
                 <?php endif; ?>
                 <?php if ($inStock): ?>
-                    <form class="product-add" method="post" action="/basket">
+                    <form class="product-add" id="product-add" method="post" action="/basket">
                         <?php // Guests without a session have no token yet; /basket checks the Origin header for them instead ?>
                         <input type="hidden" name="csrfToken" value="<?= htmlspecialchars($basketToken) ?>">
                         <input type="hidden" name="action" value="add">
@@ -167,22 +211,26 @@ $navSection = 'products';
                                         $variantInStock = (int)$variant['inventoryCount'] > 0;
                                     ?>
                                         <label class="chip">
-                                            <input type="radio" name="variantId" value="<?= (int)$variant['itemVariantId'] ?>" required<?= $variantInStock ? '' : ' disabled' ?><?= (int)$variant['itemVariantId'] === $defaultVariantId ? ' checked' : '' ?>>
+                                            <input type="radio" name="variantId" value="<?= (int)$variant['itemVariantId'] ?>" required<?= $variantInStock ? '' : ' disabled' ?><?= (int)$variant['itemVariantId'] === $defaultVariantId ? ' checked' : '' ?><?= $variantData($variant) ?>>
                                             <span class="chip__name"><?= htmlspecialchars($types ? implode(' / ', $variant['values']) : $variant['varriantName']) ?></span>
-                                            <span class="chip__price"><?= $variantInStock ? formatPrice($variant['varriantPrice']) : 'Udsolgt' ?></span>
+                                            <span class="chip__price"><?= $variantInStock ? formatPriceShort($variant['varriantPrice']) : 'Udsolgt' ?></span>
                                         </label>
                                     <?php endforeach; ?>
                                 </div>
                             </fieldset>
                         <?php else: ?>
-                            <input type="hidden" name="variantId" value="<?= (int)$variants[0]['itemVariantId'] ?>">
+                            <input type="hidden" name="variantId" value="<?= (int)$variants[0]['itemVariantId'] ?>"<?= $variantData($variants[0]) ?>>
                         <?php endif; ?>
                         <div class="field">
                             <label for="amount">Antal</label>
                             <input type="number" id="amount" name="amount" value="1" min="1" max="<?= BASKET_MAX_AMOUNT ?>" required inputmode="numeric">
                         </div>
-                        <button type="submit" class="button--large button--block">Læg i kurv</button>
+                        <button type="submit" class="button--large button--block" id="add-button">Læg i kurv</button>
                     </form>
+                    <?php // Delivery, right where the decision is made: GLS to a parcel shop, and what one unit costs to ship ?>
+                    <ul class="buy-facts">
+                        <li><?= uiIcon('local-shipping', 'icon--20') ?><span>Sendes med GLS til en Pakkeshop. Fragt <span data-variant-shipping><?= htmlspecialchars(variantShippingText($shownVariant['varriantWeight'] === null ? null : (int)$shownVariant['varriantWeight'])) ?></span>, efter ordrens samlede vægt.</span></li>
+                    </ul>
                 <?php else: ?>
                     <div class="product-soldout">
                         <p class="type-title-large">Udsolgt lige nu</p>
@@ -200,48 +248,6 @@ $navSection = 'products';
                 </section>
             <?php endif; ?>
 
-            <section aria-labelledby="varianter">
-                <h2 id="varianter"><?= count($variants) > 1 ? 'Varianter' : 'Pris og lager' ?></h2>
-                <div class="table-scroll" role="region" aria-labelledby="varianter" tabindex="0">
-                    <table class="product-variants">
-                        <thead>
-                            <tr>
-                                <?php if ($types): ?>
-                                    <?php foreach ($types as $type): ?>
-                                        <th scope="col"><?= htmlspecialchars($type) ?></th>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <th scope="col">Variant</th>
-                                <?php endif; ?>
-                                <th scope="col" class="num">Pris</th>
-                                <th scope="col">Lager</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($variants as $variant): ?>
-                                <tr>
-                                    <?php if ($types): ?>
-                                        <?php foreach ($variant['values'] as $value): ?>
-                                            <td><?= htmlspecialchars($value) ?></td>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <td><?= htmlspecialchars($variant['varriantName']) ?></td>
-                                    <?php endif; ?>
-                                    <td class="num"><?= formatPrice($variant['varriantPrice']) ?></td>
-                                    <td>
-                                        <?php if ((int)$variant['inventoryCount'] > 0): ?>
-                                            <span class="stock stock--in">På lager (<?= (int)$variant['inventoryCount'] ?>)</span>
-                                        <?php else: ?>
-                                            <span class="stock">Udsolgt</span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
             <?php if ($tags): ?>
                 <section aria-labelledby="tags">
                     <h2 id="tags">Tags</h2>
@@ -253,6 +259,46 @@ $navSection = 'products';
                 </section>
             <?php endif; ?>
         </div>
+
+        <?php if ($related): ?>
+            <section class="related" aria-labelledby="mere">
+                <div class="related__head">
+                    <h2 id="mere"><?= htmlspecialchars($relatedHeading) ?></h2>
+                    <a href="<?= htmlspecialchars($categoryPath !== null && $relatedCategoryId > 0 ? $categoryPath : '/products') ?>">Se alle</a>
+                </div>
+                <ul class="product-grid product-grid--row">
+                    <?php foreach ($related as $i => $product): ?>
+                        <?= productCard($product, $i, 'h3', 0) ?>
+                    <?php endforeach; ?>
+                </ul>
+            </section>
+        <?php endif; ?>
+
+        <?php if ($inStock): ?>
+            <?php // Phones: the price and the button stay in reach while the real button is out of sight (assets/js/site.js) ?>
+            <div class="buy-bar" data-sticky-for="add-button" hidden>
+                <p class="buy-bar__info"><span class="buy-bar__name"><?= htmlspecialchars($item['itemName']) ?></span> <span class="buy-bar__price" data-variant-price><?= htmlspecialchars($shownPrice) ?></span></p>
+                <button type="submit" form="product-add">Læg i kurv</button>
+            </div>
+            <script>
+                // The chosen variant's price, stock and shipping in the buy box and the bar. Without JavaScript the page
+                // shows the first variant's.
+                (() => {
+                    const form = document.getElementById('product-add');
+                    const show = (input) => {
+                        if (!input || !input.dataset.price) return;
+                        document.querySelectorAll('[data-variant-price]').forEach((el) => { el.textContent = input.dataset.price; });
+                        const stock = document.querySelector('[data-variant-stock]');
+                        stock.textContent = input.dataset.stock;
+                        stock.classList.toggle('stock--in', input.dataset.inStock === '1');
+                        const shipping = document.querySelector('[data-variant-shipping]');
+                        if (shipping) shipping.textContent = input.dataset.shipping;
+                    };
+                    form.addEventListener('change', (event) => { if (event.target.name === 'variantId') show(event.target); });
+                    show(form.querySelector('input[name="variantId"]:checked'));
+                })();
+            </script>
+        <?php endif; ?>
     </main>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/footer.php'; ?>
 </body>

@@ -137,6 +137,175 @@
     padding-block: var(--space-8);
   }
 
+  /* A section's heading with "Se alle" on the right */
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+
+  .home-section .section-head :is(h2, h3) {
+    margin: 0;
+  }
+
+  .home-products .product-grid {
+    margin-bottom: 0;
+  }
+
+  /* ---- The Wheel of the Year (moss band): the wheel left, the next sabbat and the coming eight right ---- */
+  .wheel-section__inner {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .wheel {
+    justify-self: center;
+    width: min(100%, 480px);
+    height: auto;
+  }
+
+  .wheel__ring {
+    fill: none;
+    stroke: var(--ctx-outline);
+    stroke-width: 1;
+    opacity: .6;
+  }
+
+  /* The season so far: from the last sabbat to today, in lavender (5.10:1 on moss) */
+  .wheel__season {
+    fill: none;
+    stroke: var(--ctx-link);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .wheel__sabbat {
+    fill: var(--color-secondary);
+    stroke: var(--ctx-text);
+    stroke-width: 1.5;
+  }
+
+  .wheel__sabbat--next {
+    fill: var(--ctx-link);
+    stroke: none;
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-secondary-accent) 60%, transparent));
+  }
+
+  .wheel__today {
+    fill: var(--ctx-text);
+  }
+
+  .wheel__label {
+    fill: var(--ctx-text-muted);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .wheel__label--next {
+    fill: var(--ctx-text);
+    font-size: 15px;
+  }
+
+  .wheel__center {
+    fill: var(--ctx-text);
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .wheel__center--small {
+    fill: var(--ctx-text-muted);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .wheel-section h2 {
+    margin-top: 0;
+  }
+
+  .wheel-section__text > p {
+    max-width: var(--measure);
+  }
+
+  /* The coming eight: name, date, meaning; the next one marked with a lavender bar */
+  .wheel-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    gap: var(--space-2) var(--space-5);
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .wheel-list li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 var(--space-3);
+    padding: var(--space-2) 0 var(--space-2) var(--space-3);
+    border-left: 2px solid color-mix(in srgb, var(--color-on-secondary) 25%, transparent);
+  }
+
+  .wheel-list .wheel-list__next {
+    border-left-color: var(--ctx-link);
+  }
+
+  .wheel-list__name {
+    font-family: var(--font-serif);
+    font-weight: 600;
+  }
+
+  .wheel-list__date {
+    color: var(--ctx-text-muted);
+    font-size: var(--font-size-label-medium);
+    font-variant-numeric: lining-nums;
+  }
+
+  .wheel-list__meaning {
+    grid-column: 1 / -1;
+    color: var(--ctx-text-muted);
+    font-size: var(--font-size-label-medium);
+  }
+
+  .wheel-products {
+    margin-top: var(--space-7);
+  }
+
+  .wheel-products .product-grid {
+    margin-bottom: 0;
+  }
+
+  /* Phones: the wheel is about 300px wide, so its text is drawn larger to stay at 11px or more on screen */
+  @media (max-width: 599.98px) {
+    .wheel__label {
+      font-size: 20px;
+    }
+
+    .wheel__label--next {
+      font-size: 22px;
+    }
+
+    .wheel__center {
+      font-size: 28px;
+    }
+
+    .wheel__center--small {
+      font-size: 20px;
+    }
+  }
+
+  @media (min-width: 840px) {
+    .wheel-section__inner {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-8);
+    }
+  }
+
   .home-section h2 {
     margin-top: 0;
     margin-bottom: var(--space-6);

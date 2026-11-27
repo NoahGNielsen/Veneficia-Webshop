@@ -315,7 +315,7 @@ $messageOk = $message === 'Rabatkoden er tilføjet.';
                     <?php elseif ($tooHeavy): ?>
                         <p class="banner banner--error">Ordren vejer over 20 kg og kan ikke sendes. <a href="/basket">Del den op i flere ordrer</a>.</p>
                     <?php else: ?>
-                        <form class="checkout-form form-stack" method="post" action="/checkout">
+                        <form class="checkout-form form-stack" id="checkout-form" method="post" action="/checkout">
                             <input type="hidden" name="csrfToken" value="<?= htmlspecialchars(csrfToken()) ?>">
                             <input type="hidden" name="basketFingerprint" value="<?= htmlspecialchars(basketFingerprint($items, $code)) ?>">
 
@@ -340,8 +340,13 @@ $messageOk = $message === 'Rabatkoden er tilføjet.';
                             </div>
 
                             <p class="checkout-total"><span>Total</span> <span><?= formatPrice($total) ?></span></p>
-                            <button type="submit" class="button--large button--block">Bestil og betal</button>
+                            <button type="submit" class="button--large button--block" id="order-button">Bestil og betal</button>
                         </form>
+                        <?php // Phones: the total and the button stay in reach until the real button is in sight (assets/js/site.js) ?>
+                        <div class="buy-bar" data-sticky-for="order-button" hidden>
+                            <p class="buy-bar__info"><span class="buy-bar__name">Total</span> <span class="buy-bar__price"><?= formatPrice($total) ?></span></p>
+                            <button type="submit" form="checkout-form">Bestil og betal</button>
+                        </div>
                     <?php endif; ?>
                 </section>
             </div>

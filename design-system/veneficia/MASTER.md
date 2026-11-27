@@ -11,7 +11,7 @@
 **Kategori:** E-handel · wellness/spiritualitet (Wicca)
 **Designfilosofi:** Material Design 3, tilpasset med Material Theming (egen palet, typografi og former)
 **Stemning:** organisk, rolig og mystisk: bløde runde former, jordfarver, masser af luft og ét stærkt lilla accent
-**Stack:** PHP 8 + MySQL og ren CSS (`@layer`). Ingen frameworks, ingen CDN'er, ingen JS-biblioteker, ingen ikon-fonte. JavaScript kun i små, egne stykker, hvor CSS ikke kan (se "Ændret efter designkritikken").
+**Stack:** PHP 8 + MySQL og ren CSS (`@layer`). Ingen frameworks, ingen CDN'er, ingen JS-biblioteker, ingen ikon-fonte. JavaScript kun i små, egne stykker, hvor CSS ikke kan: `assets/js/site.js` (cachet, `defer`) på alle sider, og små inline-scripts på produktlisten og produktsiden. Alt virker uden JavaScript.
 **Design-dials** (svarer til skillets dials): Variance 3/10 (centreret/rolig) · Motion 3/10 (diskrete mikrointeraktioner) · Density 3/10 (luftig)
 
 ---
@@ -130,19 +130,20 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 - Fallbacks: `--font-brand: "Cinzel", "Lora", Georgia, serif`, `--font-serif: "Lora", Georgia, serif` og `--font-sans: "Raleway", system-ui, sans-serif`.
 - `font-variant-numeric: lining-nums` på `body`. Raleways standardtal er gammeldags tal.
 - Raleway har ingen tabeltal, så tal i tabelkolonner højrestilles.
-- Brug ikke Raleway under vægt 400. Brug ikke kursiv Lora.
+- Brødtekst er Raleway **450** (variabel font, gratis): lidt mere sværtning på Pergament end 400. Brug ikke Raleway under vægt 400. Brug ikke kursiv Lora.
+- Skalaen har tydelige trin (ca. 1,2 imellem), ikke fem størrelser inden for 3px.
 - `text-wrap: balance` på overskrifter og `text-wrap: pretty` på afsnit.
 
 | Rolle | Klasse | Font | Størrelse / linjehøjde | Brug |
 |---|---|---|---|---|
 | brand | `.wordmark` | Cinzel 600 | 1.375rem (navbar) til 2rem (log ind), +0.04em | wordmarket "Veneficia", statuskoder |
-| display | `.type-display` | Lora 600 | `clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem)` / 1.08 | forsidens h1 |
-| headline-large | `.type-headline-large` (h1) | Lora 600 | `clamp(1.875rem, 1.4rem + 1.8vw, 2.5rem)` / 1.15 | sidens h1 |
-| headline-medium | `.type-headline-medium` (h2) | Lora 600 | `clamp(1.5rem, 1.25rem + 1vw, 1.875rem)` / 1.2 | h2 |
-| title-large | `.type-title-large` (h3) | Lora 600 | 1.25rem / 1.3 | h3 og kortoverskrifter |
-| title-medium | `.type-title-medium` | Lora 600 | 1.0625rem / 1.35 | produktnavne på kort |
-| body-large | `.type-body-large` | Raleway 400 | 1.0625rem / 1.7, maks 68ch | produktbeskrivelser |
-| body | (standard) | Raleway 400 | 1rem / 1.6 | standard |
+| display | `.type-display` | Lora 600 | `clamp(2.5rem, 1.6rem + 3.6vw, 4rem)` / 1.08 | forsidens h1 |
+| headline-large | `.type-headline-large` (h1) | Lora 600 | `clamp(2rem, 1.5rem + 2vw, 2.75rem)` / 1.15 | sidens h1 |
+| headline-medium | `.type-headline-medium` (h2) | Lora 600 | `clamp(1.5rem, 1.25rem + 1vw, 2rem)` / 1.2 | h2 |
+| title-large | `.type-title-large` (h3) | Lora 600 | 1.375rem / 1.3 | h3 og kortoverskrifter |
+| title-medium | `.type-title-medium` | Lora 600 | 1.125rem / 1.35 | prisen på produktkort (Raleway 700) |
+| body-large | `.type-body-large` | Raleway 450 | 1.125rem / 1.7, maks 68ch | produktbeskrivelser |
+| body | (standard) | Raleway 450 | 1rem / 1.6 | standard, produktnavne på kort (Lora 600) |
 | label-large | `.type-label-large` | Raleway 600 | 0.9375rem / 1.2, +0.01em | knapper og chips |
 | label-medium | `.type-label-medium` | Raleway 500 | 0.875rem / 1.4 | meta, brødkrummer, lagerstatus |
 
@@ -232,7 +233,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 - Side-CSS (`homepage.css`, `products.css`, `usermgnt.css`, `statusCodePage.css`, `admin.css`) ligger i `@layer pages`.
 - **Al CSS ligger i et lag.** CSS uden lag vinder ellers over alt.
 - Hold specificiteten lav med `:where()`, og brug klassenavne i kebab-case.
-- Budget: `mainStyle.css` < ca. 42 kB, hver side-CSS < ca. 15 kB (uminificeret). `admin.css` må fylde ca. 20 kB, fordi kun personalet henter den.
+- Budget (uminificeret): `mainStyle.css` < ca. 46 kB (søgning, købsbjælke og kort kom med i analysen), `products.css` < ca. 20 kB, andre side-CSS < ca. 15 kB, `admin.css` ca. 20 kB (kun personalet). Komprimeret af serveren er det ca. en femtedel.
 
 ---
 
@@ -302,7 +303,7 @@ Logoet er Augusts tegning: et pentagram med månens faser i en ramme af to firka
 | **Tekstfelter** | `.field`, `input`, `select`, `textarea` | M3 outlined: label over feltet, 48px, Lærred, 1px Oliven, radius 8. Hover Nattegrøn kant. Fokus 2px Ametyst (via `box-shadow`, intet layout-skift). `:user-invalid` giver Fejl-kant + hjælpetekst. Påkrævet markeres via `:has(:required)`. `<select>` med egen pil. Antalsfelt ca. 5,5rem. | formularer |
 | **Checkbox/radio** | `.check` | `accent-color`, 20px, hele labelrækken er klikbar og ≥ 44px høj | kasse, log ind, opret |
 | **Chips** | `.chip` (+ `[aria-current]`, `:checked`) | 36px, fuldt runde, 1px Oliven. Assist/link: Lærred + Nattegrøn. Valgt/aktuel: Ametystskær + Ametyst + check-ikon. | tags, kategorier, varianter |
-| **Produktkort** | `ul.product-grid` > `li.product-card` > `.media-frame` (+ `--empty`), `.product-card__body` > `__category`, `__name` > `a.product-card__link`, `__price`, `.stock` | M3 outlined → elevated ved hover. Lærred, Sand-kant, radius 16. 1:1-billede i `.media-frame`, kategori (label-medium, kan mangle), navn i title-medium, pris Raleway 600, lagerstatus med prik + tekst. Hele kortet klikbart (`.product-card__link::after`), fokusring på kortet via `:has(.product-card__link:focus-visible)`. Skyggen ligger på `::before`, så kun dens opacity animeres. Hover: elevation 2, `translateY(-2px)`, billede `scale(1.03)`. Kategorien står som label-medium med almindelige bogstaver. | produktliste |
+| **Produktkort** | `productCard()` i `assets/php/products.php` → `li.product-card` (+ `--compact` uden billede, `--soldout`) > `.media-frame` eller `.product-card__icon` (kategoriens ikon i en lille bue), `.product-card__body` > `__category`, `__name`, `__price`, `.stock` | Samme kort overalt (liste, forside, produktside, tom kurv). Navn Lora 16px, pris Raleway 18px 700 med tabeltal, "20 kr." uden ",00" (`formatPriceShort()`). Uden billede: kompakt kort (ca. 45 % lavere). Udsolgt: billedet mister farven, teksten siger "Udsolgt". Hele kortet er klikbart, løft ved hover | liste, forside, produktside, kurv |
 | **Lagerstatus** | `.stock` + `--in` / `--out` | prik + tekst (label-medium). "På lager" Succes, "Udsolgt" rolig Oliven | kort, produktside |
 | **Bannere** | `.banner` + `--info` `--success` `--error`, `[role=status]`, `[role=alert]`, `.auth-error`, `.admin-success` | Radius 12, ikon + tekst, Nattegrøn brødtekst. Info: Ametystskær. Succes: success-container. Fejl: error-container + 4px venstrekant. | beskeder overalt |
 | **Tabeller** | `.data-table`, `.table-scroll` | Styres af en **container query**: Er tabellens container under 600px, bliver rækkerne til kort (`data-label` + `::before`). Ellers vises en tabel med højrestillede tal (`.num`) og total i `tfoot` (`.total-row`, Lora 600 1.25rem). Containerne er `main`, `.basket-lines`, `.summary` og `.card`, så tabellen i kassens smalle oversigt også stables. | kurv, kasse, bekræftelse, varianter |
@@ -314,7 +315,13 @@ Logoet er Augusts tegning: et pentagram med månens faser i en ramme af to firka
 | **Købsboks** | `.product-add` | Lærred-kort, Sand-kant, radius 16. Varianter som radio-chips i `<fieldset>`, antal, "Læg i kurv" (filled `--large` `--block`). | produktside |
 | **Månefaser** | `.moon-phases` > `svg.moon-phases__phase` (+ `--today`) | otte faser, dagens 36px i Lavendel med glød, resten 20px dæmpede, `aria-hidden` (teksten ved siden af siger fasen) | forside (hero), styleguide |
 | **Dialog** | `dialog.dialog` | radius 28, elevation 3, scrim. *(kommende: mersalg ved kassen)* | styleguide |
-| **Sendt-knap** | `button[aria-busy="true"]` | Scriptet i `header.php` sætter `aria-busy` på knappen, der sendte formularen. Den får en snurrende ring efter teksten (stille ved reduced motion), og formularen kan ikke sendes to gange. Frigives efter 10 s og ved tilbage-knappen | alle formularer |
+| **Søgning** | `form.nav-search[role=search]` (top app bar, i skuffen på mobil), `form.list-search` (produktlisten), `ul.search-suggestions` | Søger i navn, beskrivelse og kategori (`productSearchWhere()`, `/products?q=`). Mens man skriver: op til seks forslag fra `/searchSuggestions` som links under feltet (pil ned ind i listen, Esc lukker, antallet læses op) | alle kundesider |
+| **Liste-værktøjer** | `.list-tools` > `.chip` "Kun på lager" + `nav.list-sort` | Links, ét tryk hver: "Kun på lager" (`?lager=1`) og sortering (Anbefalet, Nyeste, Billigst først, Dyrest først). Anbefalet: på lager, så med billede, så nyeste. Kategori-chips, sider og søgning beholder filtrene | produktlisten |
+| **Købsbjælke** | `.buy-bar[data-sticky-for="knap-id"]` | Fast i bunden på mobil, mens den rigtige knap ikke er synlig (`site.js`): navn eller "Total", prisen og knappen (`form="…"`). Uden JS ingen bjælke. Fra 840px skjult | produktside, kassen |
+| **Købsfakta** | `ul.buy-facts` | Under "Læg i kurv": GLS Pakkeshop og fragten for den valgte variant (`shippingPriceFor()`) | produktside |
+| **Adgangskodefelt** | `.password-field` + `.password-toggle` | `site.js` lægger en "Vis"/"Skjul"-knap ind i hvert adgangskodefelt | log ind, opret, admin |
+| **Årets hjul** | `svg.wheel` + `ol.wheel-list` (`.wheel-section.on-secondary`) | De otte højtider placeret efter dato på en cirkel (1. januar øverst), sæsonen indtil nu som en Lavendel-bue, i dag som en prik, den næste fremhævet med glød. Listen ved siden af er indholdet (hjulet er `aria-hidden`) | forsiden |
+| **Sendt-knap** | `button[aria-busy="true"]` | `site.js` sætter `aria-busy` på knappen, der sendte formularen. Den får en snurrende ring efter teksten (stille ved reduced motion), og formularen kan ikke sendes to gange. Frigives efter 10 s og ved tilbage-knappen | alle formularer |
 | **Admin-sidebjælke** | `adminBar.php`: `.admin-topbar` + `nav#admin-menu.admin-nav[popover]` > `.admin-nav__head`, `.admin-menu` (`.admin-menu__label` + `.nav-list` > `.nav-link`), `.admin-account` | Mosgrøn, 272px, sticky i fuld højde fra 840px. Under 840px en skuffe fra en topbar (Popover API). Tre grupper: Butik (Overblik, Ordrer, Varer, Kategorier, Rabatkoder), Site (Sitemap, Se butikken), Konto (Medarbejdere, Skift adgangskode). Punkter 44px, 4px imellem, ikon + tekst. Aktiv: lavendel pille. Ordrer har et badge med betalte ordrer. Nederst: initial, brugernavn og "Log ud" | alle admin-sider |
 | **Ordrestatus** | `.status` + `--paid` `--packed` `--shipped` `--delivered` `--soldout` | Ordet i en pille med en prik. Betalt: Ametystskær/Ametyst (den eneste i handlingsfarven, for den skal pakkes). Pakket: Sand/Nattegrøn. Afsendt: success-container/Succes. Leveret: Oliven-kant og -tekst. Udsolgt: error-container/Fejl | admin |
 | **Nøgletal** | `.stat` (+ `--attention`) > `__label` `__value` `__note` | Lærred-kort, label, tallet i Lora headline-large, en note (fx "12 % flere end de 30 dage før"). Det ene tal, der kræver handling, får Ametyst-kant og Ametystskær | admin-overblik |
@@ -329,9 +336,9 @@ Logoet er Augusts tegning: et pentagram med månens faser i en ramme af to firka
 
 | Side | Fil → CSS | Mønster |
 |---|---|---|
-| Forside | `index.php` → `homepage.css` | Hero (Blender-renderet på Nattegrøn, `.on-secondary`, se *Hero-render*): display-h1, én linje, primærknap "Se alle produkter" + outlined "Find en kategori", dagens månefase → "Find en kategori" (enkel liste af links, ikon i lille bue, ingen kort) → "Godt at vide, før du handler" (`<dl>`: fragtpriser fra `SHIPPING_RATES`, beskrivelser, konto, rabatkode) |
-| Produktliste/kategori | `products.php` → `products.css` | Brødkrumme, h1, beskrivelse (body-large), kategori-chips, gitter 2/3/4, paginering, tom tilstand, tag-filter som valgt chip |
-| Produktside | `product.php` → `products.css` | `.product-layout`: galleri (7/12) + sticky info. Compact: vandret galleri, 88 % bredde. Info: brødkrumme, h1, pris, lager, købsboks. Nederst: Beskrivelse, Varianter (tabel), Tags |
+| Forside | `index.php` → `homepage.css` | Hero (renderet, display-h1, to knapper, dagens månefase og næste højtid) → **varer** ("Til fuldmånen" osv. når varer har fasens tag, ellers "Fra butikken": 8 i anbefalet rækkefølge) → **Årets hjul** (mosgrønt bånd: hjulet, den næste højtid, de otte kommende, og varer med højtidens tag) → "Find en kategori" → "Godt at vide" |
+| Produktliste/kategori | `products.php` → `products.css` | Brødkrumme, h1 (eller "Søgning: „…“"), beskrivelse, kategori-chips ("Andet" sidst), søgefelt (mobil, og i en kategori), liste-værktøjer, gitter 2/3/4 med kompakte kort uden billede, paginering, tom tilstand der foreslår næste skridt |
+| Produktside | `product.php` → `products.css` | `.product-layout`: galleri (7/12) + sticky købsboks. Pris, lager ("Kun 3 på lager" ved 5 eller færre) og fragt følger den valgte variant. Købsfakta under knappen. Beskrivelse og tags under. "Mere fra kategorien" (4 kort). Købsbjælke på mobil. Ingen varianttabel (det står i chips og lagerlinjen) |
 | Kurv | `basket.php` → `products.css` | Trin 1, varelinjer (`.basket-lines`) + sticky opsummeringskort (`.summary`) med "Gå til kassen" (filled `--block`) og "Fortsæt med at handle". "Opdater" er tonal, og "Fjern" er en text-knap med ikon. Begge har varens navn som skjult tekst for skærmlæsere. |
 | Kasse | `checkout.php` → `products.css` | Trin 2. Fejlopsummeringen står øverst (`role="alert"`, `tabindex="-1"`, `autofocus`). `<aside class="summary">` med ordreoversigt og rabatkode står først i DOM'en, så ordren læses før man bestiller (og står først på mobil). Fra 840px står leveringsformularen til venstre og oversigten til højre. Totalen gentages lige over knappen **"Bestil og betal"**. En godkendt rabatkode giver et succesbanner med "magisk støv" (`.magic-dust`, 600ms, kun opacity og transform). |
 | Ordrebekræftelse | `ordreConfimation.php` → `products.css` | Trin 3, bue med måne, "Tak for din ordre, navn!", ordrenummer i Lora, kort med levering + varer, "Shop videre". `@media print` |
@@ -451,6 +458,35 @@ August sendte syv opslag om UI. Her er pointerne, og hvor de er brugt. Det meste
 | Bento-gitter (davidm_ai) | `grid-template-areas`, der skifter med bredden | Admin-overblikket, med container queries, fordi sidebjælken ændrer pladsen |
 | Admin-dashboard (paulcodes4) | Sidebjælke med grupper og badges, hilsen, hurtige handlinger, nøgletal med udvikling, graf, liste over nyeste ordrer | Hele det nye admin. Uden glas-effekt, mørk tilstand og løft ved hover: det strider mod stilen og anti-mønstrene |
 
+## Ændret efter UX-analysen (2026-11-27)
+
+En analyse af live-sitet fandt, at butikken så professionel ud, men ikke solgte: 74 varer, 5 med billede og 1 på lager, så side 1 var 48 ens udsolgte pladsholdere. Forsiden viste ingen varer, og der var ingen søgning.
+
+| Før | Nu | Hvorfor |
+|---|---|---|
+| Nyeste først, udsolgte øverst | "Anbefalet": på lager, så med billede, så nyeste. Plus sortering og "Kun på lager" | Det, man kan købe, står først |
+| 48 ens kvadratiske pladsholdere | Kompakte kort uden billede, udsolgte billeder uden farve | Mindre "mur", tydeligere hvad der kan købes |
+| Ingen søgning | Søgefelt i navbaren og skuffen, på produktlisten, med forslag mens man skriver | Den hurtigste vej til en bestemt vare |
+| Kategorier kun på produktlisten, "Andet" først | Kategorier med ikoner i mobilskuffen, "Andet" sidst | Navigation hvor man leder (Jakob), det mindst sigende sidst |
+| "Log ind" og "Opret konto" i menuen | Kun "Log ind" (log ind-siden linker til opret) | Færre valg i menuen (Hick) |
+| Ingen varer på forsiden | Varer lige under hero'en, styret af månefasens tag | Et klik mindre til noget at købe, og signaturen bliver en salgsmotor |
+| Ingen sæsoner | **Årets hjul** med de otte højtider og varer med højtidens tag | Wicca lever i årets cyklus (se *Sæsoner*) |
+| "Fra 50,00 kr." uanset valgt variant, varianttabel under | Pris, lager og fragt følger varianten. Ingen tabel | Det, man ser, er det, man får |
+| Intet om levering i købsboksen | GLS Pakkeshop og fragtprisen under knappen | Fragt er en af de største grunde til at forlade en kurv |
+| "Læg i kurv" under første skærm på mobil | Købsbjælke i bunden | Fitts: knappen er altid inden for rækkevidde |
+| Kassen: tre rækker pr. vare, knappen ved 2096px | Én linje pr. vare og en bjælke med total og "Bestil og betal" | Kortere vej på mobil |
+| Tom kurv er en blindgyde | 4 varer under | Ikke en blindgyde |
+| "Gentag adgangskode" uden mulighed for at se den | "Vis"/"Skjul" i feltet, mindre logo på mobil | Færre tastefejl, formularen starter i første skærm |
+| Skala med 14/15/16/17/17/20px, pris i brødtekst-størrelse | Tydelige trin, pris 18px 700, brødtekst 450 | Hierarki |
+| Ingen kontaktoplysninger | Felter i `footer.php`, der vises, når de er udfyldt | Lovkrav og tillid. **Skal udfyldes af jer** |
+
+**Ikke lavet (kræver beslutninger, backend eller indhold):** køb som gæst (ordrer kræver en kunde i databasen), MobilePay (kræver en aftale), valg af Pakkeshop (kræver GLS' API), anmeldelser (ingen måde at skrive dem på endnu), betalingslogoer (betalingen er ikke valgt), "Om Veneficia", fortrydelsesret i handelsbetingelserne (lovkrav), produktbilleder og oprydning af testvarer.
+
+### Sæsoner (Wicca)
+- **Årets hjul** (`assets/php/seasons.php`): Samhain (31/10), Yule (vintersolhverv), Imbolc (1/2), Ostara (forårsjævndøgn), Beltane (1/5), Litha (sommersolhverv), Lughnasadh (1/8), Mabon (efterårsjævndøgn). Solhverv og jævndøgn regnes ud (Meeus, inden for ca. en halv time), resten har faste datoer.
+- **Varer til en højtid:** tag varen med højtidens navn i små bogstaver (`yule`, `samhain`, `beltane` …). Den vises på forsiden, mens højtiden er den næste.
+- **Varer til månen:** tag med `nymåne`, `tiltagende måne`, `fuldmåne` eller `aftagende måne`. De vises under hero'en i den fase.
+
 ## Pre-Delivery Checklist
 
 Gennemgået 2026-11-24 i Fase 7. Siderne er testet som statiske mockups, der spejler PHP-skabelonernes output, fordi PHP ikke var installeret. De rigtige PHP-sider er ikke kørt i en browser.
@@ -463,7 +499,7 @@ Gennemgået 2026-11-24 i Fase 7. Siderne er testet som statiske mockups, der spe
 - [x] Intet formidles kun med farve.
 - [x] Ingen vandret scroll ved 320px. Layoutet virker ved 360, 768, 1280 og 1440px og ved 200 % zoom.
 - [x] `prefers-reduced-motion` slår animationerne fra.
-- [x] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen JS-biblioteker (kun det lille chip-script i `products.php` og formular-scriptet i `header.php`).
+- [x] Ingen eksterne requests, to tekst-fontfamilier + Cinzel-subsettet, højst to preloads, CSS-budget overholdt, ingen JS-biblioteker (kun `assets/js/site.js` og de små inline-scripts på produktlisten og produktsiden).
 - [x] Billeder har `width`/`height`.
 - [x] Formularer har uændret `name`, `action`, `method` og CSRF, og al output er escaped.
 - [x] Skillets Quick Reference §1–9 (i `SKILL.md`) er gennemgået.

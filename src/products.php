@@ -1,7 +1,9 @@
 <?php
-// Every product in the shop, newest first, PRODUCTS_PER_PAGE at a time. /products?tag=sommer shows only the products
-// with that tag. /category-name (see categoryPagePath() and .htaccess) shows only the products in that category or one of
-// its subcategories, and takes ?tag= too. Products without any variants are left out, since they can't be bought.
+// Every product in the shop, PRODUCTS_PER_PAGE at a time. /products?tag=sommer shows only the products with that tag.
+// /category-name (see categoryPagePath() and .htaccess) shows only the products in that category or one of its
+// subcategories, and takes the same parameters. ?q= searches names, descriptions and categories, ?sort= picks one of
+// PRODUCT_SORTS (default: in stock first, then with a picture, then newest) and ?lager=1 hides sold-out products.
+// Products without any variants are left out, since they can't be bought.
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/session.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/assets/php/products.php';
 startSession(false);
@@ -14,6 +16,11 @@ if (mb_strlen($tag) > 50) {
     $tag = '';
 }
 $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => PRODUCTS_MAX_PAGE]]) ?: 1;
+$search = is_string($_GET['q'] ?? null) ? mb_substr(trim(preg_replace('/\s+/u', ' ', $_GET['q']) ?? ''), 0, 100) : '';
+$sort = is_string($_GET['sort'] ?? null) && isset(PRODUCT_SORTS[$_GET['sort']]) ? $_GET['sort'] : PRODUCT_SORT_DEFAULT;
+$inStockOnly = ($_GET['lager'] ?? '') === '1';
+// The filters every link on the page keeps (category chips, sort, pages)
+$listFilters = ['q' => $search, 'sort' => $sort, 'lager' => $inStockOnly ? '1' : null];
 
 $db = getDb();
 $categories = loadShopCategories($db);
@@ -36,50 +43,32 @@ if ($requestPath !== '/products' && $requestPath !== '/products/') {
     }
     // /Toej or /toej/ moves to /toej, so each category has one URL
     if ($requestPath !== $wanted) {
-        header('Location: ' . productsUrl($tag, $page, $wanted), true, 301);
+        header('Location: ' . productsUrl($tag, $page, $wanted, $listFilters), true, 301);
         exit;
     }
 }
 $category = $categoryId !== null ? $categories[$categoryId] : null;
 $listPath = $category['path'] ?? '/products';
 
-// One row more than a page is fetched, so we know whether there is a next page without a separate COUNT query
-$sql = 'SELECT i.itemId, i.itemName, MIN(v.varriantPrice) AS minPrice, MAX(v.varriantPrice) AS maxPrice, SUM(v.inventoryCount) AS stock,
-               MIN(pc.categoryName) AS categoryName
-        FROM VeneficiaItems i ' . PRODUCT_CATEGORY_JOIN . ' JOIN VeneficiaItemVariants v ON v.itemId = i.itemId';
+$where = [];
 $params = [];
 if ($tag !== '') {
-    $sql .= ' JOIN VeneficiaItemTags it ON it.itemId = i.itemId JOIN VeneficiaTags t ON t.tagId = it.tagId AND t.tagName = ?';
+    $where[] = 'EXISTS (SELECT 1 FROM VeneficiaItemTags it JOIN VeneficiaTags t ON t.tagId = it.tagId WHERE it.itemId = i.itemId AND t.tagName = ?)';
     $params[] = $tag;
 }
 if ($categoryId !== null) {
     // The category or any of its subcategories. Each id is bound as a JSON value ("5"), like /admin/categories does.
     $ids = categoryWithDescendants($categories, $categoryId);
-    $sql .= ' WHERE (' . implode(' OR ', array_fill(0, count($ids), "JSON_CONTAINS(i.itemOptions->'$.categories', ?)")) . ')';
+    $where[] = '(' . implode(' OR ', array_fill(0, count($ids), "JSON_CONTAINS(i.itemOptions->'$.categories', ?)")) . ')';
     array_push($params, ...array_map('strval', $ids));
 }
-$sql .= ' GROUP BY i.itemId ORDER BY i.itemId DESC LIMIT ' . (PRODUCTS_PER_PAGE + 1) . ' OFFSET ' . (($page - 1) * PRODUCTS_PER_PAGE);
-$stmt = $db->prepare($sql);
-$stmt->execute($params);
-$products = $stmt->fetchAll();
+array_push($where, ...productSearchWhere($search, $params));
+
+// One row more than a page is fetched, so we know whether there is a next page without a separate COUNT query
+$products = loadProductCards($db, $where, $params, PRODUCT_SORTS[$sort][1], PRODUCTS_PER_PAGE + 1, ($page - 1) * PRODUCTS_PER_PAGE,
+    $inStockOnly ? 'SUM(v.inventoryCount) > 0' : '');
 $hasNext = count($products) > PRODUCTS_PER_PAGE;
 $products = array_slice($products, 0, PRODUCTS_PER_PAGE);
-
-// The first image of each product on this page, in one query
-$images = [];
-if ($products) {
-    $ids = array_map('intval', array_column($products, 'itemId'));
-    $stmt = $db->prepare(
-        'SELECT ia.itemId, a.fileUrl, a.altText
-         FROM VeneficiaItemAttachments ia JOIN VeneficiaAttachments a ON a.attachmentId = ia.attachmentId
-         WHERE ia.itemId IN (' . implode(',', array_fill(0, count($ids), '?')) . ')
-         ORDER BY ia.itemId, ia.sortOrder, a.attachmentId'
-    );
-    $stmt->execute($ids);
-    foreach ($stmt->fetchAll() as $row) {
-        $images[(int)$row['itemId']] ??= $row;
-    }
-}
 
 // The categories to browse into: the subcategories here, or the top level on /products
 $subcategories = array_filter($categories, fn($c) => $c['parent'] === $categoryId && $c['path'] !== null);
@@ -97,12 +86,16 @@ if (!$subcategories && $category !== null) {
 }
 $navSection = 'products';
 
-// A page past the end (or an unknown tag) has nothing to show. An empty category is still a real page, just noindex.
-if (!$products && ($page > 1 || $tag !== '')) {
+// A page past the end (or an unknown tag) has nothing to show. An empty category or search is still a real page.
+if (!$products && ($page > 1 || $tag !== '') && $search === '' && !$inStockOnly) {
     http_response_code(404);
 }
+// A search, another sort or the stock filter is a view of the same list: search engines get the list itself
 $headerCanonicalPath = productsUrl($tag, $page, $listPath);
-$heading = $category['name'] ?? 'Produkter';
+$listIsFiltered = $search !== '' || $sort !== PRODUCT_SORT_DEFAULT || $inStockOnly;
+$heading = $search !== ''
+    ? 'Søgning: „' . $search . '“' . ($category !== null ? ' i ' . $category['name'] : '')
+    : ($category['name'] ?? 'Produkter');
 $title = $heading . ($tag !== '' ? ' med tagget ' . $tag : '') . ($page > 1 ? " - side $page" : '') . ' - Veneficia';
 if ($category !== null && $category['description'] !== '' && $tag === '') {
     $description = mb_strimwidth(preg_replace('/\s+/u', ' ', $category['description']), 0, 160, '…');
@@ -120,7 +113,7 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
     <meta name="description" content="<?= htmlspecialchars($description) ?>">
     <meta property="og:title" content="<?= htmlspecialchars($title) ?>">
     <meta property="og:description" content="<?= htmlspecialchars($description) ?>">
-    <?php if (!$products): ?>
+    <?php if (!$products || $listIsFiltered): ?>
         <meta name="robots" content="noindex">
     <?php endif; ?>
 </head>
@@ -131,7 +124,7 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
             <nav class="breadcrumbs" aria-label="Brødkrumme">
                 <ol>
                     <li><a href="/">Forside</a></li>
-                    <?php if ($category === null && $tag === ''): ?>
+                    <?php if ($category === null && $tag === '' && $search === ''): ?>
                         <li><span aria-current="page">Produkter</span></li>
                     <?php else: ?>
                         <li><a href="/products">Produkter</a></li>
@@ -145,27 +138,29 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
                         <?php endif; ?>
                         <?php if ($tag !== ''): ?>
                             <li><span aria-current="page">Tagget „<?= htmlspecialchars($tag) ?>“</span></li>
+                        <?php elseif ($search !== ''): ?>
+                            <li><span aria-current="page">Søgning</span></li>
                         <?php endif; ?>
                     <?php endif; ?>
                 </ol>
             </nav>
             <h1><?= htmlspecialchars($heading) ?><?= $tag !== '' ? ' med tagget „' . htmlspecialchars($tag) . '“' : '' ?></h1>
-            <?php if ($category !== null && $category['description'] !== '' && $page === 1): ?>
+            <?php if ($category !== null && $category['description'] !== '' && $page === 1 && $search === ''): ?>
                 <p class="category-description type-body-large"><?= nl2br(htmlspecialchars($category['description'])) ?></p>
             <?php endif; ?>
             <?php if ($tag !== ''): ?>
                 <p class="tag-filter">
                     <span class="chip" aria-current="true"><span class="visually-hidden">Viser tagget </span><?= htmlspecialchars($tag) ?></span>
-                    <a href="<?= htmlspecialchars($listPath) ?>">Vis alle <?= $category !== null ? 'i ' . htmlspecialchars($category['name']) : 'produkter' ?></a>
+                    <a href="<?= htmlspecialchars(productsUrl(null, 1, $listPath, $listFilters)) ?>">Vis alle <?= $category !== null ? 'i ' . htmlspecialchars($category['name']) : 'produkter' ?></a>
                 </p>
             <?php endif; ?>
 
             <?php if ($chipCategories): ?>
                 <nav class="category-list" id="kategorier" aria-label="Kategorier">
                     <ul class="chip-set">
-                        <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $chipAll['path'])) ?>"<?= $chipAll['current'] ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($chipAll['name']) ?></a></li>
+                        <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $chipAll['path'], $listFilters)) ?>"<?= $chipAll['current'] ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($chipAll['name']) ?></a></li>
                         <?php foreach ($chipCategories as $chipId => $chip): ?>
-                            <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $chip['path'])) ?>"<?= $chipId === $categoryId ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($chip['name']) ?></a></li>
+                            <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $chip['path'], $listFilters)) ?>"<?= $chipId === $categoryId ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($chip['name']) ?></a></li>
                         <?php endforeach; ?>
                     </ul>
                 </nav>
@@ -180,49 +175,61 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
                     })();
                 </script>
             <?php endif; ?>
+
+            <?php // Search in this list (on phones, and in a category; the top app bar searches the whole shop) ?>
+            <form class="list-search<?= $category !== null ? ' list-search--category' : '' ?>" method="get" action="<?= htmlspecialchars($listPath) ?>" role="search">
+                <?php if ($tag !== ''): ?>
+                    <input type="hidden" name="tag" value="<?= htmlspecialchars($tag) ?>">
+                <?php endif; ?>
+                <?php if ($sort !== PRODUCT_SORT_DEFAULT): ?>
+                    <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
+                <?php endif; ?>
+                <?php if ($inStockOnly): ?>
+                    <input type="hidden" name="lager" value="1">
+                <?php endif; ?>
+                <label for="list-q" class="visually-hidden">Søg i <?= $category !== null ? htmlspecialchars($category['name']) : 'produkterne' ?></label>
+                <input type="search" id="list-q" name="q" maxlength="100" placeholder="Søg i <?= $category !== null ? htmlspecialchars($category['name']) : 'produkterne' ?>" value="<?= htmlspecialchars($search) ?>">
+                <button type="submit" class="icon-button" aria-label="Søg"><?= uiIcon('search') ?></button>
+            </form>
+
+            <?php // The stock filter and the sort are links: one tap, no form, and the page's address says what you see ?>
+            <div class="list-tools">
+                <a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $listPath, array_merge($listFilters, ['lager' => $inStockOnly ? null : '1']))) ?>"<?= $inStockOnly ? ' aria-current="true"' : '' ?>>Kun på lager</a>
+                <nav class="list-sort" aria-label="Sortering">
+                    <ul class="chip-set">
+                        <?php foreach (PRODUCT_SORTS as $sortKey => [$sortLabel]): ?>
+                            <li><a class="chip" href="<?= htmlspecialchars(productsUrl($tag, 1, $listPath, array_merge($listFilters, ['sort' => $sortKey]))) ?>"<?= $sortKey === $sort ? ' aria-current="true"' : '' ?>><?= htmlspecialchars($sortLabel) ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
+            </div>
         </header>
 
         <?php if (!$products): ?>
             <div class="empty-state">
-                <span class="arch-icon"><?= uiIcon('category') ?></span>
-                <p class="type-title-large">Der er ingen produkter at vise</p>
-                <?php if ($category === null && $tag === '' && $page === 1): ?>
+                <span class="arch-icon"><?= uiIcon($search !== '' ? 'search' : 'category') ?></span>
+                <?php if ($search !== ''): ?>
+                    <p class="type-title-large">Ingen varer passer til „<?= htmlspecialchars($search) ?>“</p>
+                    <p>Prøv et andet eller kortere ord<?= $inStockOnly ? ', eller vis også de udsolgte' : '' ?>.</p>
+                    <a class="button" href="<?= htmlspecialchars($inStockOnly ? productsUrl($tag, 1, $listPath, array_merge($listFilters, ['lager' => null])) : '/products') ?>"><?= $inStockOnly ? 'Vis også udsolgte' : 'Se alle produkter' ?></a>
+                <?php elseif ($inStockOnly): ?>
+                    <p class="type-title-large">Intet er på lager her lige nu</p>
+                    <p>Se de udsolgte varer, eller kig i en anden kategori.</p>
+                    <a class="button" href="<?= htmlspecialchars(productsUrl($tag, 1, $listPath, array_merge($listFilters, ['lager' => null]))) ?>">Vis også udsolgte</a>
+                <?php elseif ($category === null && $tag === '' && $page === 1): ?>
+                    <p class="type-title-large">Der er ingen produkter at vise</p>
                     <p>Kig forbi igen snart.</p>
                     <a class="button" href="/">Til forsiden</a>
                 <?php else: ?>
+                    <p class="type-title-large">Der er ingen produkter at vise</p>
                     <p>Prøv en anden kategori, eller se alle produkterne.</p>
                     <a class="button" href="/products">Se alle produkter</a>
                 <?php endif; ?>
             </div>
         <?php else: ?>
             <ul class="product-grid">
-                <?php foreach ($products as $i => $product):
-                    $id = (int)$product['itemId'];
-                    $image = $images[$id] ?? null;
-                    $samePrice = (float)$product['minPrice'] === (float)$product['maxPrice'];
-                    $productInStock = (int)$product['stock'] > 0;
-                ?>
-                    <li class="product-card">
-                        <?php if ($image !== null): ?>
-                            <div class="media-frame">
-                                <img src="<?= htmlspecialchars($image['fileUrl']) ?>" alt="<?= htmlspecialchars($image['altText'] ?: $product['itemName']) ?>"
-                                     width="300" height="300" decoding="async" <?= $i < 4 ? 'fetchpriority="high"' : 'loading="lazy"' ?>>
-                            </div>
-                        <?php else: ?>
-                            <?php // No image yet: the category's icon stands in (decoration, the name says what it is) ?>
-                            <div class="media-frame media-frame--empty" aria-hidden="true"><?= uiIcon(categoryIcon($product['categoryName'])) ?></div>
-                        <?php endif; ?>
-                        <div class="product-card__body">
-                            <?php if ((string)$product['categoryName'] !== ''): ?>
-                                <p class="product-card__category"><?= htmlspecialchars($product['categoryName']) ?></p>
-                            <?php endif; ?>
-                            <h2 class="product-card__name">
-                                <a class="product-card__link" href="<?= htmlspecialchars(productUrl($id, $product['itemName'], $product['categoryName'])) ?>"><?= htmlspecialchars($product['itemName']) ?></a>
-                            </h2>
-                            <p class="product-card__price"><?= $samePrice ? '' : 'Fra ' ?><?= formatPrice($product['minPrice']) ?></p>
-                            <p class="stock<?= $productInStock ? ' stock--in' : '' ?>"><?= $productInStock ? 'På lager' : 'Udsolgt' ?></p>
-                        </div>
-                    </li>
+                <?php foreach ($products as $i => $product): ?>
+                    <?= productCard($product, $i) ?>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
@@ -230,11 +237,11 @@ if ($category !== null && $category['description'] !== '' && $tag === '') {
         <?php if ($page > 1 || $hasNext): ?>
             <nav class="pagination product-pages" aria-label="Sider">
                 <?php if ($page > 1): ?>
-                    <a class="button button--outlined" href="<?= htmlspecialchars(productsUrl($tag, $page - 1, $listPath)) ?>" rel="prev"><?= uiIcon('chevron-left', 'icon--20') ?>Forrige side</a>
+                    <a class="button button--outlined" href="<?= htmlspecialchars(productsUrl($tag, $page - 1, $listPath, $listFilters)) ?>" rel="prev"><?= uiIcon('chevron-left', 'icon--20') ?>Forrige side</a>
                 <?php endif; ?>
                 <span class="pagination__current">Side <?= $page ?></span>
                 <?php if ($hasNext): ?>
-                    <a class="button button--outlined" href="<?= htmlspecialchars(productsUrl($tag, $page + 1, $listPath)) ?>" rel="next">Næste side<?= uiIcon('chevron-right', 'icon--20') ?></a>
+                    <a class="button button--outlined" href="<?= htmlspecialchars(productsUrl($tag, $page + 1, $listPath, $listFilters)) ?>" rel="next">Næste side<?= uiIcon('chevron-right', 'icon--20') ?></a>
                 <?php endif; ?>
             </nav>
         <?php endif; ?>
