@@ -85,6 +85,7 @@
     --color-secondary: var(--palette-moss);
     --color-on-secondary: var(--palette-parchment);
     --color-secondary-accent: var(--palette-lavender);
+    --color-inverse-surface: var(--palette-night); /* the dark band under the homepage hero render (.on-secondary text) */
     --color-error: var(--palette-error);
     --color-on-error: var(--palette-white);
     --color-error-container: color-mix(in srgb, var(--palette-error) 10%, var(--palette-canvas));
@@ -232,8 +233,8 @@
     font-variant-numeric: lining-nums;
   }
 
-  /* The moss-green context (top app bar, footer, hero, admin bar): parchment text and lavender accents for
-     everything inside. Hover layers on moss only carry parchment text, never lavender (4.13:1). */
+  /* The dark context (top app bar, footer and admin bar on moss, the homepage hero on Nattegrøn): parchment text and
+     lavender accents for everything inside. Hover layers on moss only carry parchment text, never lavender (4.13:1). */
   .on-secondary {
     --ctx-text: var(--color-on-secondary);
     --ctx-text-muted: var(--color-surface-variant);
@@ -1016,19 +1017,7 @@
     border-bottom: 0;
   }
 
-  /* ---- The arch (signature shape). Only on a 4:5 box, so the top is an exact half circle. ---- */
-  .arch {
-    aspect-ratio: 4 / 5;
-    border-radius: var(--shape-arch);
-  }
-
-  .arch--glow {
-    background:
-      radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--color-secondary-accent) 34%, transparent),
-        color-mix(in srgb, var(--color-primary) 22%, transparent) 40%, transparent 70%),
-      var(--color-secondary);
-  }
-
+  /* ---- The arch (signature shape) around an icon. Only on a 4:5 box, so the top is an exact half circle. ---- */
   .arch-icon {
     display: grid;
     place-items: center;

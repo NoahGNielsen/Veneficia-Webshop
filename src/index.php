@@ -41,6 +41,14 @@ $homeDescription = 'Krystaller, røgelse, urter og bøger til din spirituelle pr
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/assets/php/navbar.php'; ?>
     <main id="indhold" class="homepage">
         <section class="hero on-secondary" aria-labelledby="hero-titel">
+            <div class="hero__media">
+                <?php // The Blender render (16:9, the crystal about two thirds across). A new render replaces it by
+                      // exporting the same two file names; ?v= makes browsers fetch it again. ?>
+                <img src="<?= htmlspecialchars($headerVersion('/assets/images/forside-1920.webp')) ?>"
+                     srcset="<?= htmlspecialchars($headerVersion('/assets/images/forside-1280.webp')) ?> 1280w, <?= htmlspecialchars($headerVersion('/assets/images/forside-1920.webp')) ?> 1920w"
+                     sizes="(max-width: 599px) 222vw, 100vw" width="1920" height="1080" fetchpriority="high"
+                     alt="Ametyst-krystaltårn på et alter med pentagram i en tåget skov ved levende lys">
+            </div>
             <div class="container hero__inner">
                 <div class="hero__text">
                     <h1 id="hero-titel" class="type-display">Redskaber til din spirituelle praksis</h1>
@@ -57,10 +65,6 @@ $homeDescription = 'Krystaller, røgelse, urter og bøger til din spirituelle pr
                         </div>
                         <p class="moon-today__text"><strong><?= MOON_PHASE_NAMES[$moonPhase] ?> i dag.</strong> <?= $moonNext ?></p>
                     </div>
-                </div>
-                <div class="hero__visual arch arch--glow">
-                    <?php // The hero visual. A Blender render replaces it by changing src only (keep it 4:5, alt="" since it's decoration). ?>
-                    <img src="/assets/images/obelisk.svg" alt="" width="400" height="500" fetchpriority="high">
                 </div>
             </div>
         </section>

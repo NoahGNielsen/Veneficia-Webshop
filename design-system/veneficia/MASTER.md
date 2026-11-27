@@ -41,11 +41,11 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 | Pergament | `#F5F0E6` | 60 %: sidebaggrund |
 | Lærred | `#FFFCF5` | 60 %: kort, felter og flader |
 | Sand | `#DED5C3` | 60 %: kun pynt (skillelinjer, dekorative kanter) |
-| Mosgrøn | `#3B4D2E` | 30 %: top app bar, footer, hero og billedbaggrunde |
+| Mosgrøn | `#3B4D2E` | 30 %: top app bar, footer og billedbaggrunde |
 | Ametyst | `#733B9B` | 10 %: primærknapper, links, fokus på lys bund, aktiv tilstand |
 | Ametystskær | `#EFE7F6` | 10 %-familien: tonale knapper, valgte chips, info-flader |
 | Lavendel | `#CFB8E8` | 10 % på mørk bund: links, fokus, knapper og badges på mosgrøn |
-| Nattegrøn | `#1F2619` | brødtekst og overskrifter |
+| Nattegrøn | `#1F2619` | brødtekst og overskrifter, og bunden under forsidens hero-render |
 | Oliven | `#5B6250` | sekundær tekst, feltkanter og chip-kanter |
 | Fejl | `#B3261E` | fejl |
 | Succes | `#297044` | succes og "på lager" |
@@ -63,12 +63,13 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 | `--color-primary-container` / `--color-on-primary-container` | Ametystskær / Ametyst | |
 | `--color-secondary` / `--color-on-secondary` | Mosgrøn / Pergament | |
 | `--color-secondary-accent` | Lavendel | accent på mosgrøn |
+| `--color-inverse-surface` | Nattegrøn | bunden under forsidens hero-render (M3 inverse surface). Teksten bruger `.on-secondary` |
 | `--color-error` / `--color-on-error` | Fejl / `#FFFFFF` | |
 | `--color-error-container` | `color-mix(Fejl 10 %, Lærred)` ≈ `#F7E7E0` | fejlbanner |
 | `--color-success` / `--color-on-success` | Succes / `#FFFFFF` | |
 | `--color-success-container` | `color-mix(Succes 12 %, Lærred)` ≈ `#E5EBE0` | succesbanner |
 
-**Kontekstvariabler (`--ctx-*`).** Komponenterne læser deres tekst-, link-, fokus- og knapfarve fra kontekstvariabler. `:root` sætter dem til lys bund. Klassen **`.on-secondary`** (bruges på navbar, footer, hero og admin-bar) sætter dem til mosgrøn bund. Så får alt indeni automatisk Pergament tekst og Lavendel accent.
+**Kontekstvariabler (`--ctx-*`).** Komponenterne læser deres tekst-, link-, fokus- og knapfarve fra kontekstvariabler. `:root` sætter dem til lys bund. Klassen **`.on-secondary`** (bruges på navbar, footer og admin-bar på Mosgrøn og på forsidens hero på Nattegrøn) sætter dem til mørk bund. Så får alt indeni automatisk Pergament tekst og Lavendel accent.
 
 | Variabel | Lys bund (`:root`) | Mosgrøn (`.on-secondary`) |
 |---|---|---|
@@ -82,7 +83,7 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 
 **60-30-10 i praksis**
 - **Ametyst (10 %)** bruges til det, man kan klikke på, og til den ene primære handling pr. skærm. Det bruges aldrig til pynt (Von Restorff).
-- **Mosgrøn (30 %)** rammer siden ind (navbar og footer), bærer forsidens hero og ligger bag produktbillederne.
+- **Mosgrøn (30 %)** rammer siden ind (navbar og footer) og ligger bag produktbillederne. Forsidens hero er selve renderet på Nattegrøn.
 - **Pergament og Lærred (60 %)** er resten.
 
 ### Kontrast (WCAG-formlen, rundet ned, genberegnet 2026-11-24)
@@ -105,6 +106,8 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 | Sand mod Pergament / Lærred | 1,28 / 1,42 | kun pynt, aldrig kant på et felt |
 | Pergament / Lærred på Mosgrøn | 8,08 / 8,96 | ✓ tekst på mosgrøn |
 | Sand på Mosgrøn | 6,30 | ✓ sekundær tekst på mosgrøn |
+| Pergament / Sand / Lavendel på Nattegrøn | 13,70 / 10,67 / 8,65 | ✓ hero-teksten under renderet (compact og medium) |
+| Pergament / Sand over hero-renderet med Nattegrøn-skyggen (værste pixel under teksten, 320–2560px) | 9,46 / 9,39 | ✓ målt pixel for pixel under hver tekstlinje (2026-11-27) |
 | Lavendel på Mosgrøn | 5,10 | ✓ links, fokusring og aktiv tilstand |
 | Nattegrøn på Lavendel / lavendel-hover `#C1ACD7` | 8,65 / 7,52 | ✓ knap og badge på mosgrøn |
 | Pergament på mosgrøn hover (8 % Pergament) `#4A5A3D` | 6,55 | ✓ nav-hover |
@@ -167,7 +170,7 @@ Kun lys tilstand. **Rå hex står kun i `:root`.** Komponenter bruger kun de sem
 | `--radius-lg` | 16px | kort, købsboks |
 | `--radius-xl` | 28px | dialoger og formular-kort (log ind) |
 | `--radius-full` | 999px | knapper, chips og badges |
-| **Buen** `--shape-arch` | `999px 999px var(--radius-lg) var(--radius-lg)` | **sparsomt:** hero-visual, kategori-ikoner og ordrebekræftelsen |
+| **Buen** `--shape-arch` | `999px 999px var(--radius-lg) var(--radius-lg)` | **sparsomt:** kategori-ikoner, tomme tilstande og ordrebekræftelsen (`.arch-icon`) |
 
 ### Elevation (skygger tonet i Nattegrøn, aldrig rent sort)
 
@@ -222,7 +225,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 ```
 @layer tokens, base, layout, components, pages, utilities;
 ```
-- `mainStyle.css`: tokens, base, layout, fælles komponenter og utilities. Komponenter, der bruges på flere slags sider: ikoner, skip-link, knapper, felter, chips, kort, produktkort, billedramme, lagerstatus, badge, bannere, tabel-basis, buen, månefaser, top app bar og footer.
+- `mainStyle.css`: tokens, base, layout, fælles komponenter og utilities. Komponenter, der bruges på flere slags sider: ikoner, skip-link, knapper, felter, chips, kort, produktkort, billedramme, lagerstatus, badge, bannere, tabel-basis, bue-ikonet, månefaser, top app bar og footer.
 - `products.css`: komponenter, der kun bruges på butikkens sider, som alle linker `products.css`: `.data-table`, trinindikator, brødkrummer, paginering og tom tilstand.
 - `styleguide.css`: kun `/styleguide`, plus de **kommende** komponenter (søgefelt, fri-fragt-bar og dialog). Når en af dem bygges, skal dens CSS flyttes til `mainStyle.css`.
 - Side-CSS (`homepage.css`, `products.css`, `usermgnt.css`, `statusCodePage.css`, `admin.css`) ligger i `@layer pages`.
@@ -253,10 +256,21 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 - **Pladsholder** for en vare uden billede: samme glød og **kategoriens ikon** (`categoryIcon()` i `assets/php/products.php`), ingen tekst. Den skal se bevidst ud, ikke som en fejl, og fortæller, hvad slags vare det er.
 - **Alt-tekst:** `altText` fra admin, ellers produktnavnet.
 
+### Hero-render (forsiden)
+- **Filer:** `src/assets/images/forside-1920.webp` og `forside-1280.webp` (16:9, 1920 × 1080 og 1280 × 720 px, WebP, højst ca. 100 kB). Et nyt render erstatter dem ved at blive eksporteret med samme filnavne. `?v=` får browserne til at hente det igen.
+- **Komposition:** hovedmotivet ca. to tredjedele inde fra venstre (krystallen står ved 67 %). Venstre halvdel skal være rolig og mørk, fordi teksten står der. Hold luft over og under motivet, for på brede skærme beskæres top og bund.
+- **Visning:**
+  - **Compact:** en 4:5-beskæring øverst med krystallen i midten (`object-position: 80%`). Den toner over i Nattegrøn, og teksten starter på det tonede stykke.
+  - **Medium:** hele renderet i 16:9 øverst.
+  - **Expanded:** renderet fylder båndet bag teksten. Båndet er højst skærmhøjden minus en stribe, så næste afsnit kan ses. En Nattegrøn-skygge går fra venstre (90 % → 0 % ved 66 %), og teksten holder sig inden for 48 % af bredden.
+- **Indlæsning:** `fetchpriority="high"`, `srcset` med 1280w og 1920w og `sizes="(max-width: 599px) 222vw, 100vw"`. På compact vises billedet 2,22 gange bredere end skærmen på grund af beskæringen.
+- **Alt-tekst:** "Ametyst-krystaltårn på et alter med pentagram i en tåget skov ved levende lys".
+- **Ingen zoom-animation og ingen tekst, der toner ind.** En uendelig zoom er bevægelse uden pauseknap (WCAG 2.2.2), og indtoning udskyder den største tekst (LCP).
+
 ### Signaturelementer (den røde tråd)
-1. **Buen** (shape-arch): hero-visual, kategori-ikoner og ordrebekræftelsen.
+1. **Buen** (shape-arch): kategori-ikoner, tomme tilstande og ordrebekræftelsen.
 2. **Dagens månefase:** månens otte faser på række (`moon-0` til `moon-7` i spriten, `aria-hidden`) med **dagens fase fremhævet** og en linje som "Tiltagende måne i dag. Fuldmåne om 5 dage." Kun i forsidens hero. `index.php` regner fasen ud fra datoen (præcis inden for ca. en dag). Det er sitets ene dristige element og henviser til, at månens cyklus er central i Wicca.
-3. **Ametyst-glød:** en radial gradient i Lavendel og Ametyst på Mosgrøn bag hero-visualet og produktbillederne. Den er et ekko af krystallerne, der lyser indefra.
+3. **Ametyst-glød:** en radial gradient i Lavendel og Ametyst på Mosgrøn bag produktbillederne og bue-ikonerne. Den er et ekko af krystallen i hero-renderet, der lyser indefra.
 4. **Papirstruktur:** SVG-støj (`--texture-paper`) på body'ens Pergament, højst ca. 3 % mørkere, så baggrunden læses som papir og ikke som flad creme. Kort og felter (Lærred) er glatte.
 
 ---
@@ -293,7 +307,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 
 | Side | Fil → CSS | Mønster |
 |---|---|---|
-| Forside | `index.php` → `homepage.css` | Hero (Mosgrøn, `.on-secondary`): display-h1, én linje, primærknap "Se alle produkter" + outlined "Find en kategori", dagens månefase, bue-visual med glød (SVG-obelisk, erstattes af en render ved at skifte `src`) → "Find en kategori" (enkel liste af links, ikon i lille bue, ingen kort) → "Godt at vide, før du handler" (`<dl>`: fragtpriser fra `SHIPPING_RATES`, beskrivelser, konto, rabatkode) |
+| Forside | `index.php` → `homepage.css` | Hero (Blender-renderet på Nattegrøn, `.on-secondary`, se *Hero-render*): display-h1, én linje, primærknap "Se alle produkter" + outlined "Find en kategori", dagens månefase → "Find en kategori" (enkel liste af links, ikon i lille bue, ingen kort) → "Godt at vide, før du handler" (`<dl>`: fragtpriser fra `SHIPPING_RATES`, beskrivelser, konto, rabatkode) |
 | Produktliste/kategori | `products.php` → `products.css` | Brødkrumme, h1, beskrivelse (body-large), kategori-chips, gitter 2/3/4, paginering, tom tilstand, tag-filter som valgt chip |
 | Produktside | `product.php` → `products.css` | `.product-layout`: galleri (7/12) + sticky info. Compact: vandret galleri, 88 % bredde. Info: brødkrumme, h1, pris, lager, købsboks. Nederst: Beskrivelse, Varianter (tabel), Tags |
 | Kurv | `basket.php` → `products.css` | Trin 1, varelinjer (`.basket-lines`) + sticky opsummeringskort (`.summary`) med "Gå til kassen" (filled `--block`) og "Fortsæt med at handle". "Opdater" er tonal, og "Fjern" er en text-knap med ikon. Begge har varens navn som skjult tekst for skærmlæsere. |
@@ -343,7 +357,7 @@ Bland "on"-farven (`--ctx-state` eller komponentens forgrund) ind i baggrunden m
 | `--motion`-dialens GSAP-snippets | Ren CSS | Ingen JS-biblioteker. |
 | `spring-physics` | M3's cubic-bezier-easing | Ren CSS uden JS. M3 easing er vores motion-system. |
 | Stack-råd (React, Tailwind osv.) | Springes over | Ingen af skillets stacks passer til ren PHP + vanilla CSS. |
-| *(prompten)* Hero-obelisken som inline SVG | `src/assets/images/obelisk.svg` vist med `<img alt="">` | En Blender-render kan senere erstatte den ved blot at skifte `src`, og filen caches. Den bruges også som demobillede i styleguiden. |
+| *(prompten)* Hero-obelisken som inline SVG i en bue | Augusts Blender-render fylder hele hero'en (se *Hero-render*). `obelisk.svg` er kun demobillede i styleguiden | Renderet viser butikkens stemning (skov, levende lys, ametyst) langt bedre end en tegning, og 16:9 passer ikke i en 4:5-bue |
 | *(prompten)* Brødkrummen inde i produktsidens info-kolonne | Brødkrummen står over hele `.product-layout` | På mobil står galleriet først. En brødkrumme under billedet ville se forkert ud, og øverst er hvor folk leder efter den (Jakobs lov). |
 | *(prompten)* Al fælles komponent-CSS i `mainStyle.css` | Butiksflowets komponenter i `products.css`, kommende i `styleguide.css` | Så holdes `mainStyle.css` på ca. 40 kB, og besøgende henter ikke CSS, de ikke bruger. |
 
@@ -387,6 +401,19 @@ En gennemgang med `frontend-design`-skillet fandt steder, hvor designet lignede 
 | Flad Pergament | Svag papirstruktur | Pergament læses som papir og ikke som generisk "AI-creme" |
 | Drawer med exit-animation | Lukker med det samme | Exit-overgangen på `display` fik drawer'en til at blinke, når vinduet krydsede 840px |
 | Ingen JavaScript | Ét lille inline-script i `products.php` | Scroller den aktive kategori-chip frem på mobil. Uden JS virker alt stadig, chippen er bare ikke i syne |
+
+## Hero-renderet (2026-11-27)
+
+August lavede renderet i Blender og sendte det med et forslag til en hero (`hero.html`). Her er, hvad der er brugt fra forslaget, og hvad der ikke er:
+
+| Forslaget | Her | Hvorfor |
+|---|---|---|
+| Renderet fylder hero'en, mørk skygge til venstre, billedet øverst på mobil og toner over i baggrunden | Brugt | Renderet er forsidens stærkeste billede. Skyggen giver mindst 9,39:1 under al tekst |
+| Google Fonts (Cinzel og EB Garamond) | Lora og Raleway (egne filer) | Ingen eksterne requests. Cinzel kun til brand-elementer |
+| Guld `#d9b26a` til knap og overline | Lavendel-knap (`.on-secondary`) | Guld er ikke i paletten. Lavendel gentager ametysten i renderet |
+| Overline "Månens krystal", "Ametyst", pris "xxx kr." og links til et ametysttårn | Forsidens egen tekst | Produktet og prisen findes ikke i databasen. Vi opdigter ikke indhold |
+| Uendelig zoom (22 s) og tekst, der toner ind | Udeladt | WCAG 2.2.2 (bevægelse over 5 s kræver en pauseknap) og LCP |
+| `<link rel="preload">` til billedet | `fetchpriority="high"` på `<img>` | Billedet står tidligt i HTML'en, så browseren finder det med det samme |
 
 ## Pre-Delivery Checklist
 
